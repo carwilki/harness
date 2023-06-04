@@ -18,9 +18,13 @@ class RaptorValidatorConfig(Validator,BaseModel):
     
 
 class RaptorValidator(Validator):
+    _raptor_job_id = 785268334432278
+    _token ="dapi80e895d3500c5b7b0f06ce6466e88d34"
+    _host = "https://3247751575194472.2.gcp.databricks.com/"
+    
     def validate(config:RaptorValidatorConfig)->Optional[int]:
-        JobsApi(ApiClient(host=host,token=token)).run_now(
-            job_id=raptor_job_id,
+        JobsApi(ApiClient(host=self._host,token=self._token)).run_now(
+            job_id=self._raptor_job_id,
             notebook_params={
                 "email_address":config.email_address,
                 "teams_cahnnel":config.teams_cahnnel,

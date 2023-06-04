@@ -1,30 +1,8 @@
-import uuid
-from enum import Enum
-from typing import Any, Optional
+from typing import Optional
 from pydantic import BaseModel
 
-
-class EnumBase(Enum):
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, Enum):
-            return self.value == other.value
-        return False
-
-
-class SnapshotSource(str, EnumBase):
-    jdbc = "jdbc"
-    rocky = "rocky"
-
-
-class RaptorConfig(BaseModel):
-    email_address: list[str]
-    teams_cahnnel: str
-    primary_key_list: list[str]
-    source_query: str
-    source_system_type: str
-    target_query: str
-    target_system_type: str
-    output_table_name_format: str
+from harness.config import RaptorConfig
+from harness.validator import validator_config
 
 
 class RockyConfig(BaseModel):
@@ -58,22 +36,4 @@ class RockyConfig(BaseModel):
     tidal_dependencies: list[str] = list(())
     tidal_trigger_condition: Optional[str] = None
     job_watchers: list[str] = list(())
-    raptor_config: RaptorConfig
-
-
-class SnapshotterConfig(BaseModel):
-    snapshot_name: Optional[str] = None
-    target_config: RockyConfig
-    pre_table_configs: list[RockyConfig] = list(())
-
-
-class SnapshotProperties(BaseModel):
-    rocky_id: int
-    version_number: int
-
-
-class Snapshot(BaseModel):
-    snapshot_id: str = uuid.uuid4().hex
-    snapshot_name: str
-    snapshot_config: SnapshotterConfig
-    
+    raptor_config: validator_config = RaptorConfig()
