@@ -6,7 +6,13 @@ from databricks_cli.sdk.api_client import ApiClient
 from databricks_cli.sdk.service import JobsService
 from harness.config.config import SnapshotConfig
 from harness.snaphotter.rocky.rocky_config import RockyConfig
+from harness.config.env import PetSmartEnvConfig
 
+spark = SparkSession.getActiveSession()
+host = PetSmartEnvConfig.workspace_url
+token = PetSmartEnvConfig.workspace_access_token
+api_client = ApiClient(host=host, token=token)
+jobs_service = JobsService(api_client)
 
 def insert_rocky_config(config: RockyConfig, spark: SparkSession):
     """This function inserts the rocky configuration into the rocky table
@@ -22,7 +28,7 @@ def insert_rocky_config(config: RockyConfig, spark: SparkSession):
     primary_key, initial_load_filter, load_frequency, load_cron_expr, tidal_dependencies,
     expected_start_time, job_watchers, max_retry, job_tag, is_scheduled,
     job_id, snowflake_ddl , tidal_trigger_condition , disable_no_record_failure , snowflake_pre_sql ,
-    snowflake_post_sql )
+    snowflake_post_sql)
     VALUES (
     {config.table_group},--table_group
     null,--table_group_desc
@@ -59,26 +65,61 @@ def insert_rocky_config(config: RockyConfig, spark: SparkSession):
 
     spark.sql(insert).collect()
 
-def strip_rocky_metadata(config: RockyConfig, spark: SparkSession):
-    """This function strips off the rocky speciffic metadata from the rocky table 
-    the data is then written to the target table
-    Args:
-        config (RockyConfig): the rocky configuration
-        spark (SparkSession): requires a spark session to function
-    """
-    spark.sql(f"select * from {config.rocky_target_db}.{config.rocky_target_table_name}")\
-        .drop("rocky_ingestion_metadata")\
-        .write.format("delta").mode("overwrite").saveAsTable(f"{config.target_db}.{config.target_table_name}")
 
-def execute_rocky_job(config: RockyConfig):
-    """This function executes the rocky job via service api call to retreive the data after
+def trigger_rocky_creation_job(config: RockyConfig, spark: SparkSession):
+    """This function triggers the rocky job via service api call to retreive the data after
     the job has been configured
 
     Args:
         config (RockyConfig): the rocky configuration
     """
     dbutils = DBUtils(spark)
-    api_client = ApiClient(host=dbutils.secrets.get(scope=config.scope, key=config.host_key),
-                           token=dbutils.secrets.get(scope=config.scope, key=config.token_key))
+
+    host = dbutils.secrets.get(scope=config.scope, key=config.host_key)
+    token = dbutils.secrets.get(scope=config.scope, key=config.token_key)
+    jobiid = dbutils.secrets.get(scope=config.scope, key=config.job_id_key)
+    if host is None or token is None:
+        raise ValueError("host or token is missing from the secrets store")
+
+    api_client = ApiClient(host=host, token=token)
+
     jobs_service = JobsService(api_client)
-    jobs_service.run_now(config.job_id)
+
+    jobs_service.run_now(job_id=jobiid)
+
+
+def strip_rocky_metadata(config: RockyConfig, spark: SparkSession):
+    """This function strips off the rocky speciffic metadata from the rocky table
+    the data is then written to the target table
+    Args:
+        config (RockyConfig): the rocky configuration
+        spark (SparkSession): requires a spark session to function
+    """
+    spark.sql(
+        f"select * from {config.rocky_target_db}.{config.rocky_target_table_name}"
+    ).drop("rocky_ingestion_metadata").write.format("delta").mode(
+        "overwrite"
+    ).saveAsTable(
+        f"{config.target_db}.{config.target_table_name}"
+    )
+
+
+def execute_rocky_job(config: RockyConfig, spark: SparkSession):
+    """This function executes the rocky job via service api call to retreive the data after
+    the job has been configured
+
+    Args:
+        config (RockyConfig): the rocky configuration
+    """
+
+    rocky_run_id = jobs_service.run_now(config.job_id)
+
+    return rocky_run_id
+
+
+def wait_for_run_compplete(rocky_run_id):
+    pass
+
+
+def wait_for_rocky_create_complete(run_id: int):
+    pass

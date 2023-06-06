@@ -10,7 +10,7 @@ class RockyConfig(SnapshotConfig, BaseModel):
     job_id: Optional[str] = None
     rocky_id: Optional[str] = None
     table_group: str = "NZ_Migration"
-    source_type: str = "NZ_Mako8"
+    source_type: str = "NZ_Mako4"
     source_db: str = "EDW_PRD"
     source_table: str
     target_sink: str = "delta"
