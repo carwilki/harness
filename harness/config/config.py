@@ -6,37 +6,35 @@ from pydantic import BaseModel
 
 from harness.utils.enumbase import EnumBase
 
+
 class ValidatorTypeEnum(EnumBase):
     raptor = "raptor"
-    
-class SourceConfig(BaseModel):
-    type:ValidatorTypeEnum
-    config:ValidatorConfig
-
-class TargetConfig(BaseModel):
-    type:ValidatorTypeEnum
-    config:ValidatorConfig
-
-class SnapshotConfig(SourceConfig,TargetConfig,BaseModel):
-    snapshot_name: Optional[str] = None
-    source: SourceConfig
-    source_inputs: dict[str,SourceConfig] = dict(())
-    target: TargetConfig
-    target_inputs: dict[str,TargetConfig] = dict(()) 
-    source_validator: Optional[ValidatorConfig] = None
-    source_validator_inputs: dict[str,ValidatorConfig] = dict(())
-       
 
 
-
-class SnapshotProperties(BaseModel):
-    rocky_id: int
-    version_number: int
+class SourceTypeEnum(EnumBase):
+    netezza = "netezza"
 
 
+class TargetTypeEnum(EnumBase):
+    delta = "delta"
 
 
 class ValidatorConfig(BaseModel):
-    def __init__(self, config):
-        self.type:ValidatorTypeEnum = config.type
-        self.config:ValidatorConfig = config
+    type: ValidatorTypeEnum
+    config: dict[str, Any]
+
+
+class SourceConfig(BaseModel):
+    config: dict[str, Any]
+
+
+class TargetConfig(BaseModel):
+    config: dict[str, Any]
+    validator: Optional[ValidatorConfig] = None
+
+
+class SnapshotConfig(SourceConfig, TargetConfig, BaseModel):
+    snapshot_name: Optional[str] = None
+    source: SourceConfig
+    source_inputs: dict[str, (SourceConfig, TargetConfig)] = dict(())
+    target_inputs: dict[str, (SourceConfig, TargetConfig)] = dict(())

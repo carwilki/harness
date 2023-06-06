@@ -1,12 +1,22 @@
 {
-    "files.watcherExclude": {
-        "**/target": true
+    "[python]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4  
     },
+    "python.formatting.provider": "black",
+    "python.analysis.typeCheckingMode": "off",
+    "python.envFile": "${workspaceFolder}/.databricks/.databricks.env",
+    "databricks.python.envFile": "${workspaceFolder}/.env",
+    "python.formatting.autopep8Args": [
+        "--ignore=E501"
+    ],
+    "flake8.args": [
+        "--max-line-length=120",
+        "--ignore=E402,F841,F401,E302,E305"
+    ],
     "python.testing.pytestArgs": [
         "tests"
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true,
-    "python.envFile": "${workspaceFolder}/.databricks/.databricks.env",
-    "databricks.python.envFile": "${workspaceFolder}/.env"
+    "python.testing.pytestEnabled": true
 }

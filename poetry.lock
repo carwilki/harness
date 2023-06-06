@@ -697,20 +697,6 @@ pandas-on-spark = ["numpy (>=1.15)", "pandas (>=1.0.5)", "pyarrow (>=1.0.0)"]
 sql = ["numpy (>=1.15)", "pandas (>=1.0.5)", "pyarrow (>=1.0.0)"]
 
 [[package]]
-name = "pyspark-gcs"
-version = "2.2.6.1"
-description = "pyspark with GCS batteries"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "pyspark_gcs-2.2.6.1-py3-none-any.whl", hash = "sha256:6a02c67be0c8eed5e609e6d3a3d56694756e2863385e5c2f84eefd80f0022679"},
-    {file = "pyspark_gcs-2.2.6.1.tar.gz", hash = "sha256:1fc96c42cb7fd57d2e3fa1a332050c90874ababe16518a270836071978ca748d"},
-]
-
-[package.dependencies]
-pyspark = "*"
-
-[[package]]
 name = "pytest"
 version = "7.3.1"
 description = "pytest: simple powerful testing with Python"
@@ -943,4 +929,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "7b155e4f3f48567af51665b9b994839ab20e77b76b4e4b4eb0a0d53b014328b0"
+content-hash = "dafe28c304fb0376bee85acfa9b57e26f2f89e42854830d99197023dd951c45c"
