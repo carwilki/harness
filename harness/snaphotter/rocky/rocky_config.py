@@ -1,12 +1,13 @@
 from typing import Optional
 from pydantic import BaseModel
+from harness.config.config import (
+    SourceConfig,
+    TargetConfig,
+    TargetTypeEnum,
+    ValidatorConfig,
+)
 
-from harness.config import RaptorConfig
-from harness.config.config import SnapshotConfig
-from harness.validator import validator_config
-
-
-class RockyConfig(SnapshotConfig, BaseModel):
+class RockySourceConfig(SourceConfig, BaseModel):
     job_id: Optional[str] = None
     rocky_id: Optional[str] = None
     table_group: str = "NZ_Migration"
@@ -28,3 +29,7 @@ class RockyConfig(SnapshotConfig, BaseModel):
     disable_no_record_failure: bool = True
     is_scheduled: bool = False
     job_watchers: list[str] = list(())
+
+
+class RockyTargetConfig(TargetConfig):
+    target_type = TargetTypeEnum.rocky

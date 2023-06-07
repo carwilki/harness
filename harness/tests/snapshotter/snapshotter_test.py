@@ -1,11 +1,8 @@
 from pytest import fixture
 from harness.config.config import SnapshotConfig
 from harness.snaphotter.snappshotter import Snapshotter
-from harness.tests.utils.generator import (
-    generate_snapshot_config,
-    generate_source_config,
-    generate_target_config,
-)
+from harness.tests.utils.generator import generate_snapshot_config
+
 from pyspark.sql import SparkSession
 
 

@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from harness.utils.enumbase import EnumBase
 from collections.abc import Sequence
 
+
 class ValidatorTypeEnum(EnumBase):
     raptor = "raptor"
 
@@ -15,6 +16,7 @@ class SourceTypeEnum(EnumBase):
 
 class TargetTypeEnum(EnumBase):
     delta = "delta"
+    rocky = "rocky"
 
 
 class ValidatorConfig(BaseModel, abc.ABC):
