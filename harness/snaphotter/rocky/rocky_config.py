@@ -6,6 +6,7 @@ from typing import Optional
 from pydantic import BaseModel
 from harness.config.config import (
     SourceConfig,
+    SourceTypeEnum,
     TargetConfig,
     TargetTypeEnum,
 )
@@ -14,16 +15,16 @@ from harness.config.config import (
 class RockySourceConfig(SourceConfig):
     """
     Defines a rocky source config to be used when the source type is rocky
-    
+
     Args:
         SourceConfig (_type_): Base class for source configs
         BaseModel (_type_): Base class for pydantic models
     """
-
+    source_type = SourceTypeEnum.rocky
     job_id: Optional[str] = None
     rocky_id: Optional[str] = None
     table_group: str = "NZ_Migration"
-    source_type: str = "NZ_Mako4"
+    source_db_type: str = "NZ_Mako4"
     source_db: str = "EDW_PRD"
     source_table: str
     target_sink: str = "delta"
@@ -48,7 +49,7 @@ class RockyTargetConfig(TargetConfig):
     Defines a rocky target config to be used when the target type is rocky
     this config is just really a place holder since the rocky target config is
     basically the same as the rocky source config + an options validator
-    
+
     Args:
         TargetConfig (_type_): base class for target configs
     """

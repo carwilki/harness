@@ -19,19 +19,20 @@ class TargetTypeEnum(EnumBase):
     rocky = "rocky"
 
 
-class ValidatorConfig(BaseModel, abc.ABC):
+class ConfigBase(BaseModel, abc.ABC):
+    config: dict[str, Any]
+
+
+class ValidatorConfig(ConfigBase, abc.ABC):
     validator_type: ValidatorTypeEnum
-    config: dict[str, Any]
 
 
-class SourceConfig(BaseModel, abc.ABC):
+class SourceConfig(ConfigBase, abc.ABC):
     source_type: SourceTypeEnum
-    config: dict[str, Any]
 
 
 class TargetConfig(BaseModel, abc.ABC):
     target_type: TargetTypeEnum
-    config: dict[str, Any]
     validator: Optional[ValidatorConfig] = None
 
 
