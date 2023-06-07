@@ -1,13 +1,12 @@
 from abc import abstractmethod
+from pyspark.sql import SparkSession
+from harness.config.config import ValidatorConfig
 
-from validator.ValidatorConfig import ValidatorConfig
 
-
-class Validatator:
+class Validator:
     def __init__(self, config: ValidatorConfig):
-        self.type = config.type
-        self.config = config.config
+        self.config = config
 
-    @abstractmethod()
-    def validate(self):
+    @abstractmethod
+    def validate(self, spark: SparkSession):
         pass

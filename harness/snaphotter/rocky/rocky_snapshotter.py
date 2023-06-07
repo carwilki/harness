@@ -87,6 +87,17 @@ def trigger_rocky_creation_job(config: RockyConfig, spark: SparkSession):
 
     jobs_service.run_now(job_id=jobiid)
 
+def execute_rocky_job(config: RockyConfig, spark: SparkSession):
+    """This function executes the rocky job via service api call to retreive the data after
+    the job has been configured
+
+    Args:
+        config (RockyConfig): the rocky configuration
+    """
+
+    rocky_run_id = jobs_service.run_now(config.job_id)
+
+    return rocky_run_id
 
 def strip_rocky_metadata(config: RockyConfig, spark: SparkSession):
     """This function strips off the rocky speciffic metadata from the rocky table
@@ -102,19 +113,6 @@ def strip_rocky_metadata(config: RockyConfig, spark: SparkSession):
     ).saveAsTable(
         f"{config.target_db}.{config.target_table_name}"
     )
-
-
-def execute_rocky_job(config: RockyConfig, spark: SparkSession):
-    """This function executes the rocky job via service api call to retreive the data after
-    the job has been configured
-
-    Args:
-        config (RockyConfig): the rocky configuration
-    """
-
-    rocky_run_id = jobs_service.run_now(config.job_id)
-
-    return rocky_run_id
 
 
 def wait_for_run_compplete(rocky_run_id):

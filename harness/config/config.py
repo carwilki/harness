@@ -1,11 +1,8 @@
-from abc import abstractclassmethod
-import uuid
-from enum import Enum
-from typing import Any, Optional
+import abc
+from typing import Any, Dict, Optional
 from pydantic import BaseModel
-
 from harness.utils.enumbase import EnumBase
-
+from collections.abc import Sequence
 
 class ValidatorTypeEnum(EnumBase):
     raptor = "raptor"
@@ -13,28 +10,30 @@ class ValidatorTypeEnum(EnumBase):
 
 class SourceTypeEnum(EnumBase):
     netezza = "netezza"
+    rocky = "rocky"
 
 
 class TargetTypeEnum(EnumBase):
     delta = "delta"
 
 
-class ValidatorConfig(BaseModel):
-    type: ValidatorTypeEnum
+class ValidatorConfig(BaseModel, abc.ABC):
+    validator_type: ValidatorTypeEnum
     config: dict[str, Any]
 
 
-class SourceConfig(BaseModel):
+class SourceConfig(BaseModel, abc.ABC):
+    source_type: SourceTypeEnum
     config: dict[str, Any]
 
 
-class TargetConfig(BaseModel):
+class TargetConfig(BaseModel, abc.ABC):
+    target_type: TargetTypeEnum
     config: dict[str, Any]
     validator: Optional[ValidatorConfig] = None
 
 
-class SnapshotConfig(SourceConfig, TargetConfig, BaseModel):
+class SnapshotConfig(BaseModel):
     snapshot_name: Optional[str] = None
-    source: SourceConfig
-    source_inputs: dict[str, (SourceConfig, TargetConfig)] = dict(())
-    target_inputs: dict[str, (SourceConfig, TargetConfig)] = dict(())
+    sources: dict[str, tuple[SourceConfig, TargetConfig]]
+    inputs: dict[str, tuple[SourceConfig, TargetConfig]]
