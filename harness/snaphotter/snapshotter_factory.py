@@ -1,7 +1,7 @@
 from typing import Optional
 from harness.config.config import SourceConfig, SourceTypeEnum
 from harness.snaphotter.rocky.rocky_snapshotter import RockySnapshotter
-from harness.snaphotter.snappshotter import Snapshotter
+from harness.snaphotter.snapshotter import Snapshotter
 
 
 class SnapshotterFactory:

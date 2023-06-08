@@ -1,13 +1,13 @@
-from harness.config.config import JobConfig
+from harness.config.config import HarnessJobConfig
 from harness.manager.manager_data import ManagerMetaData
 
 
-class HarnessManager:
+class HarnessJobManager:
     """
     Harness Manager is responsible for orchestrating the snapshotting process.
     """
 
-    def __init__(self, config: JobConfig):
+    def __init__(self, config: HarnessJobConfig):
         self.config = config
         self.metadata = ManagerMetaData()
 

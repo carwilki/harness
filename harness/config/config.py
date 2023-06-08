@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Optional
+from typing import Optional
 from pydantic import BaseModel
 from harness.utils.enumbase import EnumBase
 
@@ -37,7 +37,7 @@ class SnapshotConfig(BaseModel):
     validator: Optional[ValidatorConfig] = None
 
 
-class JobConfig(BaseModel):
+class HarnessJobConfig(BaseModel):
     id: str
     snapshot_name: Optional[str] = None
     sources: dict[str, SnapshotConfig]

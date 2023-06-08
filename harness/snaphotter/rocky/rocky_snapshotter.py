@@ -3,15 +3,12 @@ from pyspark.sql import SparkSession
 from functools import reduce
 from databricks_cli.sdk.api_client import ApiClient
 from databricks_cli.sdk.service import JobsService
-from harness.snaphotter.rocky.rocky_config import (
-    RockySnapshotConfig,
-    RockySourceConfig,
-    RockyTargetConfig,
-)
+from harness.snaphotter.rocky.rocky_config import RockySnapshotConfig
 from harness.config.env import PetSmartEnvConfig
+from harness.snaphotter.snapshotter import Snapshotter
 
 
-class RockySnapshotter:
+class RockySnapshotter(Snapshotter):
     def __init__(
         self,
         config: RockySnapshotConfig,

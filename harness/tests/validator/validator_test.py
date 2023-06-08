@@ -1,15 +1,5 @@
-from pytest import fixture
-from faker import Faker
-from faker.providers.python import Provider
-from harness.config.config import SnapshotConfig
-from harness.snaphotter.snappshotter import Snapshotter
-from harness.config.config import SourceConfig, SourceTypeEnum
-from harness.tests.utils.generator import (
-    generate_source_config,
-    generate_target_config,
-    generate_validator_config,
-)
 from pyspark.sql import SparkSession
+from harness.tests.utils.generator import generate_validator_config
 
 from harness.validator.validator import Validator
 

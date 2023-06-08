@@ -1,4 +1,4 @@
-from harness.snaphotter.snappshotter import Snapshotter
+from harness.snaphotter.snapshotter import Snapshotter
 from harness.tests.utils.generator import generate_snapshot_config
 
 from pyspark.sql import SparkSession

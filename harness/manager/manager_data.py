@@ -1,6 +1,6 @@
 from pyspark.sql import SparkSession
 
-from harness.config.config import JobConfig
+from harness.config.config import HarnessJobConfig
 
 
 class ManagerMetaData:
@@ -11,14 +11,14 @@ class ManagerMetaData:
         json = self.session.sql(
             f"""Select value from harnnes_metadata where id == {key}"""
         ).collect()
-        return JobConfig.parse_raw(json)
+        return HarnessJobConfig.parse_raw(json)
 
-    def create(self, value: JobConfig):
+    def create(self, value: HarnessJobConfig):
         self.session.sql(
             f"""Insert into harness_metadata values ({value.json()})"""
         ).collect()
 
-    def update(self, key, value: JobConfig):
+    def update(self, key, value: HarnessJobConfig):
         self.session.sql(
             f"""Update harness_metadata set value = {value.json()} where id == {key}"""
         ).collect()
