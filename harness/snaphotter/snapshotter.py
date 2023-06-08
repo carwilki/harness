@@ -3,7 +3,7 @@ from pyspark.sql import SparkSession
 from harness.config.config import SnapshotConfig
 
 
-class Snapshotter(abc.ABC):
+class AbstractSnapshotter(abc.ABC):
     def __init__(self, config: SnapshotConfig) -> None:
         self.config = config
 

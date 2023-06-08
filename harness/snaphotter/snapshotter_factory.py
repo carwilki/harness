@@ -1,7 +1,7 @@
 from typing import Optional
 from harness.config.config import SourceConfig, SourceTypeEnum
 from harness.snaphotter.rocky.rocky_snapshotter import RockySnapshotter
-from harness.snaphotter.snapshotter import Snapshotter
+from harness.snaphotter.snapshotter import AbstractSnapshotter
 
 
 class SnapshotterFactory:
@@ -14,7 +14,7 @@ class SnapshotterFactory:
     @classmethod
     def get_snapshotter(
         source_config: SourceConfig,
-    ) -> Optional[Snapshotter]:
+    ) -> Optional[AbstractSnapshotter]:
         """
         Provides a factory method to create a snapshotter based on the source type
         Args:
