@@ -1,10 +1,10 @@
 from harness.config.config import SourceTypeEnum
-from harness.snaphotter.rocky.rocky_config import RockySourceConfig
+from harness.snaphotter.rocky.rocky_config import RockySnapshotConfig
 
 
-class TestRockySource:
+class TestRockySourceConfig:
     def test_type(self):
-        config = RockySourceConfig(
+        config = RockySnapshotConfig(
             config={},
             source_table="test_table1",
             rocky_target_table_name="test_table2",

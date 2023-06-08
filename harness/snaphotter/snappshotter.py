@@ -1,17 +1,11 @@
-from abc import abstractclassmethod, abstractmethod
-from typing import Any
+import abc
 from pyspark.sql import SparkSession
 from harness.config.config import SnapshotConfig
 
 
-class Snapshotter:
-    config: SnapshotConfig
-
+class Snapshotter(abc.ABC):
     def __init__(self, config: SnapshotConfig) -> None:
         self.config = config
 
-    @abstractmethod
-    def take_snapshot(
-        self, version: int, session: SparkSession
-    ):
+    def take_snapshot(self, version: int, session: SparkSession):
         pass

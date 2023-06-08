@@ -1,6 +1,4 @@
-from pytest import fixture
 from faker import Faker
-from faker.providers.python import Provider
 from harness.config.config import (
     SnapshotConfig,
     TargetConfig,
@@ -8,7 +6,7 @@ from harness.config.config import (
     ValidatorConfig,
     ValidatorTypeEnum,
 )
-from harness.snaphotter.snappshotter import Snapshotter
+
 from harness.config.config import SourceConfig, SourceTypeEnum
 
 fake = Faker()
@@ -32,7 +30,7 @@ def generate_validator_config() -> ValidatorConfig:
 
 def generate_snapshot_config() -> SnapshotConfig:
     return SnapshotConfig(
-        snapshot_name="test",
-        sources={"test": (generate_source_config(), generate_target_config())},
-        inputs={"test": (generate_source_config(), generate_target_config())},
+        source=generate_source_config(),
+        target=generate_target_config(),
+        validator=generate_validator_config(),
     )

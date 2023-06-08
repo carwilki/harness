@@ -3,7 +3,6 @@ module for rocky config classes
 """
 
 from typing import Optional
-from pydantic import BaseModel
 from harness.config.config import (
     SourceConfig,
     SourceTypeEnum,
@@ -12,7 +11,7 @@ from harness.config.config import (
 )
 
 
-class RockySourceConfig(SourceConfig):
+class RockySnapshotConfig(SourceConfig, TargetConfig):
     """
     Defines a rocky source config to be used when the source type is rocky
 
@@ -20,6 +19,8 @@ class RockySourceConfig(SourceConfig):
         SourceConfig (_type_): Base class for source configs
         BaseModel (_type_): Base class for pydantic models
     """
+
+    target_type = TargetTypeEnum.rocky
     source_type = SourceTypeEnum.rocky
     job_id: Optional[str] = None
     rocky_id: Optional[str] = None
@@ -42,16 +43,3 @@ class RockySourceConfig(SourceConfig):
     disable_no_record_failure: bool = True
     is_scheduled: bool = False
     job_watchers: list[str] = list(())
-
-
-class RockyTargetConfig(TargetConfig):
-    """
-    Defines a rocky target config to be used when the target type is rocky
-    this config is just really a place holder since the rocky target config is
-    basically the same as the rocky source config + an options validator
-
-    Args:
-        TargetConfig (_type_): base class for target configs
-    """
-
-    target_type = TargetTypeEnum.rocky
