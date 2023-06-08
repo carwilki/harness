@@ -10,9 +10,9 @@ class HarnessManager:
     def __init__(self, config: JobConfig):
         self.config = config
         self.metadata = ManagerMetaData()
-    
+
     def snapshot(self):
-        
-    
+        pass
+
     def validate():
         pass

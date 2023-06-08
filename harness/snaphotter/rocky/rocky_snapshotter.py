@@ -4,6 +4,7 @@ from functools import reduce
 from databricks_cli.sdk.api_client import ApiClient
 from databricks_cli.sdk.service import JobsService
 from harness.snaphotter.rocky.rocky_config import (
+    RockySnapshotConfig,
     RockySourceConfig,
     RockyTargetConfig,
 )
@@ -13,13 +14,11 @@ from harness.config.env import PetSmartEnvConfig
 class RockySnapshotter:
     def __init__(
         self,
-        source_config: RockySourceConfig,
-        target_config: RockyTargetConfig,
+        config: RockySnapshotConfig,
         env: PetSmartEnvConfig,
         session: SparkSession,
     ) -> None:
-        self.source_config = source_config
-        self.target_config = target_config
+        self.config = config
         self.session = session
         self.env = env
         self.host = env.workspace_url
