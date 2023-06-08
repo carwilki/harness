@@ -6,9 +6,11 @@ from databricks_cli.sdk.service import JobsService
 from harness.snaphotter.rocky.rocky_config import RockySnapshotConfig
 from harness.config.env import PetSmartEnvConfig
 from harness.snaphotter.snapshotter import AbstractSnapshotter
+from harness.sources.source import AbstractSource
+from harness.target.target import AbstractTarget
 
 
-class RockySnapshotter(AbstractSnapshotter):
+class RockySnapshotter(AbstractSnapshotter, AbstractSource, AbstractTarget):
     def __init__(
         self,
         config: RockySnapshotConfig,
