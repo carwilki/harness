@@ -10,6 +10,7 @@ class TestRockySourceConfig:
             rocky_target_table_name="test_table2",
             target_table_name="test_table3",
         )
+        
         # assert the the variables are set correctly
         assert config.source_type == SourceTypeEnum.rocky
         assert config.source_table == "test_table1"

@@ -1,13 +1,8 @@
 import abc
-from pyspark.sql import SparkSession
-from harness.config.config import SourceConfig
+from pyspark.sql import DataFrame
 
 
 class AbstractSource(abc.ABC):
-    def __init__(self, config: SourceConfig, session: SparkSession):
-        self.config = config
-        self.session = session
-
     @abc.abstractmethod
-    def read(self):
+    def read(self) -> DataFrame:
         pass
