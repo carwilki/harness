@@ -4,6 +4,7 @@ from harness.sources.source import AbstractSource
 
 
 class JDBCSource(AbstractSource):
+    
     def __init__(self, config: SourceConfig, session: SparkSession):
         super().__init__(config, session)
 

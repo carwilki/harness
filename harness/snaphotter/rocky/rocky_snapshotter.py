@@ -1,6 +1,5 @@
-from pyspark.dbutils import DBUtils
+
 from pyspark.sql import SparkSession
-from functools import reduce
 from databricks.sdk import WorkspaceClient
 from harness.snaphotter.rocky.rocky_config import RockySnapshotConfig
 from harness.config.env import PetSmartEnvConfig
