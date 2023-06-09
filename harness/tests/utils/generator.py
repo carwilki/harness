@@ -12,12 +12,12 @@ fake = Faker()
 
 
 def generate_source_config() -> SourceConfig:
-    return SourceConfig(source_type=SourceTypeEnum.netezza, config=fake.pydict())
+    return SourceConfig(source_type=SourceTypeEnum.jdbc, config=fake.pydict())
 
 
 def generate_target_config() -> TargetConfig:
     return TargetConfig(
-        target_type=TargetTypeEnum.delta, config=fake.pydict(), validator=None
+        target_type=TargetTypeEnum.dbrtable, config=fake.pydict(), validator=None
     )
 
 
