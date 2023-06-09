@@ -1,5 +1,3 @@
-from pyspark.sql import DataFrame
-
 from harness.validator.validator import AbstractValidator
 
 
