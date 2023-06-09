@@ -3,7 +3,6 @@ from harness.config.config import (
     SnapshotConfig,
     TargetConfig,
     TargetTypeEnum,
-    ValidatorConfig,
     ValidatorTypeEnum,
 )
 
@@ -22,15 +21,9 @@ def generate_target_config() -> TargetConfig:
     )
 
 
-def generate_validator_config() -> ValidatorConfig:
-    return ValidatorConfig(
-        validator_type=ValidatorTypeEnum.raptor, config=fake.pydict()
-    )
-
-
 def generate_snapshot_config() -> SnapshotConfig:
     return SnapshotConfig(
         source=generate_source_config(),
         target=generate_target_config(),
-        validator=generate_validator_config(),
+        validator=ValidatorTypeEnum.dataframe,
     )

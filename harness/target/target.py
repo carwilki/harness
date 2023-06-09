@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession, DataFrame
 from harness.config.config import TargetConfig
 
 
@@ -9,5 +9,13 @@ class AbstractTarget(ABC):
         self.session = session
 
     @abstractmethod
-    def write(self):
+    def write(self, df: DataFrame) -> bool:
+        pass
+
+    @abstractmethod
+    def validate(self, df: DataFrame) -> bool:
+        pass
+
+    @abstractmethod
+    def validate_with(self, canidate: DataFrame, master: DataFrame):
         pass
