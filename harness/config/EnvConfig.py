@@ -9,7 +9,9 @@ class EnvConfig(BaseModel):
     catalog: Optional[str] = None
     metadata_schema: str
     metadata_table: str
+    snapshot_schema: str
+    snapshot_table_post_fix: str
     jdbc_url: str
     jdbc_user: str
     jdbc_password: str
-    jdbc_num_part: int
+    jdbc_num_part: str
