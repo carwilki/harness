@@ -1,7 +1,9 @@
-from pytest_mock import MockFixture
-from harness.config.EnvConfig import EnvConfig
 from faker import Faker
-from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
+from pytest_mock import MockFixture
+
+from harness.config.EnvConfig import EnvConfig
+from harness.manager.HarnessJobManagerEnvironment import \
+    HarnessJobManagerEnvironment
 
 
 class TestHarnessJobManagerEnvironment:

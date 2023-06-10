@@ -1,6 +1,7 @@
 from pyspark.sql import DataFrame, SparkSession
 
-from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
+from harness.manager.HarnessJobManagerEnvironment import \
+    HarnessJobManagerEnvironment
 from harness.sources.AbstractSource import AbstractSource
 from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 
