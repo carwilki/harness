@@ -15,7 +15,11 @@
         "--ignore=E402"
     ],
     "python.testing.pytestArgs": [
-        "."
+        "-v",
+        "--cov=harness/",
+        "--cov-report=html",
+        "--pdb",
+        "harness/tests/"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true
