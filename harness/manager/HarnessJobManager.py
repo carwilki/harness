@@ -6,8 +6,7 @@ from pyspark.sql import SparkSession
 from harness.config.EnvConfig import EnvConfig
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
-from harness.manager.HarnessJobManagerEnvironment import \
-    HarnessJobManagerEnvironment
+from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.manager.ManagerMetaData import ManagerMetaData
 from harness.snaphotter.AbstractSnapshotter import AbstractSnapshotter
 from harness.snaphotter.SnapshotterFactory import SnapshotterFactory

@@ -1,7 +1,7 @@
 from typing import Optional
+
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.config.TargetConfig import TargetConfig
-
 from harness.snaphotter.AbstractSnapshotter import AbstractSnapshotter
 from harness.snaphotter.Snapshotter import Snapshotter
 from harness.sources.AbstractSource import AbstractSource

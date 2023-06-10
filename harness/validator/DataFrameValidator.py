@@ -1,14 +1,12 @@
-from harness.config.ValidatorConfig import ValidatorConfig
-from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
-from harness.validator.AbstractValidator import AbstractValidator
-
+from datetime import datetime
+from io import StringIO
 
 from datacompy import SparkCompare
 from pyspark.sql import DataFrame, SparkSession
 
-
-from datetime import datetime
-from io import StringIO
+from harness.config.ValidatorConfig import ValidatorConfig
+from harness.validator.AbstractValidator import AbstractValidator
+from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
 
 
 class DataFrameValidator(AbstractValidator):
