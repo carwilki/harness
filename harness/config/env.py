@@ -1,7 +1,8 @@
 from typing import Optional
+from pydantic import BaseModel
 
 
-class EnvConfig:
+class EnvConfig(BaseModel):
     workspace_url: str
     workspace_token: str
     catalog: Optional[str] = None

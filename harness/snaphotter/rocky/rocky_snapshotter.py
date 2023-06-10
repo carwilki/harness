@@ -1,4 +1,3 @@
-
 from pyspark.sql import SparkSession
 from databricks.sdk import WorkspaceClient
 from harness.snaphotter.rocky.rocky_config import RockySnapshotConfig
@@ -23,5 +22,3 @@ class RockySnapshotter(AbstractSnapshotter, AbstractSource, AbstractTarget):
         self.rocky_job_id = env.rocky_job_id
         self.workspace_client = WorkspaceClient(host=self.host, token=self.token)
         self.workspace_client.jobs.run_now(job_id=self.rocky_job_id)
-
-   

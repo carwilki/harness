@@ -35,9 +35,11 @@ class Snapshotter(AbstractSnapshotter):
     def take_snapshot(self):
         if self.config.version < 0:
             self.config.version = 0
+
             logger.info("invalid version number provided, setting version to 0")
 
         logger.info(f"Snapshotting {self.config.name} version {self.config.version}")
+
         if self.config.version <= 1:
             df = self.source.read()
             self.target.write(df)

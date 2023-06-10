@@ -72,6 +72,3 @@ class HarnessJobManager:
             if snapshotter.config.version <= 1:
                 snapshotter.take_snapshot()
                 self._metadataManager.update(self.config)
-
-    def validate():
-        pass
