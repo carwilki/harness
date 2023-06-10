@@ -20,6 +20,12 @@ class TargetTypeEnum(EnumBase):
     dbrtable = "dbrtable"
 
 
+class ValidatorConfig(BaseModel):
+    join_keys: list[str]
+    filter: Optional[str] = None
+    validator_reports: Optional[dict[str, str]] = None
+
+
 class SourceConfig(BaseModel, abc.ABC):
     source_type: SourceTypeEnum
 
@@ -37,7 +43,7 @@ class SnapshotConfig(BaseModel):
     validator: Optional[ValidatorTypeEnum] = None
     validated: bool = False
     validation_date: Optional[datetime] = None
-    
+
 
 class HarnessJobConfig(BaseModel):
     job_id: str
