@@ -15,5 +15,9 @@ class TableTarget(AbstractTarget):
         self._targetTable = config.target_table
         self._session = session
 
-    def write(self, df: DataFrame):
-        df.writeTo("""{self.target_schema}.{self.target_table}""")
+    def create_write(self, df: DataFrame):
+        df.writeTo("""{self.target_schema}.{self.target_table}""").overwrite()
+        
+    def append_write(self, df: DataFrame):
+        #This function will append to an already existing table
+        df.writeTo("""{self.target_schema}.{self.target_table}""").append()  
