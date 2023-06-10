@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
-from pyspark.sql import SparkSession, DataFrame
-from harness.config.config import TargetConfig
+
+from pyspark.sql import DataFrame, SparkSession
+
+from harness.config.TargetConfig import TargetConfig
 
 
 class AbstractTarget(ABC):

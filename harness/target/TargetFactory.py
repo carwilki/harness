@@ -1,6 +1,7 @@
-from harness.config.config import TargetConfig, TargetTypeEnum
-from harness.target.databricks import TableTarget
-from harness.target.target import AbstractTarget
+from harness.config.TargetConfig import TargetConfig
+from harness.config.TargetTypeEnum import TargetTypeEnum
+from harness.target.AbstractTarget import AbstractTarget
+from harness.target.TableTarget import TableTarget
 
 
 class TargetFactory:

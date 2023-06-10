@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from harness.validator import validator_config
 
 
-class RaptorConfig(BaseModel,validator_config):
+class RaptorConfig(BaseModel, validator_config):
     email_address: list[str]
     teams_cahnnel: str
     primary_key_list: list[str]

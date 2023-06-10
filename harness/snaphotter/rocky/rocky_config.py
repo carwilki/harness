@@ -3,12 +3,11 @@ module for rocky config classes
 """
 
 from typing import Optional
-from harness.config.config import (
-    SourceConfig,
-    SourceTypeEnum,
-    TargetConfig,
-    TargetTypeEnum,
-)
+
+from harness.config.SourceConfig import SourceConfig
+from harness.config.SourceTypeEnum import SourceTypeEnum
+from harness.config.TargetConfig import TargetConfig
+from harness.config.TargetTypeEnum import TargetTypeEnum
 
 
 class RockySnapshotConfig(SourceConfig, TargetConfig):

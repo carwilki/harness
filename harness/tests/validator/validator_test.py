@@ -1,4 +1,4 @@
-from harness.validator.validator import AbstractValidator
+from harness.validator.AbstractValidator import AbstractValidator
 
 
 class TestValidator:
