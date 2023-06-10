@@ -43,6 +43,7 @@ class SnapshotConfig(BaseModel):
     validator: Optional[ValidatorTypeEnum] = None
     validated: bool = False
     validation_date: Optional[datetime] = None
+    validation_report: Optional[str] = None
 
 
 class HarnessJobConfig(BaseModel):
