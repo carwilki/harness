@@ -21,6 +21,7 @@ pytest = "^7.3.1"
 nutter = "^0.1.35"
 faker = "^18.10.1"
 pytest-mock = "^3.10.0"
+isort = "^5.12.0"
 
 [tool.pytest.ini_options]
 addopts = [

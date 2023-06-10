@@ -1,12 +1,11 @@
 from faker import Faker
-from harness.config.config import (
-    SnapshotConfig,
-    TargetConfig,
-    TargetTypeEnum,
-    ValidatorTypeEnum,
-)
 
-from harness.config.config import SourceConfig, SourceTypeEnum
+from harness.config.SnapshotConfig import SnapshotConfig
+from harness.config.SourceConfig import SourceConfig
+from harness.config.SourceTypeEnum import SourceTypeEnum
+from harness.config.TargetConfig import TargetConfig
+from harness.config.TargetTypeEnum import TargetTypeEnum
+from harness.config.ValidatorTypeEnum import ValidatorTypeEnum
 
 fake = Faker()
 

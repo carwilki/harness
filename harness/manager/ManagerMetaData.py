@@ -1,6 +1,8 @@
 from typing import Optional
+
 from pyspark.sql import SparkSession
-from harness.config.config import HarnessJobConfig
+
+from harness.config.HarnessJobConfig import HarnessJobConfig
 
 
 class ManagerMetaData:

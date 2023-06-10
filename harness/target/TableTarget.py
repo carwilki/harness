@@ -1,11 +1,7 @@
-from harness.config.config import TargetConfig
-from harness.target.target import AbstractTarget
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import DataFrame, SparkSession
 
-
-class TableTargetConfig(TargetConfig):
-    target_schema: str
-    target_table: str
+from harness.target import TableTargetConfig
+from harness.target.AbstractTarget import AbstractTarget
 
 
 class TableTarget(AbstractTarget):
@@ -17,7 +13,7 @@ class TableTarget(AbstractTarget):
 
     def create_write(self, df: DataFrame):
         df.writeTo("""{self.target_schema}.{self.target_table}""").overwrite()
-        
+
     def append_write(self, df: DataFrame):
-        #This function will append to an already existing table
-        df.writeTo("""{self.target_schema}.{self.target_table}""").append()  
+        # This function will append to an already existing table
+        df.writeTo("""{self.target_schema}.{self.target_table}""").append()

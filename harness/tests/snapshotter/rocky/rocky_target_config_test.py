@@ -1,4 +1,5 @@
-from harness.config.config import SourceTypeEnum, TargetTypeEnum
+from harness.config.SourceTypeEnum import SourceTypeEnum
+from harness.config.TargetTypeEnum import TargetTypeEnum
 from harness.snaphotter.rocky.rocky_config import RockySnapshotConfig
 
 

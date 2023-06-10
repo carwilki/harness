@@ -1,13 +1,9 @@
-from pyspark.sql import SparkSession, DataFrame
-from harness.config.config import SourceConfig
-from harness.manager.manager import HarnessJobManagerEnvironment
-from harness.sources.source import AbstractSource
+from pyspark.sql import DataFrame, SparkSession
 
-
-class JDBCSourceConfig(SourceConfig):
-    filter: str
-    table: str
-    schema: str
+from harness.manager.HarnessJobManagerEnvironment import \
+    HarnessJobManagerEnvironment
+from harness.sources.AbstractSource import AbstractSource
+from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 
 
 class JDBCSource(AbstractSource):
@@ -16,7 +12,7 @@ class JDBCSource(AbstractSource):
         self.session = session
 
     def read(self) -> DataFrame:
-        SQL = f"(select * from {self.config.table} where {self.config.filter}) as src"
+        SQL = f"(select * from {self.config.source_table} where {self.config.source_filter}) as src"
 
         reader_options = {
             "url": self.config.jdbc_url,

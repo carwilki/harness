@@ -1,16 +1,14 @@
-from io import StringIO
-from pydantic import BaseModel
-from pyspark.sql import DataFrame, SparkSession
-from harness.config.config import ValidatorConfig
+from harness.config.ValidatorConfig import ValidatorConfig
+from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
+from harness.validator.AbstractValidator import AbstractValidator
+
+
 from datacompy import SparkCompare
-from harness.validator.validator import AbstractValidator
+from pyspark.sql import DataFrame, SparkSession
+
+
 from datetime import datetime
-
-
-class DataFrameValidatorReport(BaseModel):
-    summary: str
-    missmatch_sample: str
-    validation_date: datetime
+from io import StringIO
 
 
 class DataFrameValidator(AbstractValidator):

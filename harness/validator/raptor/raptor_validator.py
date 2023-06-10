@@ -1,8 +1,10 @@
 from typing import Optional
-from pydantic import BaseModel
-from manager.config import Validator
+
 from databricks_cli.jobs.api import JobsApi
 from databricks_cli.sdk.api_client import ApiClient
+from manager.config import Validator
+from pydantic import BaseModel
+
 
 class RaptorValidatorConfig(Validator,BaseModel):
     email_address: list[str]
