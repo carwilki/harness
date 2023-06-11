@@ -61,7 +61,7 @@ class HarnessJobManager:
                 self._input_snapshoters[source.name] = snapshotter
             else:
                 self._source_snapshoters[str(uuid4())] = snapshotter
-    
+
     def snapshot(self):
         for snapshotter in self._source_snapshoters.values():
             if snapshotter.config.version <= 1:

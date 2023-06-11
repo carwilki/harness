@@ -1,6 +1,6 @@
 import os
-from faker import Faker
 
+from faker import Faker
 from pytest_mock import MockFixture
 
 from harness.manager.HarnessJobManager import HarnessJobManager

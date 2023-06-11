@@ -1,4 +1,5 @@
 import os
+
 from faker import Faker
 from pytest_mock import MockFixture
 
@@ -8,17 +9,17 @@ from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnviro
 
 class TestHarnessJobManagerEnvironment:
     def test_empty_env(self, mocker: MockFixture, faker: Faker):
-        mocker.patch.dict(os.environ, {"__WORKSPACE_URL": ''})
-        mocker.patch.dict(os.environ, {"__WORKSPACE_TOKEN": ''})
-        mocker.patch.dict(os.environ, {"__CATALOG": ''})
-        mocker.patch.dict(os.environ, {"__HARNESS_METADATA_SCHEMA": ''})
-        mocker.patch.dict(os.environ, {"__HARNESS_METADATA_TABLE": ''})
-        mocker.patch.dict(os.environ, {"__HARNESS_SNAPSHOT_SCHEMA": ''})
-        mocker.patch.dict(os.environ, {"__HARNESS_SNAPSHOT_TABLE_POSTFIX": ''})
-        mocker.patch.dict(os.environ, {"__JDBC_URL": ''})
-        mocker.patch.dict(os.environ, {"__JDBC_USER": ''})
-        mocker.patch.dict(os.environ, {"__JDBC_PASSWORD": ''})
-        mocker.patch.dict(os.environ, {"__JDBC_NUM_PART": ''})
+        mocker.patch.dict(os.environ, {"__WORKSPACE_URL": ""})
+        mocker.patch.dict(os.environ, {"__WORKSPACE_TOKEN": ""})
+        mocker.patch.dict(os.environ, {"__CATALOG": ""})
+        mocker.patch.dict(os.environ, {"__HARNESS_METADATA_SCHEMA": ""})
+        mocker.patch.dict(os.environ, {"__HARNESS_METADATA_TABLE": ""})
+        mocker.patch.dict(os.environ, {"__HARNESS_SNAPSHOT_SCHEMA": ""})
+        mocker.patch.dict(os.environ, {"__HARNESS_SNAPSHOT_TABLE_POSTFIX": ""})
+        mocker.patch.dict(os.environ, {"__JDBC_URL": ""})
+        mocker.patch.dict(os.environ, {"__JDBC_USER": ""})
+        mocker.patch.dict(os.environ, {"__JDBC_PASSWORD": ""})
+        mocker.patch.dict(os.environ, {"__JDBC_NUM_PART": ""})
 
         assert HarnessJobManagerEnvironment.catalog() is None
         assert HarnessJobManagerEnvironment.workspace_token() is None
