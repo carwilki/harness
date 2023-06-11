@@ -8,7 +8,7 @@ from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
-from harness.snaphotter.AbstractSnapshotter import AbstractSnapshotter
+from harness.snaphotter.Snapshotter import Snapshotter
 from harness.snaphotter.SnapshotterFactory import SnapshotterFactory
 
 
@@ -22,8 +22,8 @@ class HarnessJobManager:
     ):
         self.session: SparkSession = session
         self.config: HarnessJobConfig = config
-        self._source_snapshoters: dict[str, AbstractSnapshotter] = {}
-        self._input_snapshoters: dict[str, AbstractSnapshotter] = {}
+        self._source_snapshoters: dict[str, Snapshotter] = {}
+        self._input_snapshoters: dict[str, Snapshotter] = {}
         self._metadataManager = HarnessJobManagerMetaData(session)
         self._env = self._bindenv(envconfig)
         self._configureMetaData()

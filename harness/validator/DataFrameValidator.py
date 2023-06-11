@@ -11,16 +11,21 @@ from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
 
 class DataFrameValidator(AbstractValidator):
     def __init__(self, config: ValidatorConfig):
-        self._config: ValidatorConfig = config
+        self._config = config
 
-    def validate(self, canidate: DataFrame, master: DataFrame, session: SparkSession):
+    def validate(
+        self, canidate: DataFrame, master: DataFrame, session: SparkSession
+    ) -> DataFrameValidatorReport:
         """
         Validate the data frame
         Args:
             df (DataFrame): Data frame to validate
         """
         comparison = SparkCompare(
-            session, master, canidate, join_columns=self._config.join_keys
+            spark_session=session,
+            base_df=master,
+            compare_df=canidate,
+            join_columns=self._config.join_keys,
         )
         comparison_result = StringIO()
         comparison.report(comparison_result)

@@ -41,7 +41,7 @@ def generate_abstract_snapshot_config() -> SnapshotConfig:
     return SnapshotConfig(
         source=generate_source_config(),
         target=generate_target_config(),
-        validator=ValidatorTypeEnum.dataframe,
+        validator=None,
     )
 
 
@@ -65,7 +65,7 @@ def generate_standard_snapshot_config(version: int, faker: Faker) -> SnapshotCon
     return SnapshotConfig(
         source=generate_jdbc_source_config(faker=faker),
         target=generate_table_target_config(faker=faker),
-        validator=ValidatorTypeEnum.dataframe,
+        validator=None,
         version=version,
     )
 
