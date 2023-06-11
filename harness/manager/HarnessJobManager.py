@@ -22,11 +22,12 @@ class HarnessJobManager:
     ):
         self.session: SparkSession = session
         self.config: HarnessJobConfig = config
-        self._snapshoters: dict[str, AbstractSnapshotter] = {}
+        self._source_snapshoters: dict[str, AbstractSnapshotter] = {}
+        self._input_snapshoters: dict[str, AbstractSnapshotter] = {}
         self._metadataManager = HarnessJobManagerMetaData(session)
         self._env = self._bindenv(envconfig)
         self._configureMetaData()
-        self._configureSnapshoters()
+        self._configureSourceSnaphotters()
 
     def _bindenv(self, envconfig: EnvConfig) -> HarnessJobManagerEnvironment:
         HarnessJobManagerEnvironment.bindenv(envconfig)
@@ -39,21 +40,32 @@ class HarnessJobManager:
         )
         self._metadataManager.create(self.config)
 
-    def _configureSnapshoters(self):
+    def _configureSourceSnaphotters(self):
         source: SnapshotConfig
         for source in self.config.sources.values():
             snapshotter = SnapshotterFactory.create(
                 snapshot_config=source, session=self.session
             )
             if source.name is not None:
-                self._snapshoters[source.name] = snapshotter
+                self._source_snapshoters[source.name] = snapshotter
             else:
-                self._snapshoters[str(uuid4())] = snapshotter
+                self._source_snapshoters[str(uuid4())] = snapshotter
 
+    def _configureInputSnapshotters(self):
+        source: SnapshotConfig
+        for source in self.config.inputs.values():
+            snapshotter = SnapshotterFactory.create(
+                snapshot_config=source, session=self.session
+            )
+            if source.name is not None:
+                self._input_snapshoters[source.name] = snapshotter
+            else:
+                self._source_snapshoters[str(uuid4())] = snapshotter
+    
     def snapshot(self):
-        for snapshotter in self._snapshoters.values():
+        for snapshotter in self._source_snapshoters.values():
             if snapshotter.config.version <= 1:
                 snapshotter.take_snapshot()
-                self._metadataManager.update(self.config)
+                self._metadataManager.update(self.config.job_id, self.config)
             else:
                 logger.info("Snapshot already completed, skipping...")

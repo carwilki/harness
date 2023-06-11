@@ -12,7 +12,7 @@ class SnapshotConfig(BaseModel):
     name: Optional[str] = None
     target: TargetConfig
     source: SourceConfig
-    version: int = 1
+    version: int = 0
     validator: Optional[ValidatorTypeEnum] = None
     validated: bool = False
     validation_date: Optional[datetime] = None

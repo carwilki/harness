@@ -61,21 +61,28 @@ def generate_abstract_harness_job_config(faker: Faker) -> HarnessJobConfig:
     )
 
 
-def generate_standard_snapshot_config(faker: Faker) -> SnapshotConfig:
+def generate_standard_snapshot_config(version: int, faker: Faker) -> SnapshotConfig:
     return SnapshotConfig(
         source=generate_jdbc_source_config(faker=faker),
         target=generate_table_target_config(faker=faker),
         validator=ValidatorTypeEnum.dataframe,
+        version=version,
     )
 
 
-def generate_standard_harness_job_config(faker: Faker) -> HarnessJobConfig:
+def generate_standard_harness_job_config(
+    snapshot_version: int, faker: Faker
+) -> HarnessJobConfig:
     sources = {}
     for x in range(5):
-        sources[f"source_{x}"] = generate_standard_snapshot_config(faker)
+        sources[f"source_{x}"] = generate_standard_snapshot_config(
+            snapshot_version, faker
+        )
     inputs = {}
     for x in range(5):
-        inputs[f"input_{x}"] = generate_standard_snapshot_config(faker)
+        inputs[f"input_{x}"] = generate_standard_snapshot_config(
+            snapshot_version, faker
+        )
 
     return HarnessJobConfig(
         job_id=faker.pystr(),
