@@ -15,3 +15,4 @@ class EnvConfig(BaseModel):
     jdbc_user: str
     jdbc_password: str
     jdbc_num_part: str
+    jdbc_driver: str

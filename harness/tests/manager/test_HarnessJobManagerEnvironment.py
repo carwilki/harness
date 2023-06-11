@@ -2,8 +2,7 @@ from faker import Faker
 from pytest_mock import MockFixture
 
 from harness.config.EnvConfig import EnvConfig
-from harness.manager.HarnessJobManagerEnvironment import \
-    HarnessJobManagerEnvironment
+from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 
 
 class TestHarnessJobManagerEnvironment:
@@ -29,6 +28,7 @@ class TestHarnessJobManagerEnvironment:
             jdbc_user=faker.first_name_male(),
             jdbc_password=faker.password(),
             jdbc_num_part=str(faker.random_int()),
+            jdbc_driver=faker.pystr(),
             snapshot_schema=faker.first_name(),
             snapshot_table_post_fix=faker.first_name(),
         )

@@ -9,4 +9,3 @@ from harness.config.ValidatorTypeEnum import ValidatorTypeEnum
 
 class TargetConfig(BaseModel, abc.ABC):
     target_type: TargetTypeEnum
-    validator: Optional[ValidatorTypeEnum] = None

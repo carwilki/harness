@@ -1,5 +1,7 @@
 from typing import Optional
 
+from pyspark.sql import SparkSession
+
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.config.TargetConfig import TargetConfig
 from harness.snaphotter.AbstractSnapshotter import AbstractSnapshotter
@@ -19,7 +21,9 @@ class SnapshotterFactory:
 
     @classmethod
     def create(
+        cls,
         snapshot_config: SnapshotConfig,
+        session: SparkSession,
     ) -> Optional[AbstractSnapshotter]:
         """
         Provides a factory method to create a snapshotter based on the source type
@@ -30,14 +34,22 @@ class SnapshotterFactory:
         """
         return Snapshotter(
             snapshot_config,
-            SnapshotterFactory._create_source(snapshot_config),
-            SnapshotterFactory._create_target(snapshot_config),
+            SnapshotterFactory._create_source(
+                config=snapshot_config.source, session=session
+            ),
+            SnapshotterFactory._create_target(
+                config=snapshot_config.target, session=session
+            ),
         )
 
     @classmethod
-    def _create_source(cls, config: SnapshotConfig) -> AbstractSource:
-        return SourceFactory.create(config)
+    def _create_source(
+        cls, config: SnapshotConfig, session: SparkSession
+    ) -> AbstractSource:
+        return SourceFactory.create(config, session)
 
     @classmethod
-    def _create_target(cls, config: TargetConfig) -> AbstractTarget:
-        return TargetFactory.create(config)
+    def _create_target(
+        cls, config: TargetConfig, session: SparkSession
+    ) -> AbstractTarget:
+        return TargetFactory.create(config, session)

@@ -6,13 +6,13 @@ from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 
 
-class ManagerMetaData:
+class HarnessJobManagerMetaData:
     def __init__(self, session: SparkSession):
         self.session = session
         self._harness_metadata_schema = HarnessJobManagerEnvironment.metadata_schema()
         self._harness_metadata_table = HarnessJobManagerEnvironment.metadata_table()
         self._table = f"{self._harness_metadata_schema}.{self._harness_metadata_table}"
-        
+
     def create_metadata_table(self, schema, table):
         self.session.sql(
             f"""Create table if not exists {self._table} (id int, value string)"""
@@ -41,6 +41,4 @@ class ManagerMetaData:
         ).collect()
 
     def delete(self, key):
-        self.session.sql(
-            f"""Delete from {self._table} where id == {key}"""
-        ).collect()
+        self.session.sql(f"""Delete from {self._table} where id == {key}""").collect()
