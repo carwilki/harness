@@ -15,12 +15,19 @@
         "--ignore=E402"
     ],
     "python.testing.pytestArgs": [
-        "--no-cov"
+        //comment in to run tests in debug mode
+        //"--no-cov"
+        //comment in to run tests with coverage
         // "-v",
         // "--cov=harness/",
         // "--cov-report=html",
         // "--pdb",
         // "harness/tests/"
+        "-v",
+        "--cov=harness/",
+        "--cov-report=html",
+        "--pdb",
+        "harness/tests/"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,

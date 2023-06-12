@@ -1,4 +1,5 @@
 from logging import Logger as logger
+from logging import getLogger
 from uuid import uuid4
 
 from pyspark.sql import SparkSession
@@ -20,6 +21,7 @@ class HarnessJobManager:
     def __init__(
         self, config: HarnessJobConfig, envconfig: EnvConfig, session: SparkSession
     ):
+        self.logger = getLogger()
         self.session: SparkSession = session
         self.config: HarnessJobConfig = config
         self._source_snapshoters: dict[str, Snapshotter] = {}
@@ -28,6 +30,7 @@ class HarnessJobManager:
         self._env = self._bindenv(envconfig)
         self._configureMetaData()
         self._configureSourceSnaphotters()
+        self._configureInputSnapshotters()
 
     def _bindenv(self, envconfig: EnvConfig) -> HarnessJobManagerEnvironment:
         HarnessJobManagerEnvironment.bindenv(envconfig)
@@ -63,9 +66,27 @@ class HarnessJobManager:
                 self._source_snapshoters[str(uuid4())] = snapshotter
 
     def snapshot(self):
-        for snapshotter in self._source_snapshoters.values():
-            if snapshotter.config.version <= 1:
-                snapshotter.take_snapshot()
-                self._metadataManager.update(self.config.job_id, self.config)
-            else:
-                logger.info("Snapshot already completed, skipping...")
+        if self.config.version <= 1:
+            self.logger.info("Taking snapshot V1...")
+            self._snapshot(self._source_snapshoters)
+            self.logger.info("V1 snapshot completed.")
+            self.config.version = 1
+            for input in self.config.inputs.values():
+                input.version = 1
+        elif self.config.version == 1:
+            self.logger.info("Taking snapshot V2...")
+            self._snapshot(self._source_snapshoters)
+            self.logger.info("V2 Source Snapshot completed.")
+            self.logger.info("Snapshotting Inputs...")
+            self._snapshot(self._input_snapshoters)
+            self.logger.info("V2 Input Snapshot completed.")
+            self.logger.info("V2 Snapshot completed.")
+        else:
+            self.logger.info("Snapshot already completed, skipping...")
+
+        self._metadataManager.update(self.config.job_id, self.config)
+
+    def _snapshot(self, snapshotters: dict[str, Snapshotter]):
+        for snapshotter in snapshotters.values():
+            snapshotter.snapshot()
+            self.logger.info(f"Snapshotted {snapshotter.config.name}")

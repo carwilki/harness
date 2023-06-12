@@ -1,8 +1,8 @@
 import os
 
 from faker import Faker
-from pytest_mock import MockFixture
 from pyspark.sql import SparkSession
+from pytest_mock import MockFixture
 
 from harness.manager.HarnessJobManager import HarnessJobManager
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
@@ -62,7 +62,9 @@ class TestHarnessJobManager:
         )
         assert manager is not None
 
-    def test_can_snapshot(self, spark: SparkSession, mocker: MockFixture, faker: Faker):
+    def test_can_snapshot_V1(
+        self, spark: SparkSession, mocker: MockFixture, faker: Faker
+    ):
         config = generate_standard_harness_job_config(0, faker)
         envconfig = generate_env_config(faker)
         session = mocker.MagicMock()
@@ -76,3 +78,46 @@ class TestHarnessJobManager:
         write.assert_called()
         for source in manager.config.sources.values():
             assert source.version == 1
+
+    def test_can_snapshot_V2(
+        self, spark: SparkSession, mocker: MockFixture, faker: Faker
+    ):
+        config = generate_standard_harness_job_config(0, faker)
+        for source in config.sources.values():
+            source.version = 1
+        envconfig = generate_env_config(faker)
+        session = mocker.MagicMock()
+        read = mocker.patch.object(JDBCSource, "read")
+        write = mocker.patch.object(TableTarget, "write")
+        read.return_value(spark.createDataFrame([{"a": 1}]))
+        write.return_value(True)
+        manager = HarnessJobManager(config=config, envconfig=envconfig, session=session)
+        manager.snapshot()
+        read.assert_called()
+        write.assert_called()
+        for source in manager.config.sources.values():
+            assert source.version == 2
+
+    def test_can_not_snapshot_V3(
+        self, spark: SparkSession, mocker: MockFixture, faker: Faker
+    ):
+        config = generate_standard_harness_job_config(0, faker)
+
+        for source in config.sources.values():
+            source.version = 2
+        for source in config.inputs.values():
+            source.version = 2
+
+        envconfig = generate_env_config(faker)
+        session = mocker.MagicMock()
+        read = mocker.patch.object(JDBCSource, "read")
+        write = mocker.patch.object(TableTarget, "write")
+        read.return_value(spark.createDataFrame([{"a": 1}]))
+        write.return_value(True)
+        manager = HarnessJobManager(config=config, envconfig=envconfig, session=session)
+        manager.snapshot()
+        read.assert_not_called()
+        write.assert_not_called()
+
+        for source in manager.config.sources.values():
+            assert source.version == 2

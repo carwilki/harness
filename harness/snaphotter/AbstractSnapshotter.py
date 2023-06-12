@@ -16,5 +16,5 @@ class AbstractSnapshotter(abc.ABC):
         self.target = target
 
     @abc.abstractmethod
-    def take_snapshot(self, version: int, session: SparkSession):
+    def snapshot(self, version: int, session: SparkSession):
         pass
