@@ -69,12 +69,14 @@ class TestHarnessJobManager:
         session = mocker.MagicMock()
         read = mocker.patch.object(JDBCSource, "read")
         write = mocker.patch.object(TableTarget, "write")
+        update = mocker.patch.object(HarnessJobManagerMetaData, "update")
         read.return_value(spark.createDataFrame([{"a": 1}]))
         write.return_value(True)
         manager = HarnessJobManager(config=config, envconfig=envconfig, session=session)
         manager.snapshot()
         read.assert_called()
         write.assert_called()
+        update.assert_called()
         for source in manager.config.sources.values():
             assert source.version == 1
 
@@ -85,6 +87,7 @@ class TestHarnessJobManager:
         config.version = 1
         envconfig = generate_env_config(faker)
         session = mocker.MagicMock()
+        update = mocker.patch.object(HarnessJobManagerMetaData, "update")
         read = mocker.patch.object(JDBCSource, "read")
         write = mocker.patch.object(TableTarget, "write")
         read.return_value(spark.createDataFrame([{"a": 1}]))
@@ -93,6 +96,7 @@ class TestHarnessJobManager:
         manager.snapshot()
         read.assert_called()
         write.assert_called()
+        update.assert_called()
         for source in manager.config.sources.values():
             assert source.version == 2
 
@@ -106,6 +110,7 @@ class TestHarnessJobManager:
         for source in config.inputs.values():
             source.version = 2
 
+        update = mocker.patch.object(HarnessJobManagerMetaData, "update")
         envconfig = generate_env_config(faker)
         session = mocker.MagicMock()
         read = mocker.patch.object(JDBCSource, "read")
@@ -116,6 +121,7 @@ class TestHarnessJobManager:
         manager.snapshot()
         read.assert_not_called()
         write.assert_not_called()
-
+        update.assert_not_called()
+        
         for source in manager.config.sources.values():
             assert source.version == 2

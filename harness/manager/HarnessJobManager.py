@@ -98,9 +98,11 @@ class HarnessJobManager:
             self.logger.info("Taking snapshot V1...")
             self._snapshot(self._source_snapshoters)
             self.logger.info("V1 snapshot completed.")
+
             self.config.version = 1
             for input in self.config.inputs.values():
                 input.version = 1
+            self._metadataManager.update(self.config.job_id, self.config)
         elif self.config.version == 1:
             self.logger.info("Taking snapshot V2...")
             self._snapshot(self._source_snapshoters)
@@ -109,10 +111,9 @@ class HarnessJobManager:
             self._snapshot(self._input_snapshoters)
             self.logger.info("V2 Input Snapshot completed.")
             self.logger.info("V2 Snapshot completed.")
+            self._metadataManager.update(self.config.job_id, self.config)
         else:
             self.logger.info("Snapshot already completed, skipping...")
-
-        self._metadataManager.update(self.config.job_id, self.config)
 
     def _snapshot(self, snapshotters: dict[str, Snapshotter]):
         for snapshotter in snapshotters.values():
