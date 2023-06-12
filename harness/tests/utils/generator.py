@@ -7,7 +7,7 @@ from harness.config.SourceConfig import SourceConfig
 from harness.config.SourceTypeEnum import SourceTypeEnum
 from harness.config.TargetConfig import TargetConfig
 from harness.config.TargetTypeEnum import TargetTypeEnum
-from harness.config.ValidatorTypeEnum import ValidatorTypeEnum
+from harness.config.ValidatorConfig import ValidatorConfig
 from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 from harness.target.TableTargetConfig import TableTargetConfig
 
@@ -67,6 +67,14 @@ def generate_standard_snapshot_config(version: int, faker: Faker) -> SnapshotCon
         target=generate_table_target_config(faker=faker),
         validator=None,
         version=version,
+    )
+
+
+def generate_standard_validator_config(faker: Faker) -> ValidatorConfig:
+    return ValidatorConfig(
+        join_keys=[faker.pystr(), faker.pystr()],
+        filter=faker.pystr(),
+        validator_reports={},
     )
 
 

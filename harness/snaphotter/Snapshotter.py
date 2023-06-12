@@ -1,3 +1,4 @@
+from datetime import datetime
 from logging import getLogger
 
 from harness.config.SnapshotConfig import SnapshotConfig
@@ -15,7 +16,10 @@ class Snapshotter(AbstractSnapshotter):
         self._logger = getLogger()
         if self.config.validator is not None:
             self._validator = DataFrameValidator(self.config.validator)
-
+        else:
+            self._validator = None
+            self._logger.info(f"No validator configured for snapshotter {self.config.name}")
+            
     def snapshot(self):
         if self.config.version < 0:
             self.config.version = 0
@@ -37,6 +41,8 @@ class Snapshotter(AbstractSnapshotter):
 
         self.target.write(df)
         if self.config.validator is not None:
-            self._validator.validate(df, self.source.read, self.source.session)
-
+            date = datetime.now().strftime("%Y-%m-%d %H:%M")
+            report = self._validator.validate(df, self.source.read, self.source.session)
+            self.config.validator.validator_reports[date] = report
+        
         self.config.version += 1
