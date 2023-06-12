@@ -13,9 +13,11 @@ from harness.tests.utils.generator import (
     generate_env_config,
     generate_standard_harness_job_config,
 )
+
 from harness.validator import DataFrameValidator
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.snaphotter.Snapshotter import Snapshotter
+
 
 
 class TestHarnessJobManager:
@@ -66,6 +68,7 @@ class TestHarnessJobManager:
         self, spark: SparkSession, mocker: MockFixture, faker: Faker
     ):
         config = generate_standard_harness_job_config(0, faker)
+        config.version = 0
         envconfig = generate_env_config(faker)
         session = mocker.MagicMock()
         read = mocker.patch.object(JDBCSource, "read")
@@ -82,9 +85,8 @@ class TestHarnessJobManager:
     def test_can_snapshot_V2(
         self, spark: SparkSession, mocker: MockFixture, faker: Faker
     ):
-        config = generate_standard_harness_job_config(0, faker)
-        for source in config.sources.values():
-            source.version = 1
+        config = generate_standard_harness_job_config(1, faker)
+        config.version = 1
         envconfig = generate_env_config(faker)
         session = mocker.MagicMock()
         read = mocker.patch.object(JDBCSource, "read")
@@ -102,12 +104,12 @@ class TestHarnessJobManager:
         self, spark: SparkSession, mocker: MockFixture, faker: Faker
     ):
         config = generate_standard_harness_job_config(0, faker)
-
+        config.version = 2
         for source in config.sources.values():
             source.version = 2
         for source in config.inputs.values():
             source.version = 2
-
+            
         envconfig = generate_env_config(faker)
         session = mocker.MagicMock()
         read = mocker.patch.object(JDBCSource, "read")

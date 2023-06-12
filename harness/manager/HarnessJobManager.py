@@ -1,4 +1,3 @@
-from logging import Logger as logger
 from logging import getLogger
 from uuid import uuid4
 
@@ -17,10 +16,16 @@ class HarnessJobManager:
     """
     Harness Manager is responsible for orchestrating the snapshotting process.
     """
-
     def __init__(
         self, config: HarnessJobConfig, envconfig: EnvConfig, session: SparkSession
     ):
+        """
+        Configures a new HarnessJobManager for use.
+        Args:
+            config (HarnessJobConfig): The config that is used to setup the manager
+            envconfig (EnvConfig): Exteranl Environment Config
+            session (SparkSession): an active spark session
+        """
         self.logger = getLogger()
         self.session: SparkSession = session
         self.config: HarnessJobConfig = config
@@ -33,10 +38,21 @@ class HarnessJobManager:
         self._configureInputSnapshotters()
 
     def _bindenv(self, envconfig: EnvConfig) -> HarnessJobManagerEnvironment:
+        """
+        Binds the environment config to the os environment.
+        Args:
+            envconfig (EnvConfig): The environment config to bind
+
+        Returns:
+            HarnessJobManagerEnvironment: The environment that was bound
+        """
         HarnessJobManagerEnvironment.bindenv(envconfig)
         return HarnessJobManagerEnvironment
 
     def _configureMetaData(self):
+        """
+        configures the metadata manager repository
+        """
         self._metadataManager.create_metadata_table(
             HarnessJobManagerEnvironment.metadata_schema(),
             HarnessJobManagerEnvironment.metadata_table(),
@@ -44,6 +60,9 @@ class HarnessJobManager:
         self._metadataManager.create(self.config)
 
     def _configureSourceSnaphotters(self):
+        """
+        configures the source snapshotters
+        """
         source: SnapshotConfig
         for source in self.config.sources.values():
             snapshotter = SnapshotterFactory.create(
@@ -55,6 +74,9 @@ class HarnessJobManager:
                 self._source_snapshoters[str(uuid4())] = snapshotter
 
     def _configureInputSnapshotters(self):
+        """
+        configures the input snapshotters
+        """
         source: SnapshotConfig
         for source in self.config.inputs.values():
             snapshotter = SnapshotterFactory.create(
@@ -66,7 +88,10 @@ class HarnessJobManager:
                 self._source_snapshoters[str(uuid4())] = snapshotter
 
     def snapshot(self):
-        if self.config.version <= 1:
+        """
+        Takes a snapshot of the data sources and inputs.
+        """
+        if self.config.version < 1:
             self.logger.info("Taking snapshot V1...")
             self._snapshot(self._source_snapshoters)
             self.logger.info("V1 snapshot completed.")
