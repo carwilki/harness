@@ -122,6 +122,6 @@ class TestHarnessJobManager:
         read.assert_not_called()
         write.assert_not_called()
         update.assert_not_called()
-        
+
         for source in manager.config.sources.values():
             assert source.version == 2
