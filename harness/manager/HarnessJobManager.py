@@ -16,6 +16,7 @@ class HarnessJobManager:
     """
     Harness Manager is responsible for orchestrating the snapshotting process.
     """
+
     def __init__(
         self, config: HarnessJobConfig, envconfig: EnvConfig, session: SparkSession
     ):
@@ -31,8 +32,10 @@ class HarnessJobManager:
         self.config: HarnessJobConfig = config
         self._source_snapshoters: dict[str, Snapshotter] = {}
         self._input_snapshoters: dict[str, Snapshotter] = {}
-        self._metadataManager = HarnessJobManagerMetaData(session)
-        self._env = self._bindenv(envconfig)
+        self._metadataManager: HarnessJobManagerMetaData = HarnessJobManagerMetaData(
+            session
+        )
+        self._env: HarnessJobManagerEnvironment = self._bindenv(envconfig)
         self._configureMetaData()
         self._configureSourceSnaphotters()
         self._configureInputSnapshotters()

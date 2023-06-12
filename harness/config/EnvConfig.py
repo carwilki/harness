@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel,validator
+from pydantic import BaseModel, validator
 
 
 class EnvConfig(BaseModel):
@@ -16,76 +16,90 @@ class EnvConfig(BaseModel):
     jdbc_password: str
     jdbc_num_part: int = 5
     jdbc_driver: str
-    
+
     # adding pydantic validations
     @validator("workspace_url")
     @classmethod
-    def valid_workspace_url(cls,value):
-        if value is None or isinstance(value,str) == False:
-            return ValueError("Workspace url is not provided or it's of incorrect datatype")
+    def valid_workspace_url(cls, value):
+        if value is None or isinstance(value, str) is False:
+            return ValueError(
+                "Workspace url is not provided or it's of incorrect datatype"
+            )
         return value
-    
+
     @validator("workspace_token")
     @classmethod
-    def valid_workspace_token(cls,value):
-        if value is None or isinstance(value,str) == False:
-            return ValueError("workspace token is not provided or it's of incorrect datatype")
+    def valid_workspace_token(cls, value):
+        if value is None or isinstance(value, str) is False:
+            return ValueError(
+                "workspace token is not provided or it's of incorrect datatype"
+            )
         return value
-    
+
     @validator("metadata_schema")
     @classmethod
-    def valid_metadata_schema(cls,value):
-        if value is None or isinstance(value,str) == False:
-            return ValueError("metadata schema is not provided or it's of incorrect datatype")
+    def valid_metadata_schema(cls, value):
+        if value is None or isinstance(value, str) is False:
+            return ValueError(
+                "metadata schema is not provided or it's of incorrect datatype"
+            )
         return value
-    
+
     @validator("metadata_table")
     @classmethod
-    def valid_metadata_table(cls,value):
-        if value is None or isinstance(value,str) == False:
-            return ValueError("metadata table is not provided or it's of incorrect datatype")
+    def valid_metadata_table(cls, value):
+        if value is None or isinstance(value, str) is False:
+            return ValueError(
+                "metadata table is not provided or it's of incorrect datatype"
+            )
         return value
-    
+
     @validator("snapshot_schema")
     @classmethod
-    def valid_snapshot_schema(cls,value):
-        if value is None or isinstance(value,str) == False:
-            return ValueError("snapshot schema is not provided or it's of incorrect datatype")
+    def valid_snapshot_schema(cls, value):
+        if value is None or isinstance(value, str) == False:
+            return ValueError(
+                "snapshot schema is not provided or it's of incorrect datatype"
+            )
         return value
-    
+
     @validator("snapshot_table_post_fix")
     @classmethod
-    def valid_snapshot_table_post_fix(cls,value):
-        if value is None or isinstance(value,str) == False:
-            return ValueError("snapshot_table_post_fix is not provided or it's of incorrect datatype")
+    def valid_snapshot_table_post_fix(cls, value):
+        if value is None or isinstance(value, str) is False:
+            return ValueError(
+                "snapshot_table_post_fix is not provided or it's of incorrect datatype"
+            )
         return value
-    
+
     @validator("jdbc_url")
     @classmethod
-    def valid_jdbc_url(cls,value):
-        if value is None or isinstance(value,str) == False:
+    def valid_jdbc_url(cls, value):
+        if value is None or isinstance(value, str) is False:
             return ValueError("jdbc url is not provided or it's of incorrect datatype")
         return value
-    
-    @validator("jdbc_url")
+
+    @validator("jdbc_user")
     @classmethod
-    def valid_jdbc_url(cls,value):
-        if value is None or isinstance(value,str) == False:
+    def valid_jdbc_user(cls, value):
+        if value is None or isinstance(value, str) is False:
             return ValueError("jdbc url is not provided or it's of incorrect datatype")
         return value
-    
+
     @validator("jdbc_password")
     @classmethod
-    def valid_jdbc_password(cls,value):
-        if value is None or isinstance(value,str) == False:
-            return ValueError("jdbc password is not provided or it's of incorrect datatype")
+    def valid_jdbc_password(cls, value):
+        if value is None or isinstance(value, str) is False:
+            return ValueError(
+                "jdbc password is not provided or it's of incorrect datatype"
+            )
         return value
-    
+
     @validator("jdbc_driver")
     @classmethod
-    def valid_jdbc_driver(cls,value):
-        if value is None or isinstance(value,str) == False:
-            return ValueError("jdbc driver is not provided or it's of incorrect datatype")
+    def valid_jdbc_driver(cls, value):
+        if value is None or isinstance(value, str) is False:
+            return ValueError(
+                "jdbc driver is not provided or it's of incorrect datatype"
+            )
         return value
-        
-    
