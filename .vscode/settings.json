@@ -23,11 +23,7 @@
         // "--cov-report=html",
         // "--pdb",
         // "harness/tests/"
-        "-v",
-        "--cov=harness/",
-        "--cov-report=html",
-        "--pdb",
-        "harness/tests/"
+        "--no-cov"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
