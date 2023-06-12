@@ -90,6 +90,9 @@ class HarnessJobManager:
             else:
                 self._source_snapshoters[str(uuid4())] = snapshotter
 
+    def run(self):
+        self.snapshot()
+
     def snapshot(self):
         """
         Takes a snapshot of the data sources and inputs.
