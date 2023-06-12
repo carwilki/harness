@@ -14,8 +14,25 @@ from harness.tests.utils.generator import (
     generate_standard_harness_job_config,
 )
 
+from harness.validator import DataFrameValidator
+from harness.config.HarnessJobConfig import HarnessJobConfig
+from harness.snaphotter.Snapshotter import Snapshotter
+
+
 
 class TestHarnessJobManager:
+    def test_constructor(self,mocker: MockFixture, faker: Faker,session:SparkSession):
+        config = generate_standard_harness_job_config(0, faker)
+        envconfig = generate_env_config(faker)
+        session = mocker.MagicMock()
+        constructor = HarnessJobManager(config,envconfig,session)
+        assert constructor is not None
+        assert type(constructor.config) == HarnessJobConfig
+        assert type(config._source_snapshoters) == dict[str, Snapshotter]
+        assert type(config.__input_snapshoters) == dict[str, Snapshotter]
+        assert type(config._metadataManager) == HarnessJobManagerMetaData
+        assert type(config._env) == envconfig
+        
     def test_can_create(self, mocker: MockFixture, faker: Faker):
         config = generate_standard_harness_job_config(0, faker)
         envconfig = generate_env_config(faker)
