@@ -32,7 +32,6 @@ class TestHarnessJobManager:
     def test_can_create(self, mocker: MockFixture, faker: Faker):
         config = generate_standard_harness_job_config(0, faker)
         envconfig = generate_env_config(faker)
-
         bindenv = mocker.patch.object(HarnessJobManagerEnvironment, "bindenv")
         mocker.patch.dict(
             os.environ, {"__HARNESS_METADATA_SCHEMA": envconfig.metadata_schema}
@@ -40,14 +39,17 @@ class TestHarnessJobManager:
         mocker.patch.dict(
             os.environ, {"__HARNESS_METADATA_TABLE": envconfig.metadata_table}
         )
-        create_schema = mocker.patch.object(
-            HarnessJobManagerMetaData, "create_metadata_table"
+        create_metadata_table = mocker.patch.object(
+            HarnessJobManagerMetaData, "create_metadata_table", return_value=None
         )
+        get: mocker.MagicMock = mocker.patch.object(
+            HarnessJobManagerMetaData, "get", return_value=None
+        )
+
         session = mocker.MagicMock()
         manager = HarnessJobManager(config=config, envconfig=envconfig, session=session)
 
-        bindenv.assert_called_once_with(envconfig)
-
+        assert manager is not None
         assert HarnessJobManagerEnvironment.metadata_schema() is not None
         assert (
             HarnessJobManagerEnvironment.metadata_schema() == envconfig.metadata_schema
@@ -55,10 +57,44 @@ class TestHarnessJobManager:
         assert HarnessJobManagerEnvironment.metadata_table() is not None
         assert HarnessJobManagerEnvironment.metadata_table() == envconfig.metadata_table
 
-        create_schema.assert_called_once_with(
-            envconfig.metadata_schema, envconfig.metadata_table
+        bindenv.assert_called_once_with(envconfig)
+        create_metadata_table.assert_called_once()
+        get.assert_called_once()
+
+    def test_can_create_with_existing_metadata(self, mocker: MockFixture, faker: Faker):
+        config = generate_standard_harness_job_config(0, faker)
+        v1config = generate_standard_harness_job_config(1, faker)
+        envconfig = generate_env_config(faker)
+        bindenv = mocker.patch.object(HarnessJobManagerEnvironment, "bindenv")
+        mocker.patch.dict(
+            os.environ, {"__HARNESS_METADATA_SCHEMA": envconfig.metadata_schema}
         )
+        mocker.patch.dict(
+            os.environ, {"__HARNESS_METADATA_TABLE": envconfig.metadata_table}
+        )
+        create_metadata_table = mocker.patch.object(
+            HarnessJobManagerMetaData, "create_metadata_table", return_value=None
+        )
+        get: mocker.MagicMock = mocker.patch.object(
+            HarnessJobManagerMetaData,
+            "get",
+            return_value=v1config,
+        )
+
+        session = mocker.MagicMock()
+        manager = HarnessJobManager(config=config, envconfig=envconfig, session=session)
+
         assert manager is not None
+        assert HarnessJobManagerEnvironment.metadata_schema() is not None
+        assert (
+            HarnessJobManagerEnvironment.metadata_schema() == envconfig.metadata_schema
+        )
+        assert HarnessJobManagerEnvironment.metadata_table() is not None
+        assert HarnessJobManagerEnvironment.metadata_table() == envconfig.metadata_table
+        assert manager.config == v1config
+        bindenv.assert_called_once_with(envconfig)
+        create_metadata_table.assert_called_once()
+        get.assert_called_once_with(config.job_id)
 
     def test_can_snapshot_V1(
         self, spark: SparkSession, mocker: MockFixture, faker: Faker

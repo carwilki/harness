@@ -36,7 +36,10 @@ class HarnessJobManager:
             session
         )
         self._env: HarnessJobManagerEnvironment = self._bindenv(envconfig)
-        self._configureMetaData()
+        self._configureMetaDataTable()
+        # this will overwrite any existing inputs if there is an existing
+        # job config
+        self._loadExistingMetaDataIfExists()
         self._configureSourceSnaphotters()
         self._configureInputSnapshotters()
 
@@ -52,15 +55,32 @@ class HarnessJobManager:
         HarnessJobManagerEnvironment.bindenv(envconfig)
         return HarnessJobManagerEnvironment
 
-    def _configureMetaData(self):
+    def _configureMetaDataTable(self):
         """
         configures the metadata manager repository
         """
-        self._metadataManager.create_metadata_table(
-            HarnessJobManagerEnvironment.metadata_schema(),
-            HarnessJobManagerEnvironment.metadata_table(),
-        )
+        self._metadataManager.create_metadata_table()
         self._metadataManager.create(self.config)
+
+    def _loadExistingMetaDataIfExists(self):
+        """
+        loads the existing metadata if it exists
+        """
+        existing_config: HarnessJobConfig = self._metadataManager.get(
+            self.config.job_id
+        )
+        if existing_config is not None:
+            # if we found an existing config then swap it out
+            self.config = existing_config
+            self.logger.info(
+                f"Found existing metadata for job {self.config.job_id}, loading..."
+            )
+        else:
+            # else we create a new one based on the current config
+            self.logger.info(
+                f"Could not find existing metadata for job {self.config.job_id}, creating new..."
+            )
+            self._metadataManager.create(self.config)
 
     def _configureSourceSnaphotters(self):
         """

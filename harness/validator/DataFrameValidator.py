@@ -29,7 +29,7 @@ class DataFrameValidator(AbstractValidator):
         )
         comparison_result = StringIO()
         comparison.report(comparison_result)
-        missmatch_both: DataFrame = comparison.rows_both_mismatched
+        missmatch_both: DataFrame = comparison.rows_both_mismatch
         missmatch_sample = missmatch_both.limit(10).toPandas()
 
         return DataFrameValidatorReport(

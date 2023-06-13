@@ -26,7 +26,7 @@ class TestManagerMetaData:
         schema, table = self.configenv(mocker=mocker, faker=faker)
         session: SparkSession = mocker.MagicMock()
         metadata = HarnessJobManagerMetaData(session=session)
-        metadata.create_metadata_table(schema="schema", table="table")
+        metadata.create_metadata_table()
         session.sql.assert_called_with(
             f"""Create table if not exists {schema}.{table} (id int, value string)"""
         )
