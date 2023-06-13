@@ -9,7 +9,10 @@ class HarnessJobManagerEnvironment:
     def bindenv(cls, config: EnvConfig):
         env["__WORKSPACE_URL"] = config.workspace_url
         env["__WORKSPACE_TOKEN"] = config.workspace_token
-        env["__CATALOG"] = config.catalog
+        if config.catalog is not None:
+            env["__CATALOG"] = config.catalog
+        else:
+            env["__CATALOG"] = ""
         env["__HARNESS_METADATA_SCHEMA"] = config.metadata_schema
         env["__HARNESS_METADATA_TABLE"] = config.metadata_table
         env["__HARNESS_SNAPSHOT_SCHEMA"] = config.snapshot_schema

@@ -3,6 +3,7 @@ import os
 from faker import Faker
 from pyspark.sql import SparkSession
 from pytest_mock import MockFixture
+from harness.config.EnvConfig import EnvConfig
 
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.manager.HarnessJobManager import HarnessJobManager
@@ -161,3 +162,28 @@ class TestHarnessJobManager:
 
         for source in manager.config.sources.values():
             assert source.version == 2
+
+    def test_env_config_empyt_catalog(self, mocker: MockFixture, faker: Faker):
+        
+        config = generate_standard_harness_job_config(0, faker)
+        env = EnvConfig(
+            workspace_url="https://dbc-b703fa4f-373c.cloud.databricks.com",
+            workspace_token="dapie631edb76860dd52605706ba22d2c3ec",
+            metadata_schema="hive_metastore.default",
+            metadata_table="databricks_shubham_harness",
+            snapshot_schema="hive_metastore.default",
+            snapshot_table_post_fix="databricks_shubham_harness_post",
+            jdbc_url="jdbc:spark://dbc-b703fa4f-373c.cloud.databricks.com:443/default;transportMode=http;ssl=1;AuthMech=3;httpPath=/sql/1.0/warehouses/7d6c126fdae128cb",
+            jdbc_user="admin",
+            jdbc_password="abcde",
+            jdbc_driver="abcde",
+        )
+        session = mocker.MagicMock()
+        constructor = HarnessJobManager(config, env, session)
+        assert constructor is not None
+        assert type(constructor.config) is HarnessJobConfig
+        assert isinstance(constructor._source_snapshoters, dict)
+        assert isinstance(constructor._input_snapshoters, dict)
+        assert type(constructor._metadataManager) == HarnessJobManagerMetaData
+        assert constructor._env == HarnessJobManagerEnvironment
+
