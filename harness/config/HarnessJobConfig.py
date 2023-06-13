@@ -11,7 +11,7 @@ class HarnessJobConfig(BaseModel):
     snapshot_name: Optional[str] = None
     sources: dict[str, SnapshotConfig]
     inputs: dict[str, SnapshotConfig]
-
+    
     @classmethod
     @validator("job_id")
     def valid_job_id(cls, value):

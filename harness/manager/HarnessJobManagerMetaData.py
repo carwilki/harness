@@ -15,13 +15,13 @@ class HarnessJobManagerMetaData:
 
     def create_metadata_table(self):
         self.session.sql(
-            f"""Create table if not exists {self._table} (id int, value string)"""
+            f"""Create table if not exists {self._table} (id string, value string)"""
         ).collect()
 
     def get(self, key) -> Optional[HarnessJobConfig]:
         try:
             json: str = self.session.sql(
-                f"""Select value from {self._table} where id == {key}"""
+                f"""Select value from {self._table} where id == '{key}'"""
             ).collect()[0][0]
             if len(json) == 0:
                 return None
@@ -32,13 +32,13 @@ class HarnessJobManagerMetaData:
 
     def create(self, value: HarnessJobConfig):
         self.session.sql(
-            f"""Insert into {self._table}(id,value) values ({value.job_id},{value.json()})"""
+            f"""Insert into {self._table}(id,value) values ('{value.job_id}','{value.json()}')"""
         ).collect()
 
     def update(self, key, value: HarnessJobConfig):
         self.session.sql(
-            f"""Update {self._table} set value = {value.json()} where id == {key}"""
+            f"""Update {self._table} set value = '{value.json()}' where id == '{key}'"""
         ).collect()
 
     def delete(self, key):
-        self.session.sql(f"""Delete from {self._table} where id == {key}""").collect()
+        self.session.sql(f"""Delete from {self._table} where id == '{key}'""").collect()
