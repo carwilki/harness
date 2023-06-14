@@ -11,7 +11,9 @@ class JDBCSource(AbstractSource):
         self.config = config
 
     def read(self) -> DataFrame:
-        SQL = f"(select * from {self.config.source_table} where {self.config.source_filter}) as src"
+        SQL = f"(select * from {self.config.source_table}"
+        if self.config.source_filter is not None:
+            SQL = SQL + f" where {self.config.source_filter})"
 
         reader_options = {
             "url": self.config.jdbc_url,
