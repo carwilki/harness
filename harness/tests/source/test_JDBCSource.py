@@ -44,4 +44,4 @@ class TestJDBCSource:
         spark_mock.format.assert_called_once_with("jdbc")
         spark_mock.option.assert_called()
         spark_mock.options.assert_called()
-        spark_mock.load.assert_called()
+        spark_mock.load.assert_called_once()
