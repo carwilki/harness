@@ -11,4 +11,4 @@ class TableTarget(AbstractTarget):
 
     def write(self, df: DataFrame) -> bool:
         self.session.sql(f"""truncate table {self.config.target_schema}.{self.config.target_table}""")
-        df.writeTo(f"""{self.target_schema}.{self.target_table}""")
+        df.writeTo(f"""{self.config.target_schema}.{self.config.target_table}""")

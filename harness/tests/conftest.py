@@ -1,6 +1,5 @@
 import pytest
 from pyspark.sql import SparkSession
-from unittest.mock import MagicMock
 
 
 @pytest.fixture(scope="session")

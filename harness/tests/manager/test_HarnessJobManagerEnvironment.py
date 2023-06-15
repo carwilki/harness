@@ -4,7 +4,12 @@ from faker import Faker
 from pytest_mock import MockFixture
 
 from harness.config.EnvConfig import EnvConfig
+from harness.config.HarnessJobConfig import HarnessJobConfig
+from harness.config.SnapshotConfig import SnapshotConfig
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
+from harness.manager.HarnessJobManager import HarnessJobManager
+from harness.sources.JDBCSourceConfig import JDBCSourceConfig
+from harness.target.TableTargetConfig import TableTargetConfig
 
 
 class TestHarnessJobManagerEnvironment:
@@ -63,3 +68,36 @@ class TestHarnessJobManagerEnvironment:
         assert HarnessJobManagerEnvironment.jdbc_user() == env_config.jdbc_user
         assert HarnessJobManagerEnvironment.jdbc_password() == env_config.jdbc_password
         assert HarnessJobManagerEnvironment.jdbc_num_part() == env_config.jdbc_num_part
+
+    def test_snapshot_should_not_fail_with_given_config(
+        self, mocker: MockFixture, faker: Faker
+    ):
+        session = mocker.MagicMock()
+        username = faker.user_name()
+        password = faker.password()
+        env1 = EnvConfig(
+            workspace_url="https://3986616729757273.3.gcp.databricks.com/",
+            workspace_token="dapi5492460db39d145778c9d436bbbf1842",
+            metadata_schema="hive_metastore.nzmigration",
+            metadata_table="databricks_shubham_harness",
+            snapshot_schema="hive_metastore.nzmigration",
+            snapshot_table_post_fix="databricks_shubham_harness_post",
+            jdbc_url="jdbc:netezza:/172.16.73.181:5480/EDW_PRD",
+            jdbc_user=username,
+            jdbc_password=password,
+            jdbc_driver="org.netezza.Driver",
+        )
+
+        sc = JDBCSourceConfig(source_table="E_CONSOL_PERF_SMRY", source_schema="WMSMIS")
+        tc = TableTargetConfig(
+            target_table="WM_E_CONSOL_PERF_SMRY",
+            target_schema="hive_metastore.nzmigration",
+        )
+        snc = SnapshotConfig(target=tc, source=sc)
+        job_id = "51298d4f-934f-439a-b80d-251987f54415"
+        hjc = HarnessJobConfig(
+            job_id=job_id, sources={"source1": snc}, inputs={"source1": snc}
+        )
+
+        hjm = HarnessJobManager(hjc, env1, session)
+        hjm.snapshot()
