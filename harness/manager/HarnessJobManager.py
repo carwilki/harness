@@ -27,6 +27,7 @@ class HarnessJobManager:
             envconfig (EnvConfig): Exteranl Environment Config
             session (SparkSession): an active spark session
         """
+        self._env: HarnessJobManagerEnvironment = self._bindenv(envconfig)
         self.logger = getLogger()
         self.session: SparkSession = session
         self.config: HarnessJobConfig = config
@@ -35,11 +36,9 @@ class HarnessJobManager:
         self._metadataManager: HarnessJobManagerMetaData = HarnessJobManagerMetaData(
             session
         )
-        self._env: HarnessJobManagerEnvironment = self._bindenv(envconfig)
-        self._configureMetaDataTable()
+        self._configureMetaData()
         # this will overwrite any existing inputs if there is an existing
         # job config
-        self._loadExistingMetaDataIfExists()
         self._configureSourceSnaphotters()
         self._configureInputSnapshotters()
 
@@ -55,12 +54,12 @@ class HarnessJobManager:
         HarnessJobManagerEnvironment.bindenv(envconfig)
         return HarnessJobManagerEnvironment
 
-    def _configureMetaDataTable(self):
+    def _configureMetaData(self):
         """
         configures the metadata manager repository
         """
         self._metadataManager.create_metadata_table()
-        self._metadataManager.create(self.config)
+        self._loadExistingMetaDataIfExists()
 
     def _loadExistingMetaDataIfExists(self):
         """
@@ -86,7 +85,6 @@ class HarnessJobManager:
         """
         configures the source snapshotters
         """
-        source: SnapshotConfig
         for source in self.config.sources.values():
             snapshotter = SnapshotterFactory.create(
                 snapshot_config=source, session=self.session

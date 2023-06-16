@@ -16,3 +16,7 @@ class SourceConfig(BaseModel, abc.ABC):
                 "source_type provided is null or it's of incorrect datatype"
             )
         return value
+    
+    @classmethod
+    def parse_obj(cls, obj):
+        return cls._convert_to_real_type_(obj)

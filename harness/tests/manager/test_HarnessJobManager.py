@@ -6,11 +6,14 @@ from pytest_mock import MockFixture
 from harness.config.EnvConfig import EnvConfig
 
 from harness.config.HarnessJobConfig import HarnessJobConfig
+from harness.config.SnapshotConfig import SnapshotConfig
 from harness.manager.HarnessJobManager import HarnessJobManager
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
 from harness.sources.JDBCSource import JDBCSource
+from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 from harness.target.TableTarget import TableTarget
+from harness.target.TableTargetConfig import TableTargetConfig
 from harness.tests.utils.generator import (
     generate_env_config,
     generate_standard_harness_job_config,
@@ -164,7 +167,6 @@ class TestHarnessJobManager:
             assert source.version == 2
 
     def test_env_config_empyt_catalog(self, mocker: MockFixture, faker: Faker):
-        
         config = generate_standard_harness_job_config(0, faker)
         env = EnvConfig(
             workspace_url="https://dbc-b703fa4f-373c.cloud.databricks.com",
@@ -187,3 +189,35 @@ class TestHarnessJobManager:
         assert type(constructor._metadataManager) == HarnessJobManagerMetaData
         assert constructor._env == HarnessJobManagerEnvironment
 
+    def test_should_be_able_to_snapshot_with_jdbc_sourc_and_table_target(
+        self, spark: SparkSession, mocker: MockFixture, faker: Faker
+    ):
+        username = faker.user_name()
+        password = faker.password()
+        session = mocker.MagicMock()
+        env1 = EnvConfig(
+            workspace_url="https://3986616729757273.3.gcp.databricks.com/",
+            workspace_token="dapi5492460db39d145778c9d436bbbf1842",
+            metadata_schema="hive_metastore.nzmigration",
+            metadata_table="harness_metadata",
+            snapshot_schema="hive_metastore.nzmigration",
+            snapshot_table_post_fix="_gold",
+            jdbc_url="jdbc:netezza:/172.16.73.181:5480/EDW_PRD",
+            jdbc_user=username,
+            jdbc_password=password,
+            jdbc_driver="org.netezza.Driver",
+        )
+
+        sc = JDBCSourceConfig(source_table="E_CONSOL_PERF_SMRY", source_schema="WMSMIS")
+        tc = TableTargetConfig(
+            target_table="WM_E_CONSOL_PERF_SMRY",
+            target_schema="hive_metastore.nzmigration",
+        )
+        snc = SnapshotConfig(target=tc, source=sc)
+        job_id = "01298d4f-934f-439a-b80d-251987f54415"
+
+        hjc = HarnessJobConfig(job_id=job_id, sources={"source1": snc}, inputs={})
+
+        hjm = HarnessJobManager(hjc, env1, session)
+        
+        hjm.snapshot()

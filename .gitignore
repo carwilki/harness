@@ -5,7 +5,7 @@
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
-
+harness/manger.py
 # Local History for Visual Studio Code
 .history/
 

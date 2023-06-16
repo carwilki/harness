@@ -4,13 +4,21 @@ from unittest.mock import MagicMock
 from faker import Faker
 from pytest_mock import MockFixture
 from pyspark.sql import SparkSession
+from harness.config.EnvConfig import EnvConfig
+from harness.config.HarnessJobConfig import HarnessJobConfig
+from harness.config.SnapshotConfig import SnapshotConfig
 from harness.snaphotter.Snapshotter import Snapshotter
+from harness.sources.SourceFactory import SourceFactory
+from harness.target.TargetFactory import TargetFactory
 from harness.tests.utils.generator import (
     generate_standard_snapshot_config,
     generate_standard_validator_config,
 )
 from harness.validator.DataFrameValidator import DataFrameValidator
 from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
+from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
+from harness.sources.JDBCSourceConfig import JDBCSourceConfig
+from harness.target.TableTargetConfig import TableTargetConfig
 
 
 class TestSnapshotter:
@@ -127,7 +135,7 @@ class TestSnapshotter:
         config.validator.validator_reports = {datetime.now(): validation_report}
         source = mocker.MagicMock()
         target = mocker.MagicMock()
-        
+
         source.read.return_value = spark.createDataFrame([{"a": 1}])
 
         validator: MagicMock = mocker.patch.object(DataFrameValidator, "validate")
@@ -182,3 +190,36 @@ class TestSnapshotter:
         source.read.assert_not_called()
         target.write.assert_not_called()
         validator.assert_not_called()
+
+    def test_can_not_create_snapshot_with_jdbc_source_and_table_target_with_validator(
+        self, mocker: MockFixture, faker: Faker, spark: SparkSession
+    ):
+        username = faker.user_name()
+        password = faker.password()
+        session = mocker.MagicMock()
+        env1 = EnvConfig(
+            workspace_url="https://3986616729757273.3.gcp.databricks.com/",
+            workspace_token="dapi5492460db39d145778c9d436bbbf1842",
+            metadata_schema="hive_metastore.nzmigration",
+            metadata_table="harness_metadata",
+            snapshot_schema="hive_metastore.nzmigration",
+            snapshot_table_post_fix="_gold",
+            jdbc_url="jdbc:netezza:/172.16.73.181:5480/EDW_PRD",
+            jdbc_user=username,
+            jdbc_password=password,
+            jdbc_driver="org.netezza.Driver",
+        )
+        HarnessJobManagerEnvironment.bindenv(env1)
+        sc = JDBCSourceConfig(source_table="E_CONSOL_PERF_SMRY", source_schema="WMSMIS")
+        tc = TableTargetConfig(
+            target_table="WM_E_CONSOL_PERF_SMRY",
+            target_schema="hive_metastore.nzmigration",
+        )
+        snc = SnapshotConfig(target=tc, source=sc)
+        job_id = "01298d4f-934f-439a-b80d-251987f54415"
+        snaps = Snapshotter(
+            snc,
+            SourceFactory.create(snc.source, session),
+            TargetFactory.create(snc.target, session),
+        )
+        snaps.snapshot()

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Union
 
 from pydantic import BaseModel
 from pydantic import validator as pydantic_validator
@@ -7,12 +7,14 @@ from pydantic import validator as pydantic_validator
 from harness.config.SourceConfig import SourceConfig
 from harness.config.TargetConfig import TargetConfig
 from harness.config.ValidatorConfig import ValidatorConfig
+from harness.sources.JDBCSourceConfig import JDBCSourceConfig
+from harness.target.TableTargetConfig import TableTargetConfig
 
 
 class SnapshotConfig(BaseModel):
     name: Optional[str] = None
-    target: TargetConfig
-    source: SourceConfig
+    target: TableTargetConfig = None
+    source: JDBCSourceConfig = None
     version: int = 0
     validator: Optional[ValidatorConfig] = None
     validated: bool = False

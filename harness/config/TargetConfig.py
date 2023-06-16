@@ -18,3 +18,5 @@ class TargetConfig(BaseModel, abc.ABC):
                 "target_type provided is null or it's of incorrect datatype"
             )
         return value
+
+    

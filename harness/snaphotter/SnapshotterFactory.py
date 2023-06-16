@@ -3,6 +3,7 @@ from typing import Optional
 from pyspark.sql import SparkSession
 
 from harness.config.SnapshotConfig import SnapshotConfig
+from harness.config.SourceConfig import SourceConfig
 from harness.config.TargetConfig import TargetConfig
 from harness.snaphotter.AbstractSnapshotter import AbstractSnapshotter
 from harness.snaphotter.Snapshotter import Snapshotter
@@ -44,7 +45,7 @@ class SnapshotterFactory:
 
     @classmethod
     def _create_source(
-        cls, config: SnapshotConfig, session: SparkSession
+        cls, config: SourceConfig, session: SparkSession
     ) -> AbstractSource:
         return SourceFactory.create(config, session)
 
