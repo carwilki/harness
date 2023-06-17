@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from pyspark.sql import DataFrame, SparkSession
 
@@ -8,5 +9,5 @@ class AbstractTarget(ABC):
         self.session = session
 
     @abstractmethod
-    def write(self, df: DataFrame) -> bool:
+    def write(self, df: DataFrame, prefix: Optional[str] = None):
         pass

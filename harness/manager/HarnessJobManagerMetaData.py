@@ -1,5 +1,5 @@
 from typing import Optional
-
+from json import dumps, loads
 from pyspark.sql import SparkSession
 
 from harness.config.HarnessJobConfig import HarnessJobConfig
@@ -19,20 +19,23 @@ class HarnessJobManagerMetaData:
         ).collect()
 
     def get(self, key) -> Optional[HarnessJobConfig]:
+        self.session.conf.set("spark.sql.parser.escapedStringLiterals", "false")
         try:
             json: str = self.session.sql(
                 f"""Select value from {self._table} where id == '{key}'"""
             ).collect()[0][0]
             if len(json) == 0:
                 return None
-            return HarnessJobConfig.parse_raw(json)
+            else:
+                return HarnessJobConfig.parse_raw(loads(json))
 
         except IndexError:
             return None
 
     def create(self, value: HarnessJobConfig):
+        self.session.conf.set("spark.sql.parser.escapedStringLiterals", "false")
         self.session.sql(
-            f"""Insert into {self._table}(id,value) values ('{value.job_id}','{value.json()}')"""
+            f"""Insert into {self._table}(id,value) values ('{value.job_id}','{value.json()}'"""
         ).collect()
 
     def update(self, key, value: HarnessJobConfig):

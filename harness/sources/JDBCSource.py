@@ -11,13 +11,16 @@ class JDBCSource(AbstractSource):
         self.config: JDBCSourceConfig = config
 
     def read(self) -> DataFrame:
-        SQL = f"select * from {self.config.source_schema}.{self.config.source_table}"
+        SQL = f"""Select * from {self.config.source_schema}.{self.config.source_table}"""
+        
         if self.config.source_filter is not None:
-            SQL = SQL + f" where {self.config.source_filter}"
+            SQL = SQL + f""" WHERE {self.config.source_filter}"""
+        
+        SQL = f"""({SQL}) as data"""
 
         reader_options = {
             "url": HarnessJobManagerEnvironment.jdbc_url(),
-            "query": f"{SQL}",
+            "dbtable": f"{SQL}",
             "fetchsize": 10000,
             "user": HarnessJobManagerEnvironment.jdbc_user(),
             "password": HarnessJobManagerEnvironment.jdbc_password(),

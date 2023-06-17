@@ -13,11 +13,12 @@ from harness.target.TableTargetConfig import TableTargetConfig
 
 class SnapshotConfig(BaseModel):
     name: Optional[str] = None
+    job_id: Optional[str] = None
     target: TableTargetConfig = None
     source: JDBCSourceConfig = None
     version: int = 0
     validator: Optional[ValidatorConfig] = None
-    validated: bool = False
+    validated: bool = False   
     validation_date: Optional[datetime] = None
     validation_report: Optional[str] = None
 
