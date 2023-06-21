@@ -1,5 +1,4 @@
 from typing import Optional
-from json import dumps, loads
 from pyspark.sql import SparkSession
 
 from harness.config.HarnessJobConfig import HarnessJobConfig
@@ -19,29 +18,28 @@ class HarnessJobManagerMetaData:
         ).collect()
 
     def get(self, key) -> Optional[HarnessJobConfig]:
-        self.session.conf.set("spark.sql.parser.escapedStringLiterals", "false")
         try:
-            json: str = self.session.sql(
+            bin = self.session.sql(
                 f"""Select value from {self._table} where id == '{key}'"""
             ).collect()[0][0]
-            if len(json) == 0:
+            if len(bin) == 0:
                 return None
             else:
-                return HarnessJobConfig.parse_raw(loads(json))
-
+                return HarnessJobConfig.parse_raw(bin)
         except IndexError:
             return None
 
     def create(self, value: HarnessJobConfig):
-        self.session.conf.set("spark.sql.parser.escapedStringLiterals", "false")
-        self.session.sql(
-            f"""Insert into {self._table}(id,value) values ('{value.job_id}','{value.json()}'"""
-        ).collect()
+        bin = value.json().encode("utf-8")
+        bin = str(bin).removeprefix("b'").removesuffix("'")
+        sql = f"""Insert into {self._table} values ('{value.job_id}', '{bin}')"""
+        self.session.sql(sql).collect()
 
     def update(self, key, value: HarnessJobConfig):
-        self.session.sql(
-            f"""Update {self._table} set value = '{value.json()}' where id == '{key}'"""
-        ).collect()
-
+        bin = value.json().encode("utf-8")
+        bin = str(bin).removeprefix("b'").removesuffix("'")
+        sql = f"""update {self._table} set value = '{bin}' where id == '{value.job_id}'"""
+        self.session.sql(sql).collect()
+        
     def delete(self, key):
         self.session.sql(f"""Delete from {self._table} where id == '{key}'""").collect()

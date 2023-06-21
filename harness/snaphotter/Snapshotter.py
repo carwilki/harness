@@ -43,7 +43,12 @@ class Snapshotter(AbstractSnapshotter):
         self.target.write(df, self.config.job_id)
         if self.config.validator is not None:
             date = datetime.now().strftime("%Y-%m-%d %H:%M")
-            report = self._validator.validate(df, self.source.read, self.source.session)
+            report = self._validator.validate(
+                name=self.config.name,
+                master=self.source.read(),
+                canidate=df,
+                session=self.source.session,
+            )
             self.config.validator.validator_reports[date] = report
 
         self.config.version += 1

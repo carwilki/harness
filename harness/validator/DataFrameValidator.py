@@ -14,7 +14,7 @@ class DataFrameValidator(AbstractValidator):
         self._config = config
 
     def validate(
-        self, canidate: DataFrame, master: DataFrame, session: SparkSession
+        self, name: str, canidate: DataFrame, master: DataFrame, session: SparkSession
     ) -> DataFrameValidatorReport:
         """
         Validate the data frame
@@ -27,13 +27,18 @@ class DataFrameValidator(AbstractValidator):
             compare_df=canidate,
             join_columns=self._config.join_keys,
         )
+        
         comparison_result = StringIO()
         comparison.report(comparison_result)
         missmatch_both: DataFrame = comparison.rows_both_mismatch
-        missmatch_sample = missmatch_both.limit(10).toPandas()
+        report_table_name = (
+            f"{name}_validation_report_on_{datetime.now().strftime('%Y_%m_%d_%H_%M')}"
+        )
+
+        missmatch_both.write.saveAsTable(report_table_name)
 
         return DataFrameValidatorReport(
             summary=comparison_result,
-            missmatch_sample=missmatch_sample.to_json(),
+            table=report_table_name,
             validation_date=datetime.now(),
         )

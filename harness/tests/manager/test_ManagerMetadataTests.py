@@ -7,7 +7,9 @@ from harness.config.HarnessJobConfig import HarnessJobConfig
 
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
 from harness.sources.JDBCSourceConfig import JDBCSourceConfig
-from harness.tests.utils.generator import generate_abstract_harness_job_config, generate_standard_harness_job_config
+from harness.tests.utils.generator import (
+    generate_standard_harness_job_config,
+)
 
 
 class TestManagerMetaData:
@@ -53,22 +55,28 @@ class TestManagerMetaData:
 
     def test_can_create(self, mocker: MockFixture, faker: Faker):
         schema, table = self.configenv(mocker=mocker, faker=faker)
+        table = f"{schema}.{table}"
         session: SparkSession = mocker.MagicMock()
         metadata = HarnessJobManagerMetaData(session=session)
-        config = generate_standard_harness_job_config(0,faker=faker)
+        config = generate_standard_harness_job_config(0, faker=faker)
+        bin = config.json().encode("utf-8")
+        bin = str(bin).removeprefix("b'").removesuffix("'")
         metadata.create(value=config)
         session.sql.assert_called_with(
-            f"""Insert into {schema}.{table}(id,value) values ('{config.job_id}','{config.json()}')"""
+            f"""Insert into {table} values ('{config.job_id}', '{bin}')"""
         )
 
     def test_can_update(self, mocker: MockFixture, faker: Faker):
         schema, table = self.configenv(mocker=mocker, faker=faker)
+        table = f"{schema}.{table}"
         session: SparkSession = mocker.MagicMock()
         metadata = HarnessJobManagerMetaData(session=session)
-        config = generate_standard_harness_job_config(1,faker=faker)
+        config = generate_standard_harness_job_config(1, faker=faker)
+        bin = config.json().encode("utf-8")
+        bin = str(bin).removeprefix("b'").removesuffix("'")
         metadata.update(key=config.job_id, value=config)
         session.sql.assert_called_with(
-            f"""Update {schema}.{table} set value = '{config.json()}' where id == '{config.job_id}'"""
+            f"""update {table} set value = '{bin}' where id == '{config.job_id}'"""
         )
 
     def test_can_deserialize_proper_types(self, mocker: MockFixture, faker: Faker):
