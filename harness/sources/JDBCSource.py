@@ -34,4 +34,4 @@ class JDBCSource(AbstractSource):
             .load()
         )
 
-        return df
+        return df.repartition(100)
