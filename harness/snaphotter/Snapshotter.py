@@ -49,6 +49,9 @@ class Snapshotter(AbstractSnapshotter):
                 canidate=df,
                 session=self.source.session,
             )
+            if self.config.validator.validator_reports is None:
+                self.config.validator.validator_reports = {}
+                
             self.config.validator.validator_reports[date] = report
 
         self.config.version += 1
