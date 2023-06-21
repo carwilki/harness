@@ -5,6 +5,7 @@ from datacompy import SparkCompare
 from pyspark.sql import DataFrame, SparkSession
 
 from harness.config.ValidatorConfig import ValidatorConfig
+from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.validator.AbstractValidator import AbstractValidator
 from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
 
@@ -27,18 +28,16 @@ class DataFrameValidator(AbstractValidator):
             compare_df=canidate,
             join_columns=self._config.join_keys,
         )
-        
+
         comparison_result = StringIO()
         comparison.report(comparison_result)
         missmatch_both: DataFrame = comparison.rows_both_mismatch
-        report_table_name = (
-            f"{name}_validation_report_on_{datetime.now().strftime('%Y_%m_%d_%H_%M')}"
-        )
+        report_table_name = f"{HarnessJobManagerEnvironment.snapshot_schema()}.{name}_validation_report_on_{datetime.now().strftime('%Y_%m_%d_%H_%M')}"
 
         missmatch_both.write.saveAsTable(report_table_name)
 
         return DataFrameValidatorReport(
-            summary=comparison_result,
+            summary=comparison_result.getvalue(),
             table=report_table_name,
             validation_date=datetime.now(),
         )
