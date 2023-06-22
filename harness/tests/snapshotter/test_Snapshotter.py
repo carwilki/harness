@@ -51,6 +51,7 @@ class TestSnapshotter:
         ).return_value(
             DataFrameValidatorReport(
                 summary="test",
+                table=faker.pystr(),
                 missmatch_sample=faker.paragraph(nb_sentences=10),
                 validation_date=faker.date_time(),
             )
@@ -93,11 +94,12 @@ class TestSnapshotter:
     ):
         config = generate_standard_snapshot_config(0, faker)
         config.validator = generate_standard_validator_config(faker)
-        source = mocker.MagicMock()
-        target = mocker.MagicMock()
+        source: MagicMock = mocker.MagicMock()
+        target: MagicMock = mocker.MagicMock()
         source.read.return_value = spark.createDataFrame([{"a": 1}])
         validation_report = DataFrameValidatorReport(
             summary="test",
+            table=faker.pystr(),
             missmatch_sample=faker.paragraph(nb_sentences=10),
             validation_date=faker.date_time(),
         )
@@ -117,7 +119,7 @@ class TestSnapshotter:
         assert sut._validator is not None
         assert len(sut.config.validator.validator_reports) == 1
         assert sut.config.version == 1
-        source.read.assert_called_once()
+        assert source.read.call_count == 2
         target.write.assert_called_once()
         validator.assert_called_once()
 
@@ -126,6 +128,7 @@ class TestSnapshotter:
     ):
         validation_report = DataFrameValidatorReport(
             summary="test",
+            table=faker.pystr(),
             missmatch_sample=faker.paragraph(nb_sentences=10),
             validation_date=faker.date_time(),
         )
@@ -153,7 +156,7 @@ class TestSnapshotter:
         assert sut._validator is not None
         assert len(sut.config.validator.validator_reports) == 2
         assert sut.config.version == 2
-        source.read.assert_called_once()
+        assert source.read.call_count == 2
         target.write.assert_called_once()
         validator.assert_called_once()
 
@@ -162,6 +165,7 @@ class TestSnapshotter:
     ):
         validation_report = DataFrameValidatorReport(
             summary="test",
+            table=faker.pystr(),
             missmatch_sample=faker.paragraph(nb_sentences=10),
             validation_date=faker.date_time(),
         )
@@ -187,7 +191,7 @@ class TestSnapshotter:
         assert sut.target == target
         assert sut._validator is not None
         assert sut.config.version == 2
-        source.read.assert_not_called()
+        assert source.read.call_count == 0
         target.write.assert_not_called()
         validator.assert_not_called()
 

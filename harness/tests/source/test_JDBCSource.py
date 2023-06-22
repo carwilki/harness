@@ -40,7 +40,7 @@ class TestJDBCSource:
 
         source = JDBCSource(config, session=spark_mock)
         df = source.read()
-        assert df is rdf
+        assert df.collect() == rdf.collect()
         spark_mock.format.assert_called_once_with("jdbc")
         spark_mock.option.assert_called()
         spark_mock.options.assert_called()
