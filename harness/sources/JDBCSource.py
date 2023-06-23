@@ -19,7 +19,7 @@ class JDBCSource(AbstractSource):
         SQL = f"""({SQL}) as data"""
 
         reader_options = {
-            "url": HarnessJobManagerEnvironment.jdbc_url(),
+            "url": f"""{HarnessJobManagerEnvironment.jdbc_url()}/{self.config.source_schema}""",
             "dbtable": f"{SQL}",
             "fetchsize": 10000,
             "user": HarnessJobManagerEnvironment.jdbc_user(),
