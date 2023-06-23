@@ -1,5 +1,5 @@
 from datetime import datetime
-from logging import getLogger
+from utils.logger import getLogger
 
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.snaphotter.AbstractSnapshotter import AbstractSnapshotter
@@ -43,7 +43,7 @@ class Snapshotter(AbstractSnapshotter):
         self.target.write(df, self.config.job_id)
         if self.config.validator is not None:
             date = datetime.now().strftime("%Y-%m-%d %H:%M")
-            report = self._validator.validate(
+            report = self._validator.validateDF(
                 name=self.config.name,
                 master=self.source.read(),
                 canidate=df,
