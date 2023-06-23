@@ -7,6 +7,10 @@ from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
 
 
 class ValidatorConfig(BaseModel):
+    base_schema: str
+    base_table: str
+    canidate_schema: str
+    canidate_table: str
     join_keys: list
     filter: Optional[str] = None
     validator_reports: Optional[dict[datetime, DataFrameValidatorReport]] = None

@@ -8,6 +8,6 @@ class AbstractSource(abc.ABC):
         super().__init__()
         self.session = session
 
-    @abc.abstractmethod
+    @abc.abstractmethod 
     def read(self) -> DataFrame:
         pass

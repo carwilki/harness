@@ -1,4 +1,3 @@
-from logging import getLogger
 from uuid import uuid4
 
 from pyspark.sql import SparkSession
@@ -8,8 +7,10 @@ from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
+from harness.manager.TestDataManger import TestDataManager
 from harness.snaphotter.Snapshotter import Snapshotter
 from harness.snaphotter.SnapshotterFactory import SnapshotterFactory
+from harness.utils.logger import getLogger
 
 
 class HarnessJobManager:
@@ -27,8 +28,8 @@ class HarnessJobManager:
             envconfig (EnvConfig): Exteranl Environment Config
             session (SparkSession): an active spark session
         """
-        self._env: HarnessJobManagerEnvironment = self._bindenv(envconfig)
         self.logger = getLogger()
+        self._env: HarnessJobManagerEnvironment = self._bindenv(envconfig)
         self.session: SparkSession = session
         self.config: HarnessJobConfig = config
         self._source_snapshoters: dict[str, Snapshotter] = {}
@@ -51,6 +52,7 @@ class HarnessJobManager:
         Returns:
             HarnessJobManagerEnvironment: The environment that was bound
         """
+        self.logger.info("Binding Environment...")
         HarnessJobManagerEnvironment.bindenv(envconfig)
         return HarnessJobManagerEnvironment
 
@@ -107,9 +109,12 @@ class HarnessJobManager:
                 self._input_snapshoters[source.name] = snapshotter
             else:
                 self._source_snapshoters[str(uuid4())] = snapshotter
-
-    def run(self):
-        self.snapshot()
+    
+    def resetDataForTestRun(self):
+        for snapshot in self._source_snapshoters.values():
+            TestDataManager.configureJDBCSourceForTest(
+                snapshot.source, snapshot.target, self.session, isbase=True
+            )
 
     def snapshot(self):
         """

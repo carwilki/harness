@@ -12,6 +12,11 @@ class HarnessJobManagerMetaData:
         self._harness_metadata_table = HarnessJobManagerEnvironment.metadata_table()
         self._table = f"{self._harness_metadata_schema}.{self._harness_metadata_table}"
 
+    @classmethod
+    def getJobById(cls, id: str, spark: SparkSession) -> Optional[HarnessJobConfig]:
+        manager = HarnessJobManagerMetaData(spark)
+        return manager.get(id)
+    
     def create_metadata_table(self):
         self.session.sql(
             f"""Create table if not exists {self._table} (id string, value string)"""

@@ -3,14 +3,14 @@ from logging import getLogger
 
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.snaphotter.AbstractSnapshotter import AbstractSnapshotter
-from harness.sources.AbstractSource import AbstractSource
-from harness.target.AbstractTarget import AbstractTarget
+from harness.sources.JDBCSource import JDBCSource
+from harness.target.TableTarget import TableTarget
 from harness.validator.DataFrameValidator import DataFrameValidator
 
 
 class Snapshotter(AbstractSnapshotter):
     def __init__(
-        self, config: SnapshotConfig, source: AbstractSource, target: AbstractTarget
+        self, config: SnapshotConfig, source: JDBCSource, target: TableTarget
     ) -> None:
         super().__init__(config=config, source=source, target=target)
         self._logger = getLogger()
@@ -21,7 +21,7 @@ class Snapshotter(AbstractSnapshotter):
             self._logger.info(
                 f"No validator configured for snapshotter {self.config.name}"
             )
-
+                    
     def snapshot(self):
         if self.config.version < 0:
             self.config.version = 0
