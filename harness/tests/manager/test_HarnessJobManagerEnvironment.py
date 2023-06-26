@@ -43,11 +43,11 @@ class TestHarnessJobManagerEnvironment:
             workspace_url=faker.url(),
             metadata_schema=faker.first_name_male(),
             metadata_table=faker.first_name_female(),
-            jdbc_url=faker.url(),
-            jdbc_user=faker.first_name_male(),
-            jdbc_password=faker.password(),
-            jdbc_num_part=faker.random_int(),
-            jdbc_driver=faker.pystr(),
+            netezza_jdbc_url=faker.url(),
+            netezza_jdbc_user=faker.first_name_male(),
+            netezza_jdbc_password=faker.password(),
+            netezza_jdbc_num_part=faker.random_int(),
+            netezza_jdbc_driver=faker.pystr(),
             snapshot_schema=faker.first_name(),
             snapshot_table_post_fix=faker.first_name(),
         )
@@ -64,10 +64,10 @@ class TestHarnessJobManagerEnvironment:
         assert (
             HarnessJobManagerEnvironment.metadata_table() == env_config.metadata_table
         )
-        assert HarnessJobManagerEnvironment.jdbc_url() == env_config.jdbc_url
-        assert HarnessJobManagerEnvironment.jdbc_user() == env_config.jdbc_user
-        assert HarnessJobManagerEnvironment.jdbc_password() == env_config.jdbc_password
-        assert HarnessJobManagerEnvironment.jdbc_num_part() == env_config.jdbc_num_part
+        assert HarnessJobManagerEnvironment.jdbc_url() == env_config.netezza_jdbc_url
+        assert HarnessJobManagerEnvironment.jdbc_user() == env_config.netezza_jdbc_user
+        assert HarnessJobManagerEnvironment.jdbc_password() == env_config.netezza_jdbc_password
+        assert HarnessJobManagerEnvironment.jdbc_num_part() == env_config.netezza_jdbc_num_part
 
     def test_snapshot_should_not_fail_with_given_config(
         self, mocker: MockFixture, faker: Faker
@@ -82,10 +82,10 @@ class TestHarnessJobManagerEnvironment:
             metadata_table="databricks_shubham_harness",
             snapshot_schema="hive_metastore.nzmigration",
             snapshot_table_post_fix="databricks_shubham_harness_post",
-            jdbc_url="jdbc:netezza:/172.16.73.181:5480/EDW_PRD",
-            jdbc_user=username,
-            jdbc_password=password,
-            jdbc_driver="org.netezza.Driver",
+            netezza_jdbc_url="jdbc:netezza:/172.16.73.181:5480/EDW_PRD",
+            netezza_jdbc_user=username,
+            netezza_jdbc_password=password,
+            netezza_jdbc_driver="org.netezza.Driver",
         )
 
         sc = JDBCSourceConfig(source_table="E_CONSOL_PERF_SMRY", source_schema="WMSMIS")

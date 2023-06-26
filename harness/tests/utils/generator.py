@@ -13,7 +13,7 @@ from harness.target.TableTargetConfig import TableTargetConfig
 
 
 def generate_source_config() -> SourceConfig:
-    return SourceConfig(source_type=SourceTypeEnum.jdbc)
+    return SourceConfig(source_type=SourceTypeEnum.netezza_jdbc)
 
 
 def generate_target_config() -> TargetConfig:
@@ -30,7 +30,7 @@ def generate_table_target_config(faker: Faker) -> TargetConfig:
 
 def generate_jdbc_source_config(faker: Faker) -> TargetConfig:
     return JDBCSourceConfig(
-        source_type=SourceTypeEnum.jdbc,
+        source_type=SourceTypeEnum.netezza_jdbc,
         source_filter=None,
         source_table=faker.pystr(),
         source_schema=faker.pystr(),
@@ -110,9 +110,9 @@ def generate_env_config(faker: Faker) -> EnvConfig:
         snapshot_schema=faker.pystr(),
         snapshot_table_post_fix=faker.pystr(),
         jdbc_username=faker.pystr(),
-        jdbc_password=faker.pystr(),
-        jdbc_num_part=faker.pyint(),
-        jdbc_url=faker.url(),
-        jdbc_driver=faker.pystr(),
-        jdbc_user=faker.user_name(),
+        netezza_jdbc_password=faker.pystr(),
+        netezza_jdbc_num_part=faker.pyint(),
+        netezza_jdbc_url=faker.url(),
+        netezza_jdbc_driver=faker.pystr(),
+        netezza_jdbc_user=faker.user_name(),
     )

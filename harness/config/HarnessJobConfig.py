@@ -3,6 +3,7 @@ from typing import Optional
 from pydantic import BaseModel, validator
 
 from harness.config.SnapshotConfig import SnapshotConfig
+from harness.config.TestRunnerConfig import TestRunnerConfig
 
 
 class HarnessJobConfig(BaseModel):
@@ -12,7 +13,7 @@ class HarnessJobConfig(BaseModel):
     snapshot_name: Optional[str] = None
     sources: dict[str, SnapshotConfig]
     inputs: dict[str, SnapshotConfig]
-    
+
     @classmethod
     @validator("job_id")
     def valid_job_id(cls, value):

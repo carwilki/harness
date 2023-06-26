@@ -2,5 +2,5 @@ from harness.config.EnumBase import EnumBase
 
 
 class SourceTypeEnum(EnumBase):
-    rocky = "rocky"
-    jdbc = "jdbc"
+    netezza_jdbc = "netezza_jdbc"
+    databricks_jdbc = "databricks_jdbc"

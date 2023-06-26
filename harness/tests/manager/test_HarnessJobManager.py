@@ -10,7 +10,7 @@ from harness.config.SnapshotConfig import SnapshotConfig
 from harness.manager.HarnessJobManager import HarnessJobManager
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
-from harness.sources.JDBCSource import JDBCSource
+from harness.sources.JDBCSource import NetezzaJDBCSource
 from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 from harness.target.TableTarget import TableTarget
 from harness.target.TableTargetConfig import TableTargetConfig
@@ -28,9 +28,9 @@ class TestHarnessJobManager:
         constructor = HarnessJobManager(config, envconfig, session)
         assert constructor is not None
         assert type(constructor.config) is HarnessJobConfig
-        assert isinstance(constructor._source_snapshoters, dict)
-        assert isinstance(constructor._input_snapshoters, dict)
-        assert type(constructor._metadataManager) == HarnessJobManagerMetaData
+        assert isinstance(constructor.__source_snapshoters, dict)
+        assert isinstance(constructor.__input_snapshoters, dict)
+        assert type(constructor.__metadataManager) == HarnessJobManagerMetaData
         assert constructor._env == HarnessJobManagerEnvironment
 
     def test_can_create(self, mocker: MockFixture, faker: Faker):
@@ -107,7 +107,7 @@ class TestHarnessJobManager:
         config.version = 0
         envconfig = generate_env_config(faker)
         session = mocker.MagicMock()
-        read = mocker.patch.object(JDBCSource, "read")
+        read = mocker.patch.object(NetezzaJDBCSource, "read")
         write = mocker.patch.object(TableTarget, "write")
         update = mocker.patch.object(HarnessJobManagerMetaData, "update")
         read.return_value(spark.createDataFrame([{"a": 1}]))
@@ -128,7 +128,7 @@ class TestHarnessJobManager:
         envconfig = generate_env_config(faker)
         session = mocker.MagicMock()
         update = mocker.patch.object(HarnessJobManagerMetaData, "update")
-        read = mocker.patch.object(JDBCSource, "read")
+        read = mocker.patch.object(NetezzaJDBCSource, "read")
         write = mocker.patch.object(TableTarget, "write")
         read.return_value(spark.createDataFrame([{"a": 1}]))
         write.return_value(True)
@@ -153,7 +153,7 @@ class TestHarnessJobManager:
         update = mocker.patch.object(HarnessJobManagerMetaData, "update")
         envconfig = generate_env_config(faker)
         session = mocker.MagicMock()
-        read = mocker.patch.object(JDBCSource, "read")
+        read = mocker.patch.object(NetezzaJDBCSource, "read")
         write = mocker.patch.object(TableTarget, "write")
         read.return_value(spark.createDataFrame([{"a": 1}]))
         write.return_value(True)
@@ -175,18 +175,18 @@ class TestHarnessJobManager:
             metadata_table="databricks_shubham_harness",
             snapshot_schema="hive_metastore.default",
             snapshot_table_post_fix="databricks_shubham_harness_post",
-            jdbc_url="jdbc:spark://dbc-b703fa4f-373c.cloud.databricks.com:443/default;transportMode=http;ssl=1;AuthMech=3;httpPath=/sql/1.0/warehouses/7d6c126fdae128cb",
-            jdbc_user="admin",
-            jdbc_password="abcde",
-            jdbc_driver="abcde",
+            netezza_jdbc_url="jdbc:spark://dbc-b703fa4f-373c.cloud.databricks.com:443/default;transportMode=http;ssl=1;AuthMech=3;httpPath=/sql/1.0/warehouses/7d6c126fdae128cb",
+            netezza_jdbc_user="admin",
+            netezza_jdbc_password="abcde",
+            netezza_jdbc_driver="abcde",
         )
         session = mocker.MagicMock()
         constructor = HarnessJobManager(config, env, session)
         assert constructor is not None
         assert type(constructor.config) is HarnessJobConfig
-        assert isinstance(constructor._source_snapshoters, dict)
-        assert isinstance(constructor._input_snapshoters, dict)
-        assert type(constructor._metadataManager) == HarnessJobManagerMetaData
+        assert isinstance(constructor.__source_snapshoters, dict)
+        assert isinstance(constructor.__input_snapshoters, dict)
+        assert type(constructor.__metadataManager) == HarnessJobManagerMetaData
         assert constructor._env == HarnessJobManagerEnvironment
 
     def test_should_be_able_to_snapshot_with_jdbc_sourc_and_table_target(
@@ -202,10 +202,10 @@ class TestHarnessJobManager:
             metadata_table="harness_metadata",
             snapshot_schema="hive_metastore.nzmigration",
             snapshot_table_post_fix="_gold",
-            jdbc_url="jdbc:netezza:/172.16.73.181:5480/EDW_PRD",
-            jdbc_user=username,
-            jdbc_password=password,
-            jdbc_driver="org.netezza.Driver",
+            netezza_jdbc_url="jdbc:netezza:/172.16.73.181:5480/EDW_PRD",
+            netezza_jdbc_user=username,
+            netezza_jdbc_password=password,
+            netezza_jdbc_driver="org.netezza.Driver",
         )
 
         sc = JDBCSourceConfig(source_table="E_CONSOL_PERF_SMRY", source_schema="WMSMIS")

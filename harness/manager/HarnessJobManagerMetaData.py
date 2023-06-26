@@ -40,7 +40,7 @@ class HarnessJobManagerMetaData:
         sql = f"""Insert into {self._table} values ('{value.job_id}', '{bin}')"""
         self.session.sql(sql).collect()
 
-    def update(self, key, value: HarnessJobConfig):
+    def update(self,value: HarnessJobConfig):
         bin = value.json().encode("utf-8")
         bin = str(bin).removeprefix("b'").removesuffix("'")
         sql = f"""update {self._table} set value = '{bin}' where id == '{value.job_id}'"""

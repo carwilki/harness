@@ -207,10 +207,10 @@ class TestSnapshotter:
             metadata_table="harness_metadata",
             snapshot_schema="hive_metastore.nzmigration",
             snapshot_table_post_fix="_gold",
-            jdbc_url="jdbc:netezza:/172.16.73.181:5480/EDW_PRD",
-            jdbc_user=username,
-            jdbc_password=password,
-            jdbc_driver="org.netezza.Driver",
+            netezza_jdbc_url="jdbc:netezza:/172.16.73.181:5480/EDW_PRD",
+            netezza_jdbc_user=username,
+            netezza_jdbc_password=password,
+            netezza_jdbc_driver="org.netezza.Driver",
         )
         HarnessJobManagerEnvironment.bindenv(env1)
         sc = JDBCSourceConfig(source_table="E_CONSOL_PERF_SMRY", source_schema="WMSMIS")

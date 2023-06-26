@@ -2,10 +2,8 @@ from uuid import uuid4
 
 from pyspark.sql import SparkSession
 
-from harness.config.EnvConfig import EnvConfig
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
-from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
 from harness.manager.TestDataManger import TestDataManager
 from harness.snaphotter.Snapshotter import Snapshotter
@@ -18,9 +16,7 @@ class HarnessJobManager:
     Harness Manager is responsible for orchestrating the snapshotting process.
     """
 
-    def __init__(
-        self, config: HarnessJobConfig, envconfig: EnvConfig, session: SparkSession
-    ):
+    def __init__(self, config: HarnessJobConfig, session: SparkSession):
         """
         Configures a new HarnessJobManager for use.
         Args:
@@ -28,42 +24,21 @@ class HarnessJobManager:
             envconfig (EnvConfig): Exteranl Environment Config
             session (SparkSession): an active spark session
         """
-        self.logger = getLogger()
-        self._env: HarnessJobManagerEnvironment = self._bindenv(envconfig)
+        self._logger = getLogger()
         self.session: SparkSession = session
         self.config: HarnessJobConfig = config
-        self._source_snapshoters: dict[str, Snapshotter] = {}
-        self._input_snapshoters: dict[str, Snapshotter] = {}
         self._metadataManager: HarnessJobManagerMetaData = HarnessJobManagerMetaData(
             session
         )
-        self._configureMetaData()
+        self.__loadExistingMetaDataIfExists()
+        self._source_snapshoters: dict[str, Snapshotter] = {}
+        self._input_snapshoters: dict[str, Snapshotter] = {}
         # this will overwrite any existing inputs if there is an existing
         # job config
-        self._configureSourceSnaphotters()
-        self._configureInputSnapshotters()
+        self.__configureSourceSnaphotters()
+        self.__configureInputSnapshotters()
 
-    def _bindenv(self, envconfig: EnvConfig) -> HarnessJobManagerEnvironment:
-        """
-        Binds the environment config to the os environment.
-        Args:
-            envconfig (EnvConfig): The environment config to bind
-
-        Returns:
-            HarnessJobManagerEnvironment: The environment that was bound
-        """
-        self.logger.info("Binding Environment...")
-        HarnessJobManagerEnvironment.bindenv(envconfig)
-        return HarnessJobManagerEnvironment
-
-    def _configureMetaData(self):
-        """
-        configures the metadata manager repository
-        """
-        self._metadataManager.create_metadata_table()
-        self._loadExistingMetaDataIfExists()
-
-    def _loadExistingMetaDataIfExists(self):
+    def __loadExistingMetaDataIfExists(self):
         """
         loads the existing metadata if it exists
         """
@@ -73,17 +48,17 @@ class HarnessJobManager:
         if existing_config is not None:
             # if we found an existing config then swap it out
             self.config = existing_config
-            self.logger.info(
+            self._logger.info(
                 f"Found existing metadata for job {self.config.job_id}, loading..."
             )
         else:
             # else we create a new one based on the current config
-            self.logger.info(
+            self._logger.info(
                 f"Could not find existing metadata for job {self.config.job_id}, creating new..."
             )
             self._metadataManager.create(self.config)
 
-    def _configureSourceSnaphotters(self):
+    def __configureSourceSnaphotters(self):
         """
         configures the source snapshotters
         """
@@ -96,7 +71,7 @@ class HarnessJobManager:
             else:
                 self._source_snapshoters[str(uuid4())] = snapshotter
 
-    def _configureInputSnapshotters(self):
+    def __configureInputSnapshotters(self):
         """
         configures the input snapshotters
         """
@@ -109,11 +84,11 @@ class HarnessJobManager:
                 self._input_snapshoters[source.name] = snapshotter
             else:
                 self._source_snapshoters[str(uuid4())] = snapshotter
-    
+
     def resetDataForTestRun(self):
         for snapshot in self._source_snapshoters.values():
             TestDataManager.configureJDBCSourceForTest(
-                snapshot.source, snapshot.target, self.session, isbase=True
+                snapshot.source, snapshot.target, self.session, isBase=True
             )
 
     def snapshot(self):
@@ -121,27 +96,28 @@ class HarnessJobManager:
         Takes a snapshot of the data sources and inputs.
         """
         if self.config.version < 1:
-            self.logger.info("Taking snapshot V1...")
-            self._snapshot(self._source_snapshoters)
-            self.logger.info("V1 snapshot completed.")
+            self._logger.info("Taking snapshot V1...")
+            self.__snapshot(self._source_snapshoters)
+            self._logger.info("V1 snapshot completed.")
 
             self.config.version = 1
             for input in self.config.inputs.values():
                 input.version = 1
-            self._metadataManager.update(self.config.job_id, self.config)
+            self._metadataManager.update(self.config)
         elif self.config.version == 1:
-            self.logger.info("Taking snapshot V2...")
-            self._snapshot(self._source_snapshoters)
-            self.logger.info("V2 Source Snapshot completed.")
-            self.logger.info("Snapshotting Inputs...")
-            self._snapshot(self._input_snapshoters)
-            self.logger.info("V2 Input Snapshot completed.")
-            self.logger.info("V2 Snapshot completed.")
-            self._metadataManager.update(self.config.job_id, self.config)
+            self._logger.info("Taking snapshot V2...")
+            self.__snapshot(self._source_snapshoters)
+            self._logger.info("V2 Source Snapshot completed.")
+            self._logger.info("Snapshotting Inputs...")
+            self.__snapshot(self._input_snapshoters)
+            self._logger.info("V2 Input Snapshot completed.")
+            self._logger.info("V2 Snapshot completed.")
+            self._metadataManager.update(self.config)
         else:
-            self.logger.info("Snapshot already completed, skipping...")
+            self._logger.info("Snapshot already completed, skipping...")
 
-    def _snapshot(self, snapshotters: dict[str, Snapshotter]):
+    def __snapshot(self, snapshotters: dict[str, Snapshotter]):
         for snapshotter in snapshotters.values():
             snapshotter.snapshot()
-            self.logger.info(f"Snapshotted {snapshotter.config.name}")
+            self._metadataManager.update(snapshotter.config)
+            self._logger.info(f"Snapshotted {snapshotter.config.name}")

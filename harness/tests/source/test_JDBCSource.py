@@ -1,6 +1,6 @@
 from faker import Faker
 from pytest_mock import MockFixture
-from harness.sources.JDBCSource import JDBCSource
+from harness.sources.JDBCSource import NetezzaJDBCSource
 from pyspark.sql import SparkSession
 from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 
@@ -13,7 +13,7 @@ class TestJDBCSource:
             source_table=faker.pystr(),
             source_schema=faker.pystr(),
         )
-        source = JDBCSource(config, session=session)
+        source = NetezzaJDBCSource(config, session=session)
 
         assert source is not None
 
@@ -38,7 +38,7 @@ class TestJDBCSource:
             source_schema=faker.pystr(),
         )
 
-        source = JDBCSource(config, session=spark_mock)
+        source = NetezzaJDBCSource(config, session=spark_mock)
         df = source.read()
         assert df.collect() == rdf.collect()
         spark_mock.format.assert_called_once_with("jdbc")
