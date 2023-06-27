@@ -1,8 +1,10 @@
 from typing import Optional
+
 from pyspark.sql import SparkSession
 
 from harness.config.HarnessJobConfig import HarnessJobConfig
-from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
+from harness.manager.HarnessJobManagerEnvironment import \
+    HarnessJobManagerEnvironment
 
 
 class HarnessJobManagerMetaData:

@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession
+
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
-
 from harness.config.TargetConfig import TargetConfig
 from harness.config.TargetTypeEnum import TargetTypeEnum
 from harness.target.AbstractTarget import AbstractTarget

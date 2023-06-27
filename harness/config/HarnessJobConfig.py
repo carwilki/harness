@@ -17,20 +17,20 @@ class HarnessJobConfig(BaseModel):
     @classmethod
     @validator("job_id")
     def valid_job_id(cls, value):
-        if value is None or isinstance(value, str) == False:
+        if value is None or isinstance(value, str) is False:
             raise ValueError("Job ID provided is null or it's of incorrect datatype")
         return value
 
     @classmethod
     @validator("sources")
     def valid_sources(cls, value):
-        if value is None or isinstance(value, dict[str, SnapshotConfig]) == False:
+        if value is None or isinstance(value, dict[str, SnapshotConfig]) is False:
             raise ValueError("sources provided is null or it's of incorrect datatype")
         return value
 
     @classmethod
     @validator("inputs")
     def valid_inputs(cls, value):
-        if value is None or isinstance(value, dict[str, SnapshotConfig]) == False:
+        if value is None or isinstance(value, dict[str, SnapshotConfig]) is False:
             raise ValueError("inputs provided is null or it's of incorrect datatype")
         return value

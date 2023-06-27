@@ -1,7 +1,8 @@
 from faker import Faker
-from pytest_mock import MockFixture
-from harness.sources.JDBCSource import NetezzaJDBCSource
 from pyspark.sql import SparkSession
+from pytest_mock import MockFixture
+
+from harness.sources.JDBCSource import NetezzaJDBCSource
 from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 
 

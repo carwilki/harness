@@ -1,10 +1,10 @@
 from datetime import datetime
-from harness.sources.AbstractSource import AbstractSource
-from harness.target.AbstractTarget import AbstractTarget
 
-from harness.utils.logger import getLogger
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.snaphotter.AbstractSnapshotter import AbstractSnapshotter
+from harness.sources.AbstractSource import AbstractSource
+from harness.target.AbstractTarget import AbstractTarget
+from harness.utils.logger import getLogger
 from harness.validator.DataFrameValidator import DataFrameValidator
 
 

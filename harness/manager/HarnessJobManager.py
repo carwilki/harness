@@ -3,7 +3,6 @@ from uuid import uuid4
 from pyspark.sql import SparkSession
 
 from harness.config.HarnessJobConfig import HarnessJobConfig
-from harness.config.SnapshotConfig import SnapshotConfig
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
 from harness.manager.TestDataManger import TestDataManager
 from harness.snaphotter.Snapshotter import Snapshotter

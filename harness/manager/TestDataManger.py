@@ -1,6 +1,6 @@
+from pyspark.sql import Catalog, SparkSession
+
 from harness.sources.AbstractSource import AbstractSource
-from pyspark.sql import SparkSession
-from pyspark.sql import Catalog
 from harness.sources.JDBCSource import NetezzaJDBCSource
 from harness.target.TableTarget import TableTarget
 
@@ -35,5 +35,5 @@ class TestDataManager:
             ).collect()
         else:
             session.sql(
-                f"CREATE TABLE  if not exists {schema}.{table} as select * from {target.config.snapshot_target_schema}.{target.config.snapshot_target_table} version as of 0;"
+                f"CREATE TABLE  if not exists {schema}.{table} as select * from {target.config.snapshot_target_schema}.{target.config.snapshot_target_table} version as of 0;"  # noqa: E501
             ).collect()

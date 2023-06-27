@@ -3,21 +3,20 @@ import os
 from faker import Faker
 from pyspark.sql import SparkSession
 from pytest_mock import MockFixture
-from harness.config.EnvConfig import EnvConfig
 
+from harness.config.EnvConfig import EnvConfig
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.manager.HarnessJobManager import HarnessJobManager
-from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
+from harness.manager.HarnessJobManagerEnvironment import \
+    HarnessJobManagerEnvironment
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
 from harness.sources.JDBCSource import NetezzaJDBCSource
 from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 from harness.target.TableTarget import TableTarget
 from harness.target.TableTargetConfig import TableTargetConfig
 from harness.tests.utils.generator import (
-    generate_env_config,
-    generate_standard_harness_job_config,
-)
+    generate_env_config, generate_standard_harness_job_config)
 
 
 class TestHarnessJobManager:
@@ -219,5 +218,5 @@ class TestHarnessJobManager:
         hjc = HarnessJobConfig(job_id=job_id, sources={"source1": snc}, inputs={})
 
         hjm = HarnessJobManager(hjc, env1, session)
-        
+
         hjm.snapshot()

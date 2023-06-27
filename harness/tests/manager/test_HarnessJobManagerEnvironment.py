@@ -6,8 +6,9 @@ from pytest_mock import MockFixture
 from harness.config.EnvConfig import EnvConfig
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
-from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.manager.HarnessJobManager import HarnessJobManager
+from harness.manager.HarnessJobManagerEnvironment import \
+    HarnessJobManagerEnvironment
 from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 from harness.target.TableTargetConfig import TableTargetConfig
 
@@ -66,8 +67,14 @@ class TestHarnessJobManagerEnvironment:
         )
         assert HarnessJobManagerEnvironment.jdbc_url() == env_config.netezza_jdbc_url
         assert HarnessJobManagerEnvironment.jdbc_user() == env_config.netezza_jdbc_user
-        assert HarnessJobManagerEnvironment.jdbc_password() == env_config.netezza_jdbc_password
-        assert HarnessJobManagerEnvironment.jdbc_num_part() == env_config.netezza_jdbc_num_part
+        assert (
+            HarnessJobManagerEnvironment.jdbc_password()
+            == env_config.netezza_jdbc_password
+        )
+        assert (
+            HarnessJobManagerEnvironment.jdbc_num_part()
+            == env_config.netezza_jdbc_num_part
+        )
 
     def test_snapshot_should_not_fail_with_given_config(
         self, mocker: MockFixture, faker: Faker

@@ -1,14 +1,16 @@
 import csv
 from typing import Optional
+
+from pyspark.sql import SparkSession
+
 from harness.config.EnvConfig import EnvConfig
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.config.SourceTypeEnum import SourceTypeEnum
 from harness.manager.HarnessJobManager import HarnessJobManager
-from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
+from harness.manager.HarnessJobManagerEnvironment import \
+    HarnessJobManagerEnvironment
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
-from pyspark.sql import SparkSession
-
 from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 from harness.target.TableTargetConfig import TableTargetConfig
 
@@ -34,7 +36,7 @@ class HarnessApi:
         """
         self._metadataManager.create_metadata_table()
 
-    def resetEverything(self, dry_run: bool=True)->str:
+    def resetEverything(self, dry_run: bool = True) -> str:
         return self._metadataManager.resetEverything(dry_run)
 
     def getHarnessJobById(self, id: str) -> Optional[HarnessJobManager]:

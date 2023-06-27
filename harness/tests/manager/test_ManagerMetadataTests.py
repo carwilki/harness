@@ -3,13 +3,11 @@ import os
 from faker import Faker
 from pyspark.sql import SparkSession
 from pytest_mock import MockFixture
-from harness.config.HarnessJobConfig import HarnessJobConfig
 
+from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
 from harness.sources.JDBCSourceConfig import JDBCSourceConfig
-from harness.tests.utils.generator import (
-    generate_standard_harness_job_config,
-)
+from harness.tests.utils.generator import generate_standard_harness_job_config
 
 
 class TestManagerMetaData:

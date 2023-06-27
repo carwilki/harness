@@ -1,8 +1,6 @@
 from typing import Optional
 
 from harness.config.SourceConfig import SourceConfig
-
-
 from harness.config.SourceTypeEnum import SourceTypeEnum
 
 

@@ -2,22 +2,22 @@ from datetime import datetime
 from unittest.mock import MagicMock
 
 from faker import Faker
-from pytest_mock import MockFixture
 from pyspark.sql import SparkSession
+from pytest_mock import MockFixture
+
 from harness.config.EnvConfig import EnvConfig
 from harness.config.SnapshotConfig import SnapshotConfig
+from harness.manager.HarnessJobManagerEnvironment import \
+    HarnessJobManagerEnvironment
 from harness.snaphotter.Snapshotter import Snapshotter
+from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 from harness.sources.SourceFactory import SourceFactory
+from harness.target.TableTargetConfig import TableTargetConfig
 from harness.target.TargetFactory import TargetFactory
-from harness.tests.utils.generator import (
-    generate_standard_snapshot_config,
-    generate_standard_validator_config,
-)
+from harness.tests.utils.generator import (generate_standard_snapshot_config,
+                                           generate_standard_validator_config)
 from harness.validator.DataFrameValidator import DataFrameValidator
 from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
-from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
-from harness.sources.JDBCSourceConfig import JDBCSourceConfig
-from harness.target.TableTargetConfig import TableTargetConfig
 
 
 class TestSnapshotter:

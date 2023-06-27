@@ -18,7 +18,7 @@ class SnapshotConfig(BaseModel):
     source: JDBCSourceConfig = None
     version: int = 0
     validator: Optional[ValidatorConfig] = None
-    validated: bool = False   
+    validated: bool = False
     validation_date: Optional[datetime] = None
     validation_report: Optional[str] = None
 

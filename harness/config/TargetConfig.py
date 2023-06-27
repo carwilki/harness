@@ -1,10 +1,8 @@
 import abc
-from typing import Optional
 
 from pydantic import BaseModel, validator
 
 from harness.config.TargetTypeEnum import TargetTypeEnum
-from harness.config.ValidatorTypeEnum import ValidatorTypeEnum
 
 
 class TargetConfig(BaseModel, abc.ABC):
@@ -18,5 +16,3 @@ class TargetConfig(BaseModel, abc.ABC):
                 "target_type provided is null or it's of incorrect datatype"
             )
         return value
-
-    

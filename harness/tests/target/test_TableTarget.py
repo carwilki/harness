@@ -1,7 +1,8 @@
 from faker import Faker
-from pytest_mock import MockFixture
-from harness.target.TableTarget import TableTarget
 from pyspark.sql import SparkSession
+from pytest_mock import MockFixture
+
+from harness.target.TableTarget import TableTarget
 from harness.target.TableTargetConfig import TableTargetConfig
 
 
@@ -14,7 +15,7 @@ class TestTableTarget:
         )
 
         target = TableTarget(config=config, session=session)
-        
+
         assert target is not None
         assert target.config is not None
         assert target.session is not None

@@ -15,20 +15,20 @@ class HarnessMetadata(BaseModel):
     @classmethod
     @validator("job_id")
     def valid_job_id(cls, value):
-        if value is None or isinstance(value, str) == False:
+        if value is None or isinstance(value, str) is False:
             raise ValueError("Job ID provided is null or it's of incorrect datatype")
         return value
 
     @classmethod
     @validator("config")
     def valid_config(cls, value):
-        if value is None or isinstance(value, HarnessJobConfig) == False:
+        if value is None or isinstance(value, HarnessJobConfig) is False:
             raise ValueError("config provided is null or it's of incorrect datatype")
         return value
 
     @classmethod
     @validator("running")
     def valid_running(cls, value):
-        if value is None or isinstance(value, bool) == False:
+        if value is None or isinstance(value, bool) is False:
             raise ValueError("config provided is null or it's of incorrect datatype")
         return value

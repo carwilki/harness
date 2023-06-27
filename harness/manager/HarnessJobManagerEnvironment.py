@@ -37,7 +37,7 @@ class HarnessJobManagerEnvironment(object):
     @classmethod
     def getConfig(cls) -> dict:
         return dict(cls._config)
-    
+
     @classmethod
     def get_config(cls) -> EnvConfig:
         return cls._config
