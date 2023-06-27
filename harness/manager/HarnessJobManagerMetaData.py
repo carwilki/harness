@@ -16,7 +16,7 @@ class HarnessJobManagerMetaData:
     def getJobById(cls, id: str, spark: SparkSession) -> Optional[HarnessJobConfig]:
         manager = HarnessJobManagerMetaData(spark)
         return manager.get(id)
-    
+
     def create_metadata_table(self):
         self.session.sql(
             f"""Create table if not exists {self._table} (id string, value string)"""
@@ -40,11 +40,25 @@ class HarnessJobManagerMetaData:
         sql = f"""Insert into {self._table} values ('{value.job_id}', '{bin}')"""
         self.session.sql(sql).collect()
 
-    def update(self,value: HarnessJobConfig):
+    def update(self, value: HarnessJobConfig):
         bin = value.json().encode("utf-8")
         bin = str(bin).removeprefix("b'").removesuffix("'")
-        sql = f"""update {self._table} set value = '{bin}' where id == '{value.job_id}'"""
+        sql = (
+            f"""update {self._table} set value = '{bin}' where id == '{value.job_id}'"""
+        )
         self.session.sql(sql).collect()
-        
+
     def delete(self, key):
         self.session.sql(f"""Delete from {self._table} where id == '{key}'""").collect()
+
+    def resetEverything(self, dry_run: bool = True) -> str:
+        tables = self.session.catalog.listTables(self._harness_metadata_schema)
+        if dry_run:
+            msg = "Executing Dry Run, not deleting tables\n"
+        else:
+            msg = "Deleting tables:\n"
+
+        for table in tables:
+            msg += f"""Drop table if exists {self._harness_metadata_schema}.{table.name};\n"""
+
+        return msg

@@ -8,9 +8,9 @@ from harness.config.TestRunnerConfig import TestRunnerConfig
 
 class HarnessJobConfig(BaseModel):
     job_id: str
+    job_name: str
     version: int = 0
     testrunner: Optional[TestRunnerConfig] = None
-    snapshot_name: Optional[str] = None
     sources: dict[str, SnapshotConfig]
     inputs: dict[str, SnapshotConfig]
 

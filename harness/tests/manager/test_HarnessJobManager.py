@@ -210,8 +210,8 @@ class TestHarnessJobManager:
 
         sc = JDBCSourceConfig(source_table="E_CONSOL_PERF_SMRY", source_schema="WMSMIS")
         tc = TableTargetConfig(
-            target_table="WM_E_CONSOL_PERF_SMRY",
-            target_schema="hive_metastore.nzmigration",
+            snapshot_target_table="WM_E_CONSOL_PERF_SMRY",
+            snapshot_target_schema="hive_metastore.nzmigration",
         )
         snc = SnapshotConfig(target=tc, source=sc)
         job_id = "01298d4f-934f-439a-b80d-251987f54415"

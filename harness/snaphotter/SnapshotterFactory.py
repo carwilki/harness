@@ -1,6 +1,7 @@
 from typing import Optional
 
 from pyspark.sql import SparkSession
+from harness.config.HarnessJobConfig import HarnessJobConfig
 
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.config.SourceConfig import SourceConfig
@@ -23,6 +24,7 @@ class SnapshotterFactory:
     @classmethod
     def create(
         cls,
+        harness_config: HarnessJobConfig,
         snapshot_config: SnapshotConfig,
         session: SparkSession,
     ) -> Optional[AbstractSnapshotter]:
@@ -36,21 +38,44 @@ class SnapshotterFactory:
         return Snapshotter(
             snapshot_config,
             SnapshotterFactory._create_source(
-                config=snapshot_config.source, session=session
+                harness_config=harness_config,
+                harness_config=harness_config,
+                config=snapshot_config.source,
+                session=session,
             ),
             SnapshotterFactory._create_target(
-                config=snapshot_config.target, session=session
+                harness_config=harness_config,
+                snapshot_config=snapshot_config,
+                config=snapshot_config.target,
+                session=session,
             ),
         )
 
     @classmethod
     def _create_source(
-        cls, config: SourceConfig, session: SparkSession
+        cls,
+        harness_config: HarnessJobConfig,
+        snapshot_config: SnapshotConfig,
+        config: SourceConfig,
+        session: SparkSession,
     ) -> AbstractSource:
-        return SourceFactory.create(config, session)
+        return SourceFactory.create(
+            harness_config=harness_config,
+            snaphot_config=snapshot_config,
+            config=config,
+            session=session,
+        )
 
     @classmethod
     def _create_target(
-        cls, config: TargetConfig, session: SparkSession
+        cls,
+        harness_config: HarnessJobConfig,
+        snapshot_config: SnapshotConfig,
+        config: TargetConfig,
+        session: SparkSession,
     ) -> AbstractTarget:
-        return TargetFactory.create(config, session)
+        return TargetFactory.create(
+            harness_config=harness_config,
+            snapshot_config=snapshot_config,
+            config=config,
+        )

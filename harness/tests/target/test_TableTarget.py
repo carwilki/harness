@@ -10,7 +10,7 @@ class TestTableTarget:
         session: SparkSession = mocker.MagicMock()
 
         config = TableTargetConfig(
-            target_table=faker.pystr(), target_schema=faker.pystr()
+            snapshot_target_table=faker.pystr(), snapshot_target_schema=faker.pystr()
         )
 
         target = TableTarget(config=config, session=session)
@@ -18,5 +18,5 @@ class TestTableTarget:
         assert target is not None
         assert target.config is not None
         assert target.session is not None
-        assert target.config.target_table == config.target_table
-        assert target.config.target_schema == config.target_schema
+        assert target.config.snapshot_target_table == config.snapshot_target_table
+        assert target.config.snapshot_target_schema == config.snapshot_target_schema

@@ -35,5 +35,5 @@ class TestDataManager:
             ).collect()
         else:
             session.sql(
-                f"CREATE TABLE  if not exists {schema}.{table} as select * from {target.config.target_schema}.{target.config.target_table} version as of 0;"
+                f"CREATE TABLE  if not exists {schema}.{table} as select * from {target.config.snapshot_target_schema}.{target.config.snapshot_target_table} version as of 0;"
             ).collect()

@@ -1,4 +1,6 @@
 from pyspark.sql import DataFrame, SparkSession
+from harness.config.HarnessJobConfig import HarnessJobConfig
+from harness.config.SnapshotConfig import SnapshotConfig
 
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.sources.AbstractSource import AbstractSource
@@ -6,8 +8,18 @@ from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 
 
 class DatabricksJDBCSource(AbstractSource):
-    def __init__(self, config: JDBCSourceConfig, session: SparkSession):
-        super().__init__(session)
+    def __init__(
+        self,
+        harness_config: HarnessJobConfig,
+        snapshot_config: SnapshotConfig,
+        config: JDBCSourceConfig,
+        session: SparkSession,
+    ):
+        super().__init__(
+            harness_config=harness_config,
+            snapshot_config=snapshot_config,
+            session=session,
+        )
         self.config: JDBCSourceConfig = config
 
     def read(self) -> DataFrame:
@@ -34,8 +46,18 @@ class DatabricksJDBCSource(AbstractSource):
 
 
 class NetezzaJDBCSource(AbstractSource):
-    def __init__(self, config: JDBCSourceConfig, session: SparkSession):
-        super().__init__(session)
+    def __init__(
+        self,
+        harness_config: HarnessJobConfig,
+        snapshot_config: SnapshotConfig,
+        config: JDBCSourceConfig,
+        session: SparkSession,
+    ):
+        super().__init__(
+            harness_config=harness_config,
+            snapshot_config=snapshot_config,
+            session=session,
+        )
         self.config: JDBCSourceConfig = config
 
     def read(self) -> DataFrame:

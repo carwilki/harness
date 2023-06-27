@@ -23,8 +23,8 @@ def generate_target_config() -> TargetConfig:
 def generate_table_target_config(faker: Faker) -> TargetConfig:
     return TableTargetConfig(
         target_type=TargetTypeEnum.dbrtable,
-        target_schema=faker.pystr(),
-        target_table=faker.pystr(),
+        snapshot_target_schema=faker.pystr(),
+        snapshot_target_table=faker.pystr(),
     )
 
 

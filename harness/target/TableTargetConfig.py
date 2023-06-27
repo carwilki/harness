@@ -3,6 +3,8 @@ from harness.config.TargetTypeEnum import TargetTypeEnum
 
 
 class TableTargetConfig(TargetConfig):
-    target_schema: str
-    target_table: str
+    snapshot_target_schema: str
+    snapshot_target_table: str
     target_type: TargetTypeEnum = TargetTypeEnum.dbrtable
+    test_target_schema: str
+    test_target_table: str

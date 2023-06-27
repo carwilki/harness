@@ -34,6 +34,9 @@ class HarnessApi:
         """
         self._metadataManager.create_metadata_table()
 
+    def resetEverything(self, dry_run: bool=True)->str:
+        return self._metadataManager.resetEverything(dry_run)
+
     def getHarnessJobById(self, id: str) -> Optional[HarnessJobManager]:
         meta = HarnessJobManagerMetaData.getJobById(id, self._spark)
         if meta is None:
@@ -65,8 +68,8 @@ class HarnessApi:
                     source_type=sourceType,
                 )
                 tc = TableTargetConfig(
-                    target_table=table["target_table"],
-                    target_schema=HarnessJobManagerEnvironment.metadata_schema(),
+                    snapshot_target_table=table["target_table"],
+                    snapshot_target_schema=HarnessJobManagerEnvironment.metadata_schema(),
                 )
                 snc = SnapshotConfig(
                     job_id=id, target=tc, source=sc, name=table["tables"]

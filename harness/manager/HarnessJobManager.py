@@ -36,7 +36,6 @@ class HarnessJobManager:
         # this will overwrite any existing inputs if there is an existing
         # job config
         self.__configureSourceSnaphotters()
-        self.__configureInputSnapshotters()
 
     def __loadExistingMetaDataIfExists(self):
         """
@@ -68,20 +67,6 @@ class HarnessJobManager:
             )
             if source.name is not None:
                 self._source_snapshoters[source.name] = snapshotter
-            else:
-                self._source_snapshoters[str(uuid4())] = snapshotter
-
-    def __configureInputSnapshotters(self):
-        """
-        configures the input snapshotters
-        """
-        source: SnapshotConfig
-        for source in self.config.inputs.values():
-            snapshotter = SnapshotterFactory.create(
-                snapshot_config=source, session=self.session
-            )
-            if source.name is not None:
-                self._input_snapshoters[source.name] = snapshotter
             else:
                 self._source_snapshoters[str(uuid4())] = snapshotter
 

@@ -1,4 +1,3 @@
-from os import environ as env
 from typing import Optional
 
 from harness.config.EnvConfig import EnvConfig
@@ -38,3 +37,7 @@ class HarnessJobManagerEnvironment(object):
     @classmethod
     def getConfig(cls) -> dict:
         return dict(cls._config)
+    
+    @classmethod
+    def get_config(cls) -> EnvConfig:
+        return cls._config
