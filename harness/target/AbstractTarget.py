@@ -20,3 +20,7 @@ class AbstractTarget(ABC):
     @abstractmethod
     def write(self, df: DataFrame):
         pass
+    
+    @abstractmethod
+    def setup_test_target(self):
+        pass

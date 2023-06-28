@@ -8,8 +8,7 @@ from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.config.SourceTypeEnum import SourceTypeEnum
 from harness.manager.HarnessJobManager import HarnessJobManager
-from harness.manager.HarnessJobManagerEnvironment import \
-    HarnessJobManagerEnvironment
+from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
 from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 from harness.target.TableTargetConfig import TableTargetConfig
@@ -59,24 +58,29 @@ class HarnessApi:
     def createHarnessJobFromCSV(
         self, id: str, path: str, sourceType: SourceTypeEnum
     ) -> Optional[HarnessJobManager]:
+        # TODO: need to refactor this to a helper class.
         with open(path, "r") as file:
             tableList = csv.DictReader(file)
             sources = dict()
             for table in tableList:
                 sc = JDBCSourceConfig(
-                    source_table=table["tables"],
+                    source_table=table["source_table"],
                     source_schema=table["source_schema"],
                     source_filter=table["source_filter"],
                     source_type=sourceType,
                 )
                 tc = TableTargetConfig(
-                    snapshot_target_table=table["target_table"],
-                    snapshot_target_schema=HarnessJobManagerEnvironment.metadata_schema(),
+                    snapshot_target_table=table["snapshot_target_table"],
+                    snapshot_target_schema=table["snapshot_target_schema"],
+                    test_target_schema=table["test_target_schema"],
+                    test_target_table=table["test_target_table"],
                 )
                 snc = SnapshotConfig(
-                    job_id=id, target=tc, source=sc, name=table["tables"]
+                    job_id=id, target=tc, source=sc, name=table["name"]
                 )
-                sources[table["tables"]] = snc
-                hjc = HarnessJobConfig(job_id=id, sources=sources, inputs={})
+                sources[table["name"]] = snc
+        hjc = HarnessJobConfig(
+            job_id=id, job_name="databricks_jdbc_test", sources=sources
+        )
 
         return self.createHarnessJob(hjc)

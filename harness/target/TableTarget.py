@@ -21,18 +21,18 @@ class TableTarget(AbstractTarget):
             snapshot_config=snapshot_config,
             session=session,
         )
+        
         self.config = config
-
-    def write(self, df: DataFrame):
         if self.config.snapshot_target_schema is None:
             raise Exception("Schema name is required")
 
         if self.config.snapshot_target_table is None:
             raise Exception("Table name is required")
 
+    def write(self, df: DataFrame):
         temptable = f"{str(uuid4()).replace('-','')}_data"
         df.createOrReplaceTempView(temptable)
-        table = f"{self.config.snapshot_target_schema}.{self.harness_job_config.job_name}_{self.config.snapshot_target_table}_V{self.snapshot_config.version}"  # noqa: E501
+        table = f"{self.config.snapshot_target_schema}.{self.harness_job_config.job_name}_{self.config.snapshot_target_table}_V{self.snapshot_config.version + 1}"  # noqa: E501
         if not self.session.catalog.tableExists(
             f"{self.config.snapshot_target_schema}.{self.config.snapshot_target_table}"
         ):
@@ -43,3 +43,16 @@ class TableTarget(AbstractTarget):
         else:
             self.session.sql(f"truncate table {table}")
             self.session.sql(f"insert into {table} select * from {temptable}")
+
+    def setup_test_target(self):
+        catalog = self.session.catalog
+        ts = self.config.test_target_schema
+        tt = self.config.test_target_table
+        ss = self.config.snapshot_target_schema
+        st = f"{self.harness_job_config.job_name}_{self.config.snapshot_target_table}"
+        
+        if catalog.tableExists(f"{self.config.test_target_schema}.{self.config.test_target_table}"):
+            self.session.sql(f"truncate table {self.config.test_target_schema}.{self.config.test_target_table}")
+            self.session.sql(f"insert into {ts}.{tt} select * from {ss}.{st}_V1")
+        else:
+            self.session.sql(f"create table {ts}.{tt} as select * from {ss}.{st}_V1")

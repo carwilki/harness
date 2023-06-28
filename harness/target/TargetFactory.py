@@ -12,7 +12,7 @@ class TargetFactory:
     @classmethod
     def create(
         cls,
-        harness_job_config: HarnessJobConfig,
+        harness_config: HarnessJobConfig,
         snapshot_config: SnapshotConfig,
         target_config: TargetConfig,
         session: SparkSession,
@@ -20,7 +20,7 @@ class TargetFactory:
         match target_config.target_type:
             case TargetTypeEnum.dbrtable:
                 return TableTarget(
-                    harness_job_config=harness_job_config,
+                    harness_job_config=harness_config,
                     snapshot_config=snapshot_config,
                     config=target_config,
                     session=session,

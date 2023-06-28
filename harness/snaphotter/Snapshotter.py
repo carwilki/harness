@@ -22,7 +22,16 @@ class Snapshotter(AbstractSnapshotter):
             self._logger.info(
                 f"No validator configured for snapshotter {self.config.name}"
             )
-
+            
+    def setupTestData(self):
+        if self.target.snapshot_config.version != 2:
+            raise ValueError("There Must be a version 2 of the snapshot")
+      
+        self._logger.info(
+            f"Setting up test data for snapshotter {self.config.name}"
+        )
+        self.target.setup_test_target()
+        
     def snapshot(self):
         if self.config.version < 0:
             self.config.version = 0
@@ -41,7 +50,7 @@ class Snapshotter(AbstractSnapshotter):
 
     def _snapshot(self):
         df = self.source.read()
-        self.target.write(df, self.config.job_id)
+        self.target.write(df)
         if self.config.validator is not None:
             date = datetime.now().strftime("%Y-%m-%d %H:%M")
             report = self._validator.validateDF(

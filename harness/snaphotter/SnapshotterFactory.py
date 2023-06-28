@@ -39,8 +39,8 @@ class SnapshotterFactory:
             snapshot_config,
             SnapshotterFactory._create_source(
                 harness_config=harness_config,
-                harness_config=harness_config,
-                config=snapshot_config.source,
+                snapshot_config=snapshot_config,
+                source_config=snapshot_config.source,
                 session=session,
             ),
             SnapshotterFactory._create_target(
@@ -56,13 +56,13 @@ class SnapshotterFactory:
         cls,
         harness_config: HarnessJobConfig,
         snapshot_config: SnapshotConfig,
-        config: SourceConfig,
+        source_config: SourceConfig,
         session: SparkSession,
     ) -> AbstractSource:
         return SourceFactory.create(
             harness_config=harness_config,
             snaphot_config=snapshot_config,
-            config=config,
+            source_config=source_config,
             session=session,
         )
 
@@ -75,7 +75,8 @@ class SnapshotterFactory:
         session: SparkSession,
     ) -> AbstractTarget:
         return TargetFactory.create(
+            session=session,
             harness_config=harness_config,
             snapshot_config=snapshot_config,
-            config=config,
+            target_config=config,
         )
