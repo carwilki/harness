@@ -6,6 +6,7 @@ from harness.sources.AbstractSource import AbstractSource
 from harness.target.AbstractTarget import AbstractTarget
 from harness.utils.logger import getLogger
 from harness.validator.DataFrameValidator import DataFrameValidator
+from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
 
 
 class Snapshotter(AbstractSnapshotter):
@@ -30,8 +31,8 @@ class Snapshotter(AbstractSnapshotter):
         self._logger.info(f"Setting up test data for snapshotter {self.config.name}")
         self.target.setup_test_target()
 
-    def validateResults(self):
-        self.target.validate_results()
+    def validateResults(self) -> DataFrameValidatorReport:
+        return self.target.validate_results()
 
     def snapshot(self):
         if self.config.version < 0:

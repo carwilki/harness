@@ -12,8 +12,8 @@ class HarnessJobConfig(BaseModel):
     job_name: str
     version: int = 0
     testrunner: Optional[TestRunnerConfig] = None
-    snapshots: dict[str, SnapshotConfig]
-    validation_reports = dict[str, DataFrameValidatorReport]
+    snapshots: dict[str, SnapshotConfig] = {}
+    validation_reports: dict[str, DataFrameValidatorReport] = {}
 
     @classmethod
     @validator("job_id")

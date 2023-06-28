@@ -98,7 +98,11 @@ class HarnessJobManager:
             self._logger.info(f"Snapshotted {snapshotter.config.name}")
 
     def validateResults(self) -> dict[str, DataFrameValidatorReport]:
+        if self.config.validation_reports is None:
+            self.config.validation_reports = {}
+
         for snapshotter in self._source_snapshoters.values():
-            self.config.validation_reports[
-                snapshotter.config.name
-            ] = snapshotter.validateResults()
+            validation_report = snapshotter.validateResults()
+            self.config.validation_reports[snapshotter.config.name] = validation_report
+
+        self._metadataManager.update(self.config)

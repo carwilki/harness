@@ -4,6 +4,7 @@ from pyspark.sql import DataFrame, SparkSession
 
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
+from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
 
 
 class AbstractTarget(ABC):
@@ -26,5 +27,5 @@ class AbstractTarget(ABC):
         pass
 
     @abstractmethod
-    def validate_results(self):
+    def validate_results(self) -> DataFrameValidatorReport:
         pass
