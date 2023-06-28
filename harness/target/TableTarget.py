@@ -6,6 +6,7 @@ from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.target.AbstractTarget import AbstractTarget
 from harness.target.TableTargetConfig import TableTargetConfig
+from harness.validator.DataFrameValidator import DataFrameValidator
 
 
 class TableTarget(AbstractTarget):
@@ -21,7 +22,7 @@ class TableTarget(AbstractTarget):
             snapshot_config=snapshot_config,
             session=session,
         )
-        
+
         self.config = config
         if self.config.snapshot_target_schema is None:
             raise Exception("Schema name is required")
@@ -50,9 +51,27 @@ class TableTarget(AbstractTarget):
         tt = self.config.test_target_table
         ss = self.config.snapshot_target_schema
         st = f"{self.harness_job_config.job_name}_{self.config.snapshot_target_table}"
-        
-        if catalog.tableExists(f"{self.config.test_target_schema}.{self.config.test_target_table}"):
-            self.session.sql(f"truncate table {self.config.test_target_schema}.{self.config.test_target_table}")
+
+        if catalog.tableExists(
+            f"{self.config.test_target_schema}.{self.config.test_target_table}"
+        ):
+            self.session.sql(
+                f"truncate table {self.config.test_target_schema}.{self.config.test_target_table}"
+            )
             self.session.sql(f"insert into {ts}.{tt} select * from {ss}.{st}_V1")
         else:
             self.session.sql(f"create table {ts}.{tt} as select * from {ss}.{st}_V1")
+
+    def validate_results(self):
+        ts = self.config.test_target_schema
+        tt = self.config.test_target_table
+        ss = self.config.snapshot_target_schema
+        st = (
+            f"{self.harness_job_config.job_name}_{self.config.snapshot_target_table}_V2"
+        )
+        validator = DataFrameValidator(self.session)
+        results = self.session.sql(f"select * from {ts}.{tt}")
+        base = self.session.sql(f"select * from {ss}.{st}")
+        return validator.validateDF(
+            tt, results, base, self.config.primary_key, self.session
+        )

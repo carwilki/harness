@@ -4,10 +4,10 @@ from pyspark.sql import SparkSession
 
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
-from harness.manager.TestDataManger import TestDataManager
 from harness.snaphotter.Snapshotter import Snapshotter
 from harness.snaphotter.SnapshotterFactory import SnapshotterFactory
 from harness.utils.logger import getLogger
+from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
 
 
 class HarnessJobManager:
@@ -30,6 +30,7 @@ class HarnessJobManager:
             session
         )
         self._source_snapshoters: dict[str, Snapshotter] = {}
+        self.__loadExistingMetaDataIfExists()
         # this will overwrite any existing inputs if there is an existing
         # job config
         self.__configureSourceSnaphotters()
@@ -58,7 +59,7 @@ class HarnessJobManager:
         """
         configures the source snapshotters
         """
-        for source in self.config.sources.values():
+        for source in self.config.snapshots.values():
             snapshotter = SnapshotterFactory.create(
                 harness_config=self.config, snapshot_config=source, session=self.session
             )
@@ -95,3 +96,9 @@ class HarnessJobManager:
             snapshotter.snapshot()
             self._metadataManager.update(self.config)
             self._logger.info(f"Snapshotted {snapshotter.config.name}")
+
+    def validateResults(self) -> dict[str, DataFrameValidatorReport]:
+        for snapshotter in self._source_snapshoters.values():
+            self.config.validation_reports[
+                snapshotter.config.name
+            ] = snapshotter.validateResults()

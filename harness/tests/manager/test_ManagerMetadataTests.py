@@ -81,5 +81,5 @@ class TestManagerMetaData:
         metadata = '{"job_id": "01298d4f-934f-439a-b80d-251987f54415", "version": 0, "snapshot_name": null, "sources": {"source1": {"name": null, "target": {"target_type": "dbrtable", "target_schema": "hive_metastore.nzmigration", "target_table": "WM_E_CONSOL_PERF_SMRY"}, "source": {"source_type": "jdbc", "source_filter": null, "source_table": "E_CONSOL_PERF_SMRY", "source_schema": "WMSMIS"}, "version": 0, "validator": null, "validated": false, "validation_date": null, "validation_report": null}}, "inputs": {"source1": {"name": null, "target": {"target_type": "dbrtable", "target_schema": "hive_metastore.nzmigration", "target_table": "WM_E_CONSOL_PERF_SMRY"}, "source": {"source_type": "jdbc", "source_filter": null, "source_table": "E_CONSOL_PERF_SMRY", "source_schema": "WMSMIS"}, "version": 0, "validator": null, "validated": false, "validation_date": null, "validation_report": null}}}'
         config = HarnessJobConfig.parse_raw(metadata)
         assert config is not None
-        for source in config.sources.values():
+        for source in config.snapshots.values():
             assert isinstance(source.source, JDBCSourceConfig)

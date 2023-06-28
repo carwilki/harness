@@ -103,7 +103,7 @@ class TestHarnessJobManagerEnvironment:
         snc = SnapshotConfig(target=tc, source=sc)
         job_id = "51298d4f-934f-439a-b80d-251987f54415"
         hjc = HarnessJobConfig(
-            job_id=job_id, sources={"source1": snc}, inputs={"source1": snc}
+            job_id=job_id, snapshots={"source1": snc}, inputs={"source1": snc}
         )
 
         hjm = HarnessJobManager(hjc, env1, session)

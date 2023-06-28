@@ -116,7 +116,7 @@ class TestHarnessJobManager:
         read.assert_called()
         write.assert_called()
         update.assert_called()
-        for source in manager.config.sources.values():
+        for source in manager.config.snapshots.values():
             assert source.version == 1
 
     def test_can_snapshot_V2(
@@ -136,7 +136,7 @@ class TestHarnessJobManager:
         read.assert_called()
         write.assert_called()
         update.assert_called()
-        for source in manager.config.sources.values():
+        for source in manager.config.snapshots.values():
             assert source.version == 2
 
     def test_can_not_snapshot_V3(
@@ -144,7 +144,7 @@ class TestHarnessJobManager:
     ):
         config = generate_standard_harness_job_config(0, faker)
         config.version = 2
-        for source in config.sources.values():
+        for source in config.snapshots.values():
             source.version = 2
         for source in config.inputs.values():
             source.version = 2
@@ -162,7 +162,7 @@ class TestHarnessJobManager:
         write.assert_not_called()
         update.assert_not_called()
 
-        for source in manager.config.sources.values():
+        for source in manager.config.snapshots.values():
             assert source.version == 2
 
     def test_env_config_empyt_catalog(self, mocker: MockFixture, faker: Faker):
@@ -215,7 +215,7 @@ class TestHarnessJobManager:
         snc = SnapshotConfig(target=tc, source=sc)
         job_id = "01298d4f-934f-439a-b80d-251987f54415"
 
-        hjc = HarnessJobConfig(job_id=job_id, sources={"source1": snc}, inputs={})
+        hjc = HarnessJobConfig(job_id=job_id, snapshots={"source1": snc}, inputs={})
 
         hjm = HarnessJobManager(hjc, env1, session)
 

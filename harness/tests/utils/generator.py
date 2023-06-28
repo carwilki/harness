@@ -56,7 +56,7 @@ def generate_abstract_harness_job_config(faker: Faker) -> HarnessJobConfig:
     return HarnessJobConfig(
         job_id=faker.pystr(),
         snapshot_name=faker.pystr(),
-        sources=sources,
+        snapshots=sources,
         inputs=inputs,
     )
 
@@ -95,7 +95,7 @@ def generate_standard_harness_job_config(
     return HarnessJobConfig(
         job_id=faker.pystr(),
         snapshot_name=faker.pystr(),
-        sources=sources,
+        snapshots=sources,
         inputs=inputs,
     )
 

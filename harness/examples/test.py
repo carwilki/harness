@@ -19,13 +19,15 @@ env = EnvConfig(
 
 api = HarnessApi(env, spark)
 jobId = "b55fb562-e4f1-485b-9877-deb3c7c78d92"
+print(api.resetEverything())
 hjm = api.getHarnessJobById(jobId)
 if hjm is None:
-    hjm = api.createHarnessJobFromCSV(jobId, "./test.csv", "databricks_jdbc")
+    raise Exception(f"Could not find Harness job with id: {jobId}")
+    # hjm = api.createHarnessJobFromCSV(jobId, "./test.csv", "databricks_jdbc")
 
+#hjm.snapshot()
 # hjm.snapshot()
 # hjm.snapshot()
-hjm.setupTestData()
-hjm.runTest()
-hjm.validate()
-hjm.printShortReport()
+#hjm.setupTestData()
+# hjm.executeTestCase()
+print(hjm.validateResults())

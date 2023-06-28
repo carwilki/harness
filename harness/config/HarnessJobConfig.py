@@ -4,6 +4,7 @@ from pydantic import BaseModel, validator
 
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.config.TestRunnerConfig import TestRunnerConfig
+from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
 
 
 class HarnessJobConfig(BaseModel):
@@ -11,7 +12,8 @@ class HarnessJobConfig(BaseModel):
     job_name: str
     version: int = 0
     testrunner: Optional[TestRunnerConfig] = None
-    sources: dict[str, SnapshotConfig]
+    snapshots: dict[str, SnapshotConfig]
+    validation_reports = dict[str, DataFrameValidatorReport]
 
     @classmethod
     @validator("job_id")

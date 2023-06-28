@@ -70,6 +70,7 @@ class HarnessApi:
                     source_type=sourceType,
                 )
                 tc = TableTargetConfig(
+                    primary_key=table["primary_key"].split("|"),
                     snapshot_target_table=table["snapshot_target_table"],
                     snapshot_target_schema=table["snapshot_target_schema"],
                     test_target_schema=table["test_target_schema"],
@@ -80,7 +81,7 @@ class HarnessApi:
                 )
                 sources[table["name"]] = snc
         hjc = HarnessJobConfig(
-            job_id=id, job_name="databricks_jdbc_test", sources=sources
+            job_id=id, job_name="databricks_jdbc_test", snapshots=sources
         )
 
         return self.createHarnessJob(hjc)

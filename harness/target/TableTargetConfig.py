@@ -8,3 +8,4 @@ class TableTargetConfig(TargetConfig):
     target_type: TargetTypeEnum = TargetTypeEnum.dbrtable
     test_target_schema: str
     test_target_table: str
+    primary_key: list[str]

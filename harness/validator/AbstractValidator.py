@@ -7,5 +7,5 @@ from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
 
 class AbstractValidator:
     @abstractmethod
-    def validate(self, df: DataFrame) -> DataFrameValidatorReport:
+    def validateDF(self, df: DataFrame) -> DataFrameValidatorReport:
         pass
