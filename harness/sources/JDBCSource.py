@@ -2,8 +2,7 @@ from pyspark.sql import DataFrame, SparkSession
 
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
-from harness.manager.HarnessJobManagerEnvironment import \
-    HarnessJobManagerEnvironment
+from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.sources.AbstractSource import AbstractSource
 from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 
@@ -74,9 +73,9 @@ class NetezzaJDBCSource(AbstractSource):
 
         reader_options = {
             "driver": config.get("netezza_jdbc_driver"),
-            "url": config.get("netezza_jdbc_url"),
+            "url": f"""{config.get("netezza_jdbc_url")}{self.config.source_schema};""",
             "dbtable": f"{SQL}",
-            "fetchsize": config.get("netezza_jdbc_url"),
+            "fetchsize": 10000,
             "user": config.get("netezza_jdbc_user"),
             "password": config.get("netezza_jdbc_password"),
             "numPartitions": config.get("netezza_jdbc_num_part"),

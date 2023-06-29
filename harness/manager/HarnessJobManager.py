@@ -106,3 +106,5 @@ class HarnessJobManager:
             self.config.validation_reports[snapshotter.config.name] = validation_report
 
         self._metadataManager.update(self.config)
+        
+        return self.config.validation_reports

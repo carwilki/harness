@@ -30,19 +30,17 @@ class DataFrameValidator(AbstractValidator):
             df (DataFrame): Data frame to validate
         """
         comparison = SparkCompare(
+            cache_intermediates=True,
             spark_session=session,
             base_df=master,
             compare_df=canidate,
             join_columns=primary_keys,
         )
 
-        return self.build_report(name, comparison)
-
-    def build_report(self, name, comparison):
+        report_table_name = f"{HarnessJobManagerEnvironment.snapshot_schema()}.{name}_validation_report_on_{datetime.now().strftime('%Y_%m_%d_%H_%M')}"  # noqa: E501
         comparison_result = StringIO()
         comparison.report(comparison_result)
         missmatch_both: DataFrame = comparison.rows_both_mismatch
-        report_table_name = f"{HarnessJobManagerEnvironment.snapshot_schema()}.{name}_validation_report_on_{datetime.now().strftime('%Y_%m_%d_%H_%M')}"  # noqa: E501
 
         missmatch_both.write.saveAsTable(report_table_name)
 

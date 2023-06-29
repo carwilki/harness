@@ -56,7 +56,7 @@ class HarnessApi:
         return self.createNewHarnessJob(config, self._spark)
 
     def createHarnessJobFromCSV(
-        self, id: str, path: str, sourceType: SourceTypeEnum
+        self, id: str, name:str, path: str, sourceType: SourceTypeEnum
     ) -> Optional[HarnessJobManager]:
         # TODO: need to refactor this to a helper class.
         with open(path, "r") as file:
@@ -81,7 +81,7 @@ class HarnessApi:
                 )
                 sources[table["name"]] = snc
         hjc = HarnessJobConfig(
-            job_id=id, job_name="databricks_jdbc_test", snapshots=sources
+            job_id=id, job_name=name, snapshots=sources
         )
 
         return self.createHarnessJob(hjc)

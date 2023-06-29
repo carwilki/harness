@@ -26,8 +26,8 @@ if hjm is None:
     #raise Exception(f"Could not find Harness job with id: {jobId}")
     hjm = api.createHarnessJobFromCSV(jobId, "./test.csv", "databricks_jdbc")
 
-hjm.snapshot()
-hjm.snapshot()
-hjm.setupTestData()
+# hjm.snapshot()
+# hjm.snapshot()
+# hjm.setupTestData()
 # hjm.executeTestCase()
 print(hjm.validateResults())
