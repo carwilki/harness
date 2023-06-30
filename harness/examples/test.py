@@ -19,12 +19,13 @@ env = EnvConfig(
 
 api = HarnessApi(env, spark)
 # print(api.resetEverything())
-jobId = "b55fb562-e4f1-485b-9877-deb3c7c78d92"
-print(api.resetEverything())
+jobId = "b53fb562-e4f1-485b-9877-deb3c7c78d92"
 hjm = api.getHarnessJobById(jobId)
 if hjm is None:
-    #raise Exception(f"Could not find Harness job with id: {jobId}")
-    hjm = api.createHarnessJobFromCSV(jobId, "./test.csv", "databricks_jdbc")
+    # raise Exception(f"Could not find Harness job with id: {jobId}")
+    hjm = api.createHarnessJobFromCSV(
+        jobId, "firday_demo_6_30", "./test.csv", "databricks_jdbc"
+    )
 
 # hjm.snapshot()
 # hjm.snapshot()

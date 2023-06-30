@@ -19,16 +19,16 @@ env = EnvConfig(
     netezza_jdbc_driver="org.netezza.Driver",
     netezza_jdbc_num_part=9,
 )
-job_id = "eddca4a3-fe6a-42bc-9845-83b0647bc141"
+
+job_id = "eadca4a3-fe6a-42bc-9845-83b0647bc141"
 api = HarnessApi(env, spark)
-#print(api.resetEverything())
 
 hjm = api.getHarnessJobById(job_id)
 if hjm is None:
     # raise Exception(f"Could not find Harness job with id: {job_id}")
     hjm = api.createHarnessJobFromCSV(
         id=job_id,
-        name="wms_to_scds_4hr_test_2",
+        name="wms_to_scds_4hr_test_4",
         path="tableList_WMS_To_SCDS_4hr.csv",
         sourceType=SourceTypeEnum.netezza_jdbc,
     )
