@@ -5,7 +5,7 @@ dbrToken = dbutils.secrets.get(scope="db-field-eng", key="harness_dbr_token")
 workspace = dbutils.secrets.get(scope="db-field-eng", key="harness_dbr_ws_url")
 
 env = EnvConfig(
-    workspace_url=workspace,
+    workspace_url="https://3986616729757273.3.gcp.databricks.com/",
     workspace_token=dbrToken,
     metadata_schema="carson_wilkins_catalog.validator_dev",
     metadata_table="harness_metadata",
@@ -18,17 +18,17 @@ env = EnvConfig(
 )
 
 api = HarnessApi(env, spark)
-# print(api.resetEverything())
+print(api.resetEverything())
 jobId = "b53fb562-e4f1-485b-9877-deb3c7c78d92"
 hjm = api.getHarnessJobById(jobId)
 if hjm is None:
-    # raise Exception(f"Could not find Harness job with id: {jobId}")
-    hjm = api.createHarnessJobFromCSV(
-        jobId, "firday_demo_6_30", "./test.csv", "databricks_jdbc"
-    )
+    raise Exception(f"Could not find Harness job with id: {jobId}")
+#     hjm = api.createHarnessJobFromCSV(
+#         jobId, "firday_demo_6_30", "./test.csv", "databricks_jdbc"
+#     )
 
-# hjm.snapshot()
-# hjm.snapshot()
-# hjm.setupTestData()
-# hjm.executeTestCase()
+# # hjm.snapshot()
+# # hjm.snapshot()
+# # hjm.setupTestData()
+# # hjm.executeTestCase()
 print(hjm.validateResults())
