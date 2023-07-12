@@ -27,7 +27,6 @@ class TestHarnessJobManagerEnvironment:
         mocker.patch.dict(os.environ, {"__JDBC_PASSWORD": ""})
         mocker.patch.dict(os.environ, {"__JDBC_NUM_PART": ""})
 
-        assert HarnessJobManagerEnvironment.catalog() is None
         assert HarnessJobManagerEnvironment.workspace_token() is None
         assert HarnessJobManagerEnvironment.workspace_url() is None
         assert HarnessJobManagerEnvironment.metadata_schema() is None
@@ -54,7 +53,6 @@ class TestHarnessJobManagerEnvironment:
         )
         HarnessJobManagerEnvironment.bindenv(env_config)
 
-        assert HarnessJobManagerEnvironment.catalog() == env_config.catalog
         assert (
             HarnessJobManagerEnvironment.workspace_token() == env_config.workspace_token
         )

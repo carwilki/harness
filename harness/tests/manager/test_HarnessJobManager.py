@@ -2,55 +2,48 @@ import os
 
 from faker import Faker
 from pyspark.sql import SparkSession
+import pytest
 from pytest_mock import MockFixture
 
 from harness.config.EnvConfig import EnvConfig
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.manager.HarnessJobManager import HarnessJobManager
-from harness.manager.HarnessJobManagerEnvironment import \
-    HarnessJobManagerEnvironment
+from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
 from harness.sources.JDBCSource import NetezzaJDBCSource
 from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 from harness.target.TableTarget import TableTarget
 from harness.target.TableTargetConfig import TableTargetConfig
 from harness.tests.utils.generator import (
-    generate_env_config, generate_standard_harness_job_config)
+    generate_env_config,
+    generate_standard_harness_job_config,
+)
 
 
 class TestHarnessJobManager:
-    def test_constructor(self, mocker: MockFixture, faker: Faker):
-        config = generate_standard_harness_job_config(0, faker)
+    @pytest.fixture(autouse=True)
+    def bindenv(self, mocker: MockFixture, faker: Faker):
         envconfig = generate_env_config(faker)
+        HarnessJobManagerEnvironment.bindenv(envconfig)
+
+    def test_constructor(self, mocker: MockFixture, faker: Faker, bindenv):
+        config = generate_standard_harness_job_config(0, faker)
         session = mocker.MagicMock()
-        constructor = HarnessJobManager(config, envconfig, session)
+        constructor = HarnessJobManager(config, session)
         assert constructor is not None
         assert type(constructor.config) is HarnessJobConfig
-        assert isinstance(constructor.__source_snapshoters, dict)
-        assert isinstance(constructor.__input_snapshoters, dict)
-        assert type(constructor.__metadataManager) == HarnessJobManagerMetaData
-        assert constructor._env == HarnessJobManagerEnvironment
+        assert isinstance(constructor._source_snapshoters, dict)
+        assert type(constructor._metadataManager) == HarnessJobManagerMetaData
 
-    def test_can_create(self, mocker: MockFixture, faker: Faker):
+    def test_can_create(self, mocker: MockFixture, faker: Faker, bindenv):
         config = generate_standard_harness_job_config(0, faker)
-        envconfig = generate_env_config(faker)
-        bindenv = mocker.patch.object(HarnessJobManagerEnvironment, "bindenv")
-        mocker.patch.dict(
-            os.environ, {"__HARNESS_METADATA_SCHEMA": envconfig.metadata_schema}
-        )
-        mocker.patch.dict(
-            os.environ, {"__HARNESS_METADATA_TABLE": envconfig.metadata_table}
-        )
-        create_metadata_table = mocker.patch.object(
-            HarnessJobManagerMetaData, "create_metadata_table", return_value=None
-        )
         get: mocker.MagicMock = mocker.patch.object(
             HarnessJobManagerMetaData, "get", return_value=None
         )
 
         session = mocker.MagicMock()
-        manager = HarnessJobManager(config=config, envconfig=envconfig, session=session)
+        manager = HarnessJobManager(config=config, session=session)
 
         assert manager is not None
         assert HarnessJobManagerEnvironment.metadata_schema() is not None
@@ -60,24 +53,13 @@ class TestHarnessJobManager:
         assert HarnessJobManagerEnvironment.metadata_table() is not None
         assert HarnessJobManagerEnvironment.metadata_table() == envconfig.metadata_table
 
-        bindenv.assert_called_once_with(envconfig)
-        create_metadata_table.assert_called_once()
         get.assert_called_once()
 
     def test_can_create_with_existing_metadata(self, mocker: MockFixture, faker: Faker):
         config = generate_standard_harness_job_config(0, faker)
         v1config = generate_standard_harness_job_config(1, faker)
         envconfig = generate_env_config(faker)
-        bindenv = mocker.patch.object(HarnessJobManagerEnvironment, "bindenv")
-        mocker.patch.dict(
-            os.environ, {"__HARNESS_METADATA_SCHEMA": envconfig.metadata_schema}
-        )
-        mocker.patch.dict(
-            os.environ, {"__HARNESS_METADATA_TABLE": envconfig.metadata_table}
-        )
-        create_metadata_table = mocker.patch.object(
-            HarnessJobManagerMetaData, "create_metadata_table", return_value=None
-        )
+        HarnessJobManagerEnvironment.bindenv(envconfig)
         get: mocker.MagicMock = mocker.patch.object(
             HarnessJobManagerMetaData,
             "get",
@@ -85,7 +67,7 @@ class TestHarnessJobManager:
         )
 
         session = mocker.MagicMock()
-        manager = HarnessJobManager(config=config, envconfig=envconfig, session=session)
+        manager = HarnessJobManager(config=config, session=session)
 
         assert manager is not None
         assert HarnessJobManagerEnvironment.metadata_schema() is not None
@@ -95,8 +77,6 @@ class TestHarnessJobManager:
         assert HarnessJobManagerEnvironment.metadata_table() is not None
         assert HarnessJobManagerEnvironment.metadata_table() == envconfig.metadata_table
         assert manager.config == v1config
-        bindenv.assert_called_once_with(envconfig)
-        create_metadata_table.assert_called_once()
         get.assert_called_once_with(config.job_id)
 
     def test_can_snapshot_V1(
@@ -111,7 +91,7 @@ class TestHarnessJobManager:
         update = mocker.patch.object(HarnessJobManagerMetaData, "update")
         read.return_value(spark.createDataFrame([{"a": 1}]))
         write.return_value(True)
-        manager = HarnessJobManager(config=config, envconfig=envconfig, session=session)
+        manager = HarnessJobManager(config=config, session=session)
         manager.snapshot()
         read.assert_called()
         write.assert_called()
@@ -125,13 +105,14 @@ class TestHarnessJobManager:
         config = generate_standard_harness_job_config(1, faker)
         config.version = 1
         envconfig = generate_env_config(faker)
+        HarnessJobManagerEnvironment.bindenv(envconfig)
         session = mocker.MagicMock()
         update = mocker.patch.object(HarnessJobManagerMetaData, "update")
         read = mocker.patch.object(NetezzaJDBCSource, "read")
-        write = mocker.patch.object(TableTarget, "write")
+        write = mocker.patch.object(TableTarget, "write1")
         read.return_value(spark.createDataFrame([{"a": 1}]))
         write.return_value(True)
-        manager = HarnessJobManager(config=config, envconfig=envconfig, session=session)
+        manager = HarnessJobManager(config=config, session=session)
         manager.snapshot()
         read.assert_called()
         write.assert_called()

@@ -30,12 +30,12 @@ class HarnessJobManager:
             session
         )
         self._source_snapshoters: dict[str, Snapshotter] = {}
-        self.__loadExistingMetaDataIfExists()
+        self._loadExistingMetaDataIfExists()
         # this will overwrite any existing inputs if there is an existing
         # job config
-        self.__configureSourceSnaphotters()
+        self._configureSourceSnaphotters()
 
-    def __loadExistingMetaDataIfExists(self):
+    def _loadExistingMetaDataIfExists(self):
         """
         loads the existing metadata if it exists
         """
@@ -55,7 +55,7 @@ class HarnessJobManager:
             )
             self._metadataManager.create(self.config)
 
-    def __configureSourceSnaphotters(self):
+    def _configureSourceSnaphotters(self):
         """
         configures the source snapshotters
         """
@@ -78,20 +78,20 @@ class HarnessJobManager:
         """
         if self.config.version <= 0:
             self._logger.info("Taking snapshot V1...")
-            self.__snapshot(self._source_snapshoters)
+            self._snapshot(self._source_snapshoters)
             self._logger.info("V1 snapshot completed.")
             self.config.version = 1
             self._metadataManager.update(self.config)
         elif self.config.version == 1:
             self._logger.info("Taking snapshot V2...")
-            self.__snapshot(self._source_snapshoters)
+            self._snapshot(self._source_snapshoters)
             self._logger.info("V2 Snapshot completed.")
             self.config.version = 2
             self._metadataManager.update(self.config)
         else:
             self._logger.info("Snapshot already completed, skipping...")
 
-    def __snapshot(self, snapshotters: dict[str, Snapshotter]):
+    def _snapshot(self, snapshotters: dict[str, Snapshotter]):
         for snapshotter in snapshotters.values():
             snapshotter.snapshot()
             self._metadataManager.update(self.config)

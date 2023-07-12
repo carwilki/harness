@@ -25,6 +25,9 @@ def generate_table_target_config(faker: Faker) -> TargetConfig:
         target_type=TargetTypeEnum.dbrtable,
         snapshot_target_schema=faker.pystr(),
         snapshot_target_table=faker.pystr(),
+        test_target_schema=faker.pystr(),
+        test_target_table=faker.pystr(),
+        primary_key=[faker.pystr(), faker.pystr()],
     )
 
 
@@ -55,6 +58,7 @@ def generate_abstract_harness_job_config(faker: Faker) -> HarnessJobConfig:
 
     return HarnessJobConfig(
         job_id=faker.pystr(),
+        job_name=faker.pystr(),
         snapshot_name=faker.pystr(),
         snapshots=sources,
         inputs=inputs,
@@ -94,6 +98,7 @@ def generate_standard_harness_job_config(
 
     return HarnessJobConfig(
         job_id=faker.pystr(),
+        job_name=faker.pystr(),
         snapshot_name=faker.pystr(),
         snapshots=sources,
         inputs=inputs,
@@ -115,4 +120,8 @@ def generate_env_config(faker: Faker) -> EnvConfig:
         netezza_jdbc_url=faker.url(),
         netezza_jdbc_driver=faker.pystr(),
         netezza_jdbc_user=faker.user_name(),
+        databricks_jdbc_host=faker.url(),
+        databricks_jdbc_http_path=faker.url(),
+        databricks_jdbc_user=faker.user_name(),
+        databricks_jdbc_pat=faker.pystr(),
     )

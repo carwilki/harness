@@ -23,11 +23,12 @@ api = HarnessApi(env, spark)
 
 hjm = api.getHarnessJobById(job_id)
 if hjm is None:
-    raise Exception(f"No harness job found with id: {job_id}")
-    # hjm = api.createHarnessJobFromCSV(
-    #     id=job_id,
-    #     name="a_wms_to_scds_4hr_test_demo_1",
-    #     path="tableList_WMS_To_SCDS_4hr.csv",
-    #     sourceType=SourceTypeEnum.netezza_jdbc,
-    # )
+    # raise Exception(f"No harness job found with id: {job_id}")
+    hjm = api.createHarnessJobFromCSV(
+        id=job_id,
+        name="a_wms_to_scds_4hr_test_demo_1",
+        path="tableList_WMS_To_SCDS_4hr.csv",
+        sourceType=SourceTypeEnum.netezza_jdbc,
+    )
+    
 hjm.snapshot()

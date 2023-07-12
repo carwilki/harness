@@ -15,14 +15,6 @@ class HarnessJobManagerEnvironment(object):
         return cls._config.workspace_url
 
     @classmethod
-    def workspace_token(cls) -> Optional[str]:
-        return cls._config.workspace_token
-
-    @classmethod
-    def catalog(cls) -> Optional[str]:
-        return cls._config.catalog
-
-    @classmethod
     def metadata_schema(cls) -> Optional[str]:
         return cls._config.metadata_schema
 

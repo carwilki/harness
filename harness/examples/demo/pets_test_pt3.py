@@ -26,6 +26,6 @@ hjm = api.getHarnessJobById(job_id)
 if hjm is None:
     raise Exception(f"Could not find Harness job with id: {job_id}")
 
-#hjm.setupTestData()
+hjm.setupTestData()
 # hjm.executeTestCase()
-print(hjm.validateResults())
+# print(hjm.validateResults())
