@@ -19,8 +19,8 @@ class HarnessJobManagerEnvironment(object):
         return cls._config.metadata_schema
 
     @classmethod
-    def metadata_table(self) -> Optional[str]:
-        return self._config.metadata_table
+    def metadata_table(cls) -> Optional[str]:
+        return cls._config.metadata_table
 
     @classmethod
     def snapshot_schema(cls) -> Optional[str]:

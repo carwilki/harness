@@ -76,6 +76,10 @@ def generate_standard_snapshot_config(version: int, faker: Faker) -> SnapshotCon
 
 def generate_standard_validator_config(faker: Faker) -> ValidatorConfig:
     return ValidatorConfig(
+        base_schema=faker.pystr(),
+        base_table=faker.pystr(),
+        canidate_schema=faker.pystr(),
+        canidate_table=faker.pystr(),
         join_keys=[faker.pystr(), faker.pystr()],
         filter=faker.pystr(),
         validator_reports={},

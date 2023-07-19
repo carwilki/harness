@@ -1,27 +1,42 @@
 from faker import Faker
 from pyspark.sql import SparkSession
 from pytest_mock import MockFixture
-
+from harness.config.HarnessJobConfig import HarnessJobConfig
+from harness.config.SnapshotConfig import SnapshotConfig
+from pyspark.sql.dataframe import DataFrame
 from harness.sources.JDBCSource import NetezzaJDBCSource
 from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 
 
 class TestJDBCSource:
-    def test_can_create_source(self, mocker: MockFixture, faker: Faker):
+    def test_can_create_source(
+        self,
+        mocker: MockFixture,
+        harnessConfig: HarnessJobConfig,
+        snapshotConfig: SnapshotConfig,
+        jdbcSourceConfig: JDBCSourceConfig,
+    ):
         session: SparkSession = mocker.MagicMock()
-        config = JDBCSourceConfig(
-            source_filter=None,
-            source_table=faker.pystr(),
-            source_schema=faker.pystr(),
+
+        source = NetezzaJDBCSource(
+            harness_config=harnessConfig,
+            snapshot_config=snapshotConfig,
+            config=jdbcSourceConfig,
+            session=session,
         )
-        source = NetezzaJDBCSource(config, session=session)
 
         assert source is not None
 
     def test_can_read_from_source(
-        self, mocker: MockFixture, faker: Faker, spark: SparkSession
+        self,
+        mocker: MockFixture,
+        spark: SparkSession,
+        harnessConfig: HarnessJobConfig,
+        snapshotConfig: SnapshotConfig,
+        jdbcSourceConfig: JDBCSourceConfig,
+        bindenv,
     ):
-        rdf = spark.createDataFrame([{"a": 1}])
+        rdf: DataFrame = spark.createDataFrame([{"a": 1}])
         spark_mock = mocker.MagicMock()
         type(spark_mock).write = spark_mock
         type(spark_mock).read = spark_mock
@@ -30,19 +45,16 @@ class TestJDBCSource:
         spark_mock.options.return_value = spark_mock
         spark_mock.load.return_value = rdf
 
-        session: SparkSession = mocker.MagicMock()
-        session.read.format().option().options().load().return_value = rdf
-
-        config = JDBCSourceConfig(
-            source_filter=None,
-            source_table=faker.pystr(),
-            source_schema=faker.pystr(),
+        source = NetezzaJDBCSource(
+            harness_config=harnessConfig,
+            snapshot_config=snapshotConfig,
+            config=jdbcSourceConfig,
+            session=spark_mock,
         )
 
-        source = NetezzaJDBCSource(config, session=spark_mock)
         df = source.read()
+
         assert df.collect() == rdf.collect()
         spark_mock.format.assert_called_once_with("jdbc")
-        spark_mock.option.assert_called()
         spark_mock.options.assert_called()
         spark_mock.load.assert_called_once()

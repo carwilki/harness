@@ -14,7 +14,7 @@ class TableTarget(AbstractTarget):
         self,
         harness_job_config: HarnessJobConfig,
         snapshot_config: SnapshotConfig,
-        config: TableTargetConfig,
+        table_config: TableTargetConfig,
         session: SparkSession,
     ):
         super().__init__(
@@ -23,7 +23,7 @@ class TableTarget(AbstractTarget):
             session=session,
         )
 
-        self.config = config
+        self.config = table_config
         if self.config.snapshot_target_schema is None:
             raise Exception("Schema name is required")
 

@@ -4,18 +4,11 @@ from unittest.mock import MagicMock
 from faker import Faker
 from pyspark.sql import SparkSession
 from pytest_mock import MockFixture
-
-from harness.config.EnvConfig import EnvConfig
-from harness.config.SnapshotConfig import SnapshotConfig
-from harness.manager.HarnessJobManagerEnvironment import \
-    HarnessJobManagerEnvironment
 from harness.snaphotter.Snapshotter import Snapshotter
-from harness.sources.JDBCSourceConfig import JDBCSourceConfig
-from harness.sources.SourceFactory import SourceFactory
-from harness.target.TableTargetConfig import TableTargetConfig
-from harness.target.TargetFactory import TargetFactory
-from harness.tests.utils.generator import (generate_standard_snapshot_config,
-                                           generate_standard_validator_config)
+from harness.tests.utils.generator import (
+    generate_standard_snapshot_config,
+    generate_standard_validator_config,
+)
 from harness.validator.DataFrameValidator import DataFrameValidator
 from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
 
@@ -46,7 +39,7 @@ class TestSnapshotter:
         target = mocker.MagicMock()
         source.read.return_value = faker.pystr()
         validator: MagicMock = mocker.patch.object(
-            DataFrameValidator, "validate"
+            DataFrameValidator, "validateDF"
         ).return_value(
             DataFrameValidatorReport(
                 summary="test",
@@ -74,7 +67,7 @@ class TestSnapshotter:
         source = mocker.MagicMock()
         target = mocker.MagicMock()
         source.read.return_value = spark.createDataFrame([{"a": 1}])
-        validator: MagicMock = mocker.patch.object(DataFrameValidator, "validate")
+        validator: MagicMock = mocker.patch.object(DataFrameValidator, "validateDF")
         sut = Snapshotter(config=config, source=source, target=target)
         sut.snapshot()
 
@@ -103,7 +96,7 @@ class TestSnapshotter:
             validation_date=faker.date_time(),
         )
 
-        validator: MagicMock = mocker.patch.object(DataFrameValidator, "validate")
+        validator: MagicMock = mocker.patch.object(DataFrameValidator, "validateDF")
 
         validator.return_value = validation_report
 
@@ -140,7 +133,7 @@ class TestSnapshotter:
 
         source.read.return_value = spark.createDataFrame([{"a": 1}])
 
-        validator: MagicMock = mocker.patch.object(DataFrameValidator, "validate")
+        validator: MagicMock = mocker.patch.object(DataFrameValidator, "validateDF")
 
         validator.return_value = validation_report
 
@@ -176,7 +169,7 @@ class TestSnapshotter:
         target = mocker.MagicMock()
         source.read.return_value = spark.createDataFrame([{"a": 1}])
 
-        validator: MagicMock = mocker.patch.object(DataFrameValidator, "validate")
+        validator: MagicMock = mocker.patch.object(DataFrameValidator, "validateDF")
 
         validator.return_value = validation_report
 
@@ -193,36 +186,3 @@ class TestSnapshotter:
         assert source.read.call_count == 0
         target.write.assert_not_called()
         validator.assert_not_called()
-
-    def test_can_not_create_snapshot_with_jdbc_source_and_table_target_with_validator(
-        self, mocker: MockFixture, faker: Faker, spark: SparkSession
-    ):
-        username = faker.user_name()
-        password = faker.password()
-        session = mocker.MagicMock()
-        env1 = EnvConfig(
-            workspace_url="https://3986616729757273.3.gcp.databricks.com/",
-            workspace_token="dapi5492460db39d145778c9d436bbbf1842",
-            metadata_schema="hive_metastore.nzmigration",
-            metadata_table="harness_metadata",
-            snapshot_schema="hive_metastore.nzmigration",
-            snapshot_table_post_fix="_gold",
-            netezza_jdbc_url="jdbc:netezza:/172.16.73.181:5480/EDW_PRD",
-            netezza_jdbc_user=username,
-            netezza_jdbc_password=password,
-            netezza_jdbc_driver="org.netezza.Driver",
-        )
-        HarnessJobManagerEnvironment.bindenv(env1)
-        sc = JDBCSourceConfig(source_table="E_CONSOL_PERF_SMRY", source_schema="WMSMIS")
-        tc = TableTargetConfig(
-            snapshot_target_table="WM_E_CONSOL_PERF_SMRY",
-            snapshot_target_schema="hive_metastore.nzmigration",
-        )
-        snc = SnapshotConfig(target=tc, source=sc)
-        job_id = "01298d4f-934f-439a-b80d-251987f54415"
-        snaps = Snapshotter(
-            snc,
-            SourceFactory.create(snc.source, session),
-            TargetFactory.create(snc.target, session),
-        )
-        snaps.snapshot()

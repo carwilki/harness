@@ -61,7 +61,7 @@ class SnapshotterFactory:
     ) -> AbstractSource:
         return SourceFactory.create(
             harness_config=harness_config,
-            snaphot_config=snapshot_config,
+            snapshot_config=snapshot_config,
             source_config=source_config,
             session=session,
         )

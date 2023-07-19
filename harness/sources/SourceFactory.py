@@ -14,7 +14,7 @@ class SourceFactory:
     def create(
         cls,
         harness_config: HarnessJobConfig,
-        snaphot_config: SnapshotConfig,
+        snapshot_config: SnapshotConfig,
         source_config: SourceConfig,
         session: SparkSession,
     ) -> AbstractSource:
@@ -23,7 +23,7 @@ class SourceFactory:
                 assert isinstance(source_config, JDBCSourceConfig)
                 return NetezzaJDBCSource(
                     harness_config=harness_config,
-                    snapshot_config=snaphot_config,
+                    snapshot_config=snapshot_config,
                     config=source_config,
                     session=session,
                 )
@@ -31,7 +31,7 @@ class SourceFactory:
                 assert isinstance(source_config, JDBCSourceConfig)
                 return DatabricksJDBCSource(
                     harness_config=harness_config,
-                    snapshot_config=snaphot_config,
+                    snapshot_config=snapshot_config,
                     config=source_config,
                     session=session,
                 )

@@ -22,7 +22,7 @@ class TargetFactory:
                 return TableTarget(
                     harness_job_config=harness_config,
                     snapshot_config=snapshot_config,
-                    config=target_config,
+                    table_config=target_config,
                     session=session,
                 )
             case _:
