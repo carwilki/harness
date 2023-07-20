@@ -34,7 +34,6 @@ class TestSnapshotter:
         source = mocker.MagicMock()
         target = mocker.MagicMock()
         source.read.return_value = spark.createDataFrame([{"a": 1}])
-        validator: MagicMock = mocker.patch.object(DataFrameValidator, "validateDF")
         sut = Snapshotter(config=config, source=source, target=target)
         sut.snapshot()
 
@@ -46,4 +45,3 @@ class TestSnapshotter:
         assert sut.config.version == 1
         source.read.assert_called_once()
         target.write.assert_called_once()
-        validator.assert_not_called()

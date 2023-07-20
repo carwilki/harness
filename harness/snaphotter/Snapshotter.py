@@ -53,17 +53,4 @@ class Snapshotter(AbstractSnapshotter):
     def _snapshot(self):
         df = self.source.read()
         self.target.write(df)
-        if self.config.validator is not None:
-            date = datetime.now().strftime("%Y-%m-%d %H:%M")
-            report = self._validator.validateDF(
-                name=self.config.name,
-                master=self.source.read(),
-                canidate=df,
-                session=self.source.session,
-            )
-            if self.config.validator.validator_reports is None:
-                self.config.validator.validator_reports = {}
-
-            self.config.validator.validator_reports[date] = report
-
         self.config.version += 1
