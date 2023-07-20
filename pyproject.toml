@@ -15,6 +15,7 @@ databricks-sdk = "^0.1.8"
 datacompy = {version="^0.10.1", extras=["spark"]}
 pyspark = "^3.4.0"
 delta-spark = "^2.4.0"
+pytest-freezegun = "^0.4.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.3.1"

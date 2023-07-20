@@ -2,6 +2,7 @@ from faker import Faker
 import pytest
 from pyspark.sql import SparkSession
 from pytest_mock import MockFixture
+from harness.config.ValidatorConfig import ValidatorConfig
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.target.TableTargetConfig import TableTargetConfig
 from harness.tests.utils.generator import (
@@ -56,5 +57,17 @@ def tableTargetConfig(mocker: MockFixture, faker: Faker):
         snapshot_target_schema=faker.pystr(),
         test_target_schema=faker.pystr(),
         test_target_table=faker.pystr(),
-        primary_key=["test_target","test_target_2"]
+        primary_key=["test_target", "test_target_2"],
+    )
+
+
+@pytest.fixture(scope="function")
+def validatorConfig(mocker: MockFixture, faker: Faker):
+    return ValidatorConfig(
+        base_schema=faker.pystr(),
+        base_table=faker.pystr(),
+        canidate_schema=faker.pystr(),
+        canidate_table=faker.pystr(),
+        join_keys=[faker.pystr(), faker.pystr()],
+        filter=faker.pystr(),
     )
