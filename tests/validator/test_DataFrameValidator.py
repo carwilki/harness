@@ -42,7 +42,7 @@ class TestDataFrameValidator:
 
     def test_columns_with_base_postfix_should_not_cause_errors(
         self, faker, mocker: MockFixture, spark: SparkSession, bindenv, freezer
-    ):  
+    ):
         write = mocker.patch("pyspark.sql.DataFrame.write")
         write.return_value = mocker.MagicMock()
         df = pd.DataFrame(
@@ -62,10 +62,15 @@ class TestDataFrameValidator:
 
         df1 = spark.createDataFrame(df, schema)
         df2 = spark.createDataFrame(df, schema)
-        
+
         validator = DataFrameValidator()
         try:
-            validator.validateDF(session=spark, name="test", canidate=df2, master=df1, primary_keys=["id"])
+            validator.validateDF(
+                session=spark,
+                name="test",
+                canidate=df2,
+                master=df1,
+                primary_keys=["id"],
+            )
         except Exception as e:
             assert False, f"Exception raised: {e}"
-        
