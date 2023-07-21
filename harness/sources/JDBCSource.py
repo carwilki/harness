@@ -1,5 +1,6 @@
 from pyspark.sql import DataFrame, SparkSession
-
+from pyspark.sql.types import DecimalType, ByteType, ShortType, IntegerType, LongType
+from pyspark.sql.functions import col
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
@@ -82,5 +83,15 @@ class NetezzaJDBCSource(AbstractSource):
         }
 
         df = self.session.read.format("jdbc").options(**reader_options).load()
+
+        for feild in df.schema.fields:
+            if isinstance(feild.dataType, DecimalType):
+                if feild.dataType.scale == 0:
+                    if 0 < feild.dataType.precision < 5:
+                        df = df.withColumn(feild.name, col(feild.name).cast(ShortType()))
+                    elif 5 < feild.dataType.precision < 12:
+                        df = df.withColumn(feild.name, col(feild.name).cast(IntegerType()))
+                    elif 12 < feild.dataType.precision < 22:
+                        df = df.withColumn(feild.name, col(feild.name).cast(LongType()))
 
         return df.repartition(50)
