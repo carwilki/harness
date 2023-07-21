@@ -11,7 +11,7 @@ from harness.manager.HarnessJobManager import HarnessJobManager
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 from harness.target.TableTargetConfig import TableTargetConfig
-from harness.tests.utils.generator import generate_env_config
+from tests.utils.generator import generate_env_config
 
 
 class TestHarnessJobManagerEnvironment:

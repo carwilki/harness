@@ -1,13 +1,10 @@
-from unittest.mock import MagicMock
-
 from faker import Faker
 from pyspark.sql import SparkSession
 from pytest_mock import MockFixture
 from harness.snaphotter.Snapshotter import Snapshotter
-from harness.tests.utils.generator import (
+from tests.utils.generator import (
     generate_standard_snapshot_config,
 )
-from harness.validator.DataFrameValidator import DataFrameValidator
 
 
 class TestSnapshotter:

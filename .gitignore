@@ -204,3 +204,5 @@ Temporary Items
 .metals/
 .bloop/
 project/metals.sbt
+
+lcov.info

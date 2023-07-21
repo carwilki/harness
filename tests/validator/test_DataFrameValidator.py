@@ -41,3 +41,16 @@ class TestDataFrameValidator:
         )
         expected = DataFrameValidatorReport.empty()
         assert report == expected
+
+    def test_colums_with_base_prefix_cause_errors(
+        self, mocker: MockFixture, spark: SparkSession, bindenv, freezer
+    ):
+        tdf1 = spark.createDataFrame([], StructType([]))
+        tdf2 = spark.createDataFrame([], StructType([]))
+        session = mocker.MagicMock()
+        validator = DataFrameValidator()
+        report: DataFrameValidatorReport = validator.validateDF(
+            session=session, name="test", canidate=tdf2, master=tdf1, primary_keys=["A"]
+        )
+        expected = DataFrameValidatorReport.empty()
+        assert report == expected
