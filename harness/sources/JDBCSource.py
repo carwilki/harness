@@ -84,7 +84,7 @@ class NetezzaJDBCSource(AbstractSource):
 
         df = self.session.read.format("jdbc").options(**reader_options).load()
 
-        df = self.convert_decimal_to_int_types(df)
+        df = self._convert_decimal_to_int_types(df)
 
         return df.repartition(50)
 
