@@ -69,9 +69,11 @@ class TableTarget(AbstractTarget):
         st = (
             f"{self.harness_job_config.job_name}_{self.config.snapshot_target_table}_V2"
         )
-        validator = DataFrameValidator(self.session)
+        
+        validator = DataFrameValidator()
         results = self.session.sql(f"select * from {ts}.{tt}")
         base = self.session.sql(f"select * from {ss}.{st}")
+        
         return validator.validateDF(
             tt, results, base, self.config.primary_key, self.session
         )

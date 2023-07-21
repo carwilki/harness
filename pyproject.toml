@@ -12,7 +12,7 @@ databricks-cli = "^0.17.7"
 pydantic-config = "^0.1.1"
 pydantic = "^1.10.8"
 databricks-sdk = "^0.1.8"
-datacompy = {version="^0.10.1", extras=["spark"]}
+datacompy = { version = "^0.10.1", extras = ["spark"] }
 pyspark = "^3.4.0"
 delta-spark = "^2.4.0"
 pytest-freezegun = "^0.4.2"
@@ -31,10 +31,36 @@ graphviz = "^0.20.1"
 flake8 = "^6.0.0"
 
 [tool.pytest.ini_options]
-addopts = [
-    "--import-mode=importlib",
-]
+addopts = ["--import-mode=importlib"]
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.coverage.run]
+branch = true
+omit = ["harness/tests/*"]
+
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_also = [
+    # Don't complain about missing debug-only code:
+    "def __repr__",
+    "if self\\.debug",
+
+    # Don't complain if tests don't hit defensive assertion code:
+    "raise AssertionError",
+    "raise NotImplementedError",
+
+    # Don't complain if non-runnable code isn't run:
+    "if 0:",
+    "if __name__ == .__main__.:",
+
+    # Don't complain about abstract methods, they aren't run:
+    "@(abc\\.)?abstractmethod",
+]
+
+ignore_errors = true
+
+[tool.coverage.html]
+directory = "coverage_html_report"

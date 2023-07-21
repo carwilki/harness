@@ -1,3 +1,4 @@
+from datetime import datetime
 from faker import Faker
 import pytest
 from pyspark.sql import SparkSession
@@ -11,6 +12,7 @@ from harness.tests.utils.generator import (
     generate_standard_harness_job_config,
     generate_standard_snapshot_config,
 )
+from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
 
 
 @pytest.fixture(scope="session")
@@ -70,4 +72,11 @@ def validatorConfig(mocker: MockFixture, faker: Faker):
         canidate_table=faker.pystr(),
         join_keys=[faker.pystr(), faker.pystr()],
         filter=faker.pystr(),
+    )
+
+
+@pytest.fixture(scope="function")
+def validatorReport(mocker: MockFixture, faker: Faker):
+    return DataFrameValidatorReport(
+        summary=faker.pystr(), table=faker.pystr(), validation_date=datetime.now()
     )
