@@ -84,6 +84,11 @@ class NetezzaJDBCSource(AbstractSource):
 
         df = self.session.read.format("jdbc").options(**reader_options).load()
 
+        df = self.convert_decimal_to_int_types(df)
+
+        return df.repartition(50)
+
+    def _convert_decimal_to_int_types(self, df):
         for feild in df.schema.fields:
             if isinstance(feild.dataType, DecimalType):
                 if feild.dataType.scale == 0:
@@ -93,5 +98,4 @@ class NetezzaJDBCSource(AbstractSource):
                         df = df.withColumn(feild.name, col(feild.name).cast(IntegerType()))
                     elif 12 < feild.dataType.precision < 22:
                         df = df.withColumn(feild.name, col(feild.name).cast(LongType()))
-
-        return df.repartition(50)
+        return df

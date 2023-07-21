@@ -1,12 +1,10 @@
 import numpy as np
 import pandas as pd
 from pytest_mock import MockFixture
-from harness.config.ValidatorConfig import ValidatorConfig
 from harness.validator.DataFrameValidator import DataFrameValidator
 from pyspark.sql import SparkSession
-from pyspark.sql import DataFrame
 from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
-from pyspark.sql.types import StructType
+from pyspark.sql.types import StructType, StructField, IntegerType, LongType
 
 
 class TestDataFrameValidator:
@@ -42,15 +40,32 @@ class TestDataFrameValidator:
         expected = DataFrameValidatorReport.empty()
         assert report == expected
 
-    def test_colums_with_base_prefix_cause_errors(
-        self, mocker: MockFixture, spark: SparkSession, bindenv, freezer
-    ):
-        tdf1 = spark.createDataFrame([], StructType([]))
-        tdf2 = spark.createDataFrame([], StructType([]))
-        session = mocker.MagicMock()
-        validator = DataFrameValidator()
-        report: DataFrameValidatorReport = validator.validateDF(
-            session=session, name="test", canidate=tdf2, master=tdf1, primary_keys=["A"]
+    def test_columns_with_base_postfix_should_not_cause_errors(
+        self, faker, mocker: MockFixture, spark: SparkSession, bindenv, freezer
+    ):  
+        write = mocker.patch("pyspark.sql.DataFrame.write")
+        write.return_value = mocker.MagicMock()
+        df = pd.DataFrame(
+            np.random.randint(0, 100, size=(100, 5)),
+            columns=list(["id", "f2_base", "f3_base", "f2", "f3"]),
         )
-        expected = DataFrameValidatorReport.empty()
-        assert report == expected
+
+        schema = StructType(
+            [
+                StructField("id", LongType(), True),
+                StructField("f2_base", IntegerType(), True),
+                StructField("f3_base", IntegerType(), True),
+                StructField("f2", LongType(), True),
+                StructField("f3", LongType(), True),
+            ]
+        )
+
+        df1 = spark.createDataFrame(df, schema)
+        df2 = spark.createDataFrame(df, schema)
+        
+        validator = DataFrameValidator()
+        try:
+            validator.validateDF(session=spark, name="test", canidate=df2, master=df1, primary_keys=["id"])
+        except Exception as e:
+            assert False, f"Exception raised: {e}"
+        

@@ -35,6 +35,11 @@ class DataFrameValidator(AbstractValidator):
             self._logger.info("skipping validation .....")
             return DataFrameValidatorReport.empty()
 
+        # this is a bit of a hack, but we need to rename any '_base' columns to
+        # to something else since base is a reserved word
+        master = self.rename_base_colunms(master)
+        canidate = self.rename_base_colunms(canidate)
+
         comparison = SparkCompare(
             cache_intermediates=True,
             spark_session=session,
@@ -44,7 +49,7 @@ class DataFrameValidator(AbstractValidator):
         )
 
         report_table_name = f"{HarnessJobManagerEnvironment.snapshot_schema()}.{name}_validation_report_on_{datetime.now().strftime('%Y_%m_%d_%H_%M')}"  # noqa: E501
-        
+
         comparison_result = StringIO()
         self._logger.info(f"Comparing {name} master and canidate")
         comparison.report(comparison_result)
@@ -58,3 +63,9 @@ class DataFrameValidator(AbstractValidator):
             table=report_table_name,
             validation_date=datetime.now(),
         )
+
+    def rename_base_colunms(self, df: DataFrame) -> DataFrame:
+        for feild in df.schema.fields:
+            if feild.name.endswith("_base"):
+                df = df.withColumnRenamed(feild.name, feild.name.replace("_base", "_b"))
+        return df
