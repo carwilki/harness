@@ -29,7 +29,7 @@ class TableTarget(AbstractTarget):
 
         if self.config.snapshot_target_table is None:
             raise Exception("Table name is required")
-
+    
     def write(self, df: DataFrame):
         temptable = f"{str(uuid4()).replace('-','')}_data"
         df.createOrReplaceTempView(temptable)

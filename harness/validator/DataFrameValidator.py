@@ -67,5 +67,5 @@ class DataFrameValidator(AbstractValidator):
     def rename_base_colunms(self, df: DataFrame) -> DataFrame:
         for feild in df.schema.fields:
             if feild.name.endswith("_base"):
-                df = df.withColumnRenamed(feild.name, feild.name.replace("_base", "_b"))
+                df = df.withColumnRenamed(feild.name, feild.name.replace("_base", "_base_sfx"))
         return df
