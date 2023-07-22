@@ -109,6 +109,18 @@ class HarnessJobManager:
 
         return self.config.validation_reports
 
+    def updateAllTargetSchema(self, schema: str):
+        for snapshotter in self._source_snapshoters.values():
+            snapshotter.updateTargetSchema(schema)
+
+        self._metadataManager.update(self.config)
+
+    def updateAllTargetTable(self, table: str):
+        for snapshotter in self._source_snapshoters.values():
+            snapshotter.updateTargetTable(table)
+
+        self._metadataManager.update(self.config)
+
     def updateTargetSchema(self, snapshotName: str, schema: str):
         snapshotter = self._source_snapshoters[snapshotName]
 
@@ -144,4 +156,21 @@ class HarnessJobManager:
             self._metadataManager.update(self.config)
         else:
             raise ValueError(f"Snapshot {snapshotName} does not exist")
-    
+
+    def disableSnapshot(self, snapshotName: str):
+        snapshotter = self._source_snapshoters[snapshotName]
+
+        if snapshotter is not None:
+            snapshotter.disable()
+            self._metadataManager.update(self.config)
+        else:
+            raise ValueError(f"Snapshot {snapshotName} does not exist")
+
+    def enableSnapshot(self, snapshotName: str):
+        snapshotter = self._source_snapshoters[snapshotName]
+
+        if snapshotter is not None:
+            snapshotter.enable()
+            self._metadataManager.update(self.config)
+        else:
+            raise ValueError(f"Snapshot {snapshotName} does not exist")

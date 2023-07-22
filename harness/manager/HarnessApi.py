@@ -56,7 +56,7 @@ class HarnessApi:
         return self.createNewHarnessJob(config, self._spark)
 
     def createHarnessJobFromCSV(
-        self, id: str, name:str, path: str, sourceType: SourceTypeEnum
+        self, id: str, name: str, path: str, sourceType: SourceTypeEnum
     ) -> Optional[HarnessJobManager]:
         # TODO: need to refactor this to a helper class.
         with open(path, "r") as file:
@@ -80,8 +80,6 @@ class HarnessApi:
                     job_id=id, target=tc, source=sc, name=table["name"]
                 )
                 sources[table["name"]] = snc
-        hjc = HarnessJobConfig(
-            job_id=id, job_name=name, snapshots=sources
-        )
+        hjc = HarnessJobConfig(job_id=id, job_name=name, snapshots=sources)
 
         return self.createHarnessJob(hjc)

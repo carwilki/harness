@@ -58,6 +58,14 @@ class Snapshotter(AbstractSnapshotter):
         self.config.target.snapshot_target_table = table
         self._logger.debug(f"new value: {self.config.target.snapshot_target_table}")
 
+    def disable(self):
+        self._logger.info(f"Disabling snapshotter {self.config.name}")
+        self.config.enabled = False
+
+    def enable(self):
+        self._logger.info(f"Enabling snapshotter {self.config.name}")
+        self.config.enabled = True
+
     def snapshot(self):
         if self.config.version < 0:
             self.config.version = 0

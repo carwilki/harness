@@ -7,6 +7,7 @@ from harness.config.SnapshotConfig import SnapshotConfig
 from harness.manager.HarnessJobManager import HarnessJobManager
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
+from harness.snaphotter.Snapshotter import Snapshotter
 from harness.sources.JDBCSource import NetezzaJDBCSource
 from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 from harness.target.TableTarget import TableTarget
@@ -176,7 +177,7 @@ class TestHarnessJobManager:
         hjm.updateTargetSchema(snapshotName, expected)
         assert hjm.config.snapshots[snapshotName].target.test_target_schema == expected
         assert update.call_count == 1
-        
+
     def test_updateTargetTable(
         self,
         harnessConfig: HarnessJobConfig,
@@ -200,7 +201,7 @@ class TestHarnessJobManager:
         hjm.updateTargetTable(snapshotName, expected)
         assert hjm.config.snapshots[snapshotName].target.test_target_table == expected
         assert update.call_count == 1
-        
+
     def test_updateSnapshotSchema(
         self,
         harnessConfig: HarnessJobConfig,
@@ -213,7 +214,7 @@ class TestHarnessJobManager:
         expected = faker.pystr()
         inital = faker.pystr()
         update = mocker.patch.object(HarnessJobManagerMetaData, "update")
-        
+
         tableTargetConfig.snapshot_target_schema = inital
         harnessConfig.snapshots[snapshotName] = SnapshotConfig(
             name=snapshotName, target=tableTargetConfig, source=jdbcSourceConfig
@@ -251,3 +252,96 @@ class TestHarnessJobManager:
             hjm.config.snapshots[snapshotName].target.snapshot_target_table == expected
         )
         assert update.call_count == 1
+
+    def test_updateAllTargetSchema(
+        self,
+        harnessConfig: HarnessJobConfig,
+        faker: Faker,
+        mocker: MockFixture,
+    ):
+        expected = faker.pystr()
+        inital = faker.pystr()
+        update = mocker.patch.object(HarnessJobManagerMetaData, "update")
+        for cfg in harnessConfig.snapshots.values():
+            cfg.target.test_target_schema = inital
+
+        hjm = HarnessJobManager(config=harnessConfig, session=mocker.MagicMock())
+
+        for cfg in harnessConfig.snapshots.values():
+            assert cfg.target.test_target_schema == inital
+
+        hjm.updateAllTargetSchema(expected)
+
+        for cfg in harnessConfig.snapshots.values():
+            assert cfg.target.test_target_schema == expected
+
+        update.assert_called_once()
+
+    def test_updateAllTargetTable(
+        self,
+        harnessConfig: HarnessJobConfig,
+        faker: Faker,
+        mocker: MockFixture,
+    ):
+        expected = faker.pystr()
+        inital = faker.pystr()
+        update = mocker.patch.object(HarnessJobManagerMetaData, "update")
+        for cfg in harnessConfig.snapshots.values():
+            cfg.target.test_target_table = inital
+
+        hjm = HarnessJobManager(config=harnessConfig, session=mocker.MagicMock())
+
+        for cfg in harnessConfig.snapshots.values():
+            assert cfg.target.test_target_table == inital
+
+        hjm.updateAllTargetTable(expected)
+
+        for cfg in harnessConfig.snapshots.values():
+            assert cfg.target.test_target_table == expected
+
+        update.assert_called_once()
+
+    def test_disableSnapshot(
+        self,
+        harnessConfig: HarnessJobConfig,
+        faker: Faker,
+        mocker: MockFixture,
+        tableTargetConfig: TableTargetConfig,
+        jdbcSourceConfig: JDBCSourceConfig,
+    ):
+        snapshotName = faker.pystr()
+        inital = faker.pystr()
+        update = mocker.patch.object(HarnessJobManagerMetaData, "update")
+        tableTargetConfig.snapshot_target_table = inital
+        harnessConfig.snapshots[snapshotName] = SnapshotConfig(
+            name=snapshotName, target=tableTargetConfig, source=jdbcSourceConfig
+        )
+        hjm = HarnessJobManager(config=harnessConfig, session=mocker.MagicMock())
+        assert hjm.config.snapshots[snapshotName].enabled is True
+        hjm.disableSnapshot(snapshotName)
+        assert hjm.config.snapshots[snapshotName].enabled is False
+        update.assert_called_once()
+        
+    def test_enableSnapshot(
+        self,
+        harnessConfig: HarnessJobConfig,
+        faker: Faker,
+        mocker: MockFixture,
+        tableTargetConfig: TableTargetConfig,
+        jdbcSourceConfig: JDBCSourceConfig,
+    ):
+        snapshotName = faker.pystr()
+        inital = faker.pystr()
+        update = mocker.patch.object(HarnessJobManagerMetaData, "update")
+        tableTargetConfig.snapshot_target_table = inital
+        harnessConfig.snapshots[snapshotName] = SnapshotConfig(
+            name=snapshotName,
+            target=tableTargetConfig,
+            source=jdbcSourceConfig,
+            enabled=False,
+        )
+        hjm = HarnessJobManager(config=harnessConfig, session=mocker.MagicMock())
+        assert hjm.config.snapshots[snapshotName].enabled is False
+        hjm.enableSnapshot(snapshotName)
+        assert hjm.config.snapshots[snapshotName].enabled is True
+        update.assert_called_once()

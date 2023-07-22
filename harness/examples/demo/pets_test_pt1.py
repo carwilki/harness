@@ -30,5 +30,5 @@ if hjm is None:
         path="tableList_WMS_To_SCDS_4hr.csv",
         sourceType=SourceTypeEnum.netezza_jdbc,
     )
-    
+
 hjm.snapshot()

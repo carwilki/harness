@@ -72,4 +72,3 @@ for snapshot in hjc.snapshots.values():
         f"""create table if not exists {table}
             as select * from {env.snapshot_schema}.{snapshot.source.source_table}"""
     )
-
