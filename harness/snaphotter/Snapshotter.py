@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.snaphotter.AbstractSnapshotter import AbstractSnapshotter
 from harness.sources.AbstractSource import AbstractSource
@@ -33,6 +31,32 @@ class Snapshotter(AbstractSnapshotter):
 
     def validateResults(self) -> DataFrameValidatorReport:
         return self.target.validate_results()
+
+    def updateTargetSchema(self, schema: str):
+        self._logger.info(f"Changing target schema for target {self.config.name}")
+        self._logger.debug(f"initial value: {self.config.target.test_target_schema}")
+        self.config.target.test_target_schema = schema
+        self._logger.debug(f"new value: {self.config.target.test_target_schema}")
+
+    def updateTargetTable(self, table: str):
+        self._logger.info(f"Changing target table for target {self.config.name}")
+        self._logger.debug(f"initial value: {self.config.target.test_target_schema}")
+        self.config.target.test_target_table = table
+        self._logger.debug(f"new value: {self.config.target.test_target_table}")
+
+    def updateSnapshotSchema(self, schema: str):
+        self._logger.info(f"Changing source schema for snapshot {self.config.name}")
+        self._logger.debug(
+            f"initial value: {self.config.target.snapshot_target_schema}"
+        )
+        self.config.target.snapshot_target_schema = schema
+        self._logger.debug(f"new value: {self.config.target.snapshot_target_schema}")
+
+    def updateSnapshotTable(self, table: str):
+        self._logger.info(f"Changing source table for snapshot {self.config.name}")
+        self._logger.debug(f"initial value: {self.config.target.snapshot_target_table}")
+        self.config.target.snapshot_target_table = table
+        self._logger.debug(f"new value: {self.config.target.snapshot_target_table}")
 
     def snapshot(self):
         if self.config.version < 0:

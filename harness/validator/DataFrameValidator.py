@@ -4,7 +4,6 @@ from io import StringIO
 from datacompy import SparkCompare
 from pyspark.sql import DataFrame, SparkSession
 
-from harness.config.ValidatorConfig import ValidatorConfig
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.utils.logger import getLogger
 from harness.validator.AbstractValidator import AbstractValidator
@@ -53,10 +52,21 @@ class DataFrameValidator(AbstractValidator):
         comparison_result = StringIO()
         self._logger.info(f"Comparing {name} master and canidate")
         comparison.report(comparison_result)
-        missmatch_both: DataFrame = comparison.rows_both_mismatch
+        self._logger.info("Writing report tables")
 
-        self._logger.info(f"Writing report to {report_table_name}")
-        missmatch_both.write.saveAsTable(report_table_name)
+        comparison.rows_only_compare.write.saveAsTable(
+            f"{report_table_name}_compare_only"
+        )
+        comparison.rows_only_base.write.saveAsTable(f"{report_table_name}_base_only")
+
+        comparison.rows_both_mismatch.write.saveAsTable(
+            f"{report_table_name}_missmatch_only"
+        )
+
+        self._logger.info(f"compare only: {report_table_name}_compare_only")
+        self._logger.info(f"base only: {report_table_name}_base_only")
+        self._logger.info(f"mismatch only: {report_table_name}_missmatch_only")
+        self._logger.info(f"summary for {name}:")
 
         return DataFrameValidatorReport(
             summary=comparison_result.getvalue(),
@@ -67,5 +77,7 @@ class DataFrameValidator(AbstractValidator):
     def rename_base_colunms(self, df: DataFrame) -> DataFrame:
         for feild in df.schema.fields:
             if feild.name.endswith("_base"):
-                df = df.withColumnRenamed(feild.name, feild.name.replace("_base", "_base_sfx"))
+                df = df.withColumnRenamed(
+                    feild.name, feild.name.replace("_base", "_base_sfx")
+                )
         return df

@@ -88,7 +88,7 @@ class TestJDBCSource:
                 StructField("f5", DecimalType(22, 0), True),
             ]
         )
-        
+
         expected = StructType(
             [
                 StructField("f1", ShortType(), True),
@@ -98,7 +98,7 @@ class TestJDBCSource:
                 StructField("f5", DecimalType(22, 0), True),
             ]
         )
-        
+
         rdf: DataFrame = spark.createDataFrame(values, schema=schema)
 
         spark_mock = mocker.MagicMock()
@@ -117,7 +117,7 @@ class TestJDBCSource:
         )
 
         df = source.read()
-       
+
         assert df.schema == expected
 
         spark_mock.format.assert_called_once_with("jdbc")

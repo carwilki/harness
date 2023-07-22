@@ -7,6 +7,7 @@ from harness.config.SnapshotConfig import SnapshotConfig
 from harness.target.AbstractTarget import AbstractTarget
 from harness.target.TableTargetConfig import TableTargetConfig
 from harness.validator.DataFrameValidator import DataFrameValidator
+from harness.utils.logger import getLogger
 
 
 class TableTarget(AbstractTarget):
@@ -22,14 +23,14 @@ class TableTarget(AbstractTarget):
             snapshot_config=snapshot_config,
             session=session,
         )
-
+        self.logger = getLogger()
         self.config = table_config
         if self.config.snapshot_target_schema is None:
             raise Exception("Schema name is required")
 
         if self.config.snapshot_target_table is None:
             raise Exception("Table name is required")
-    
+
     def write(self, df: DataFrame):
         temptable = f"{str(uuid4()).replace('-','')}_data"
         df.createOrReplaceTempView(temptable)
@@ -69,11 +70,15 @@ class TableTarget(AbstractTarget):
         st = (
             f"{self.harness_job_config.job_name}_{self.config.snapshot_target_table}_V2"
         )
-        
+
         validator = DataFrameValidator()
         results = self.session.sql(f"select * from {ts}.{tt}")
         base = self.session.sql(f"select * from {ss}.{st}")
-        
+        self.logger.info(f"Validating results in {ts}.{tt} againsts {ss}.{st}")
         return validator.validateDF(
-            tt, results, base, self.config.primary_key, self.session
+            f"{self.harness_job_config.job_name}_{tt}",
+            results,
+            base,
+            self.config.primary_key,
+            self.session,
         )

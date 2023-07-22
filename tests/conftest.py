@@ -62,7 +62,6 @@ def tableTargetConfig(mocker: MockFixture, faker: Faker):
         primary_key=["test_target", "test_target_2"],
     )
 
-
 @pytest.fixture(scope="function")
 def validatorConfig(mocker: MockFixture, faker: Faker):
     return ValidatorConfig(
