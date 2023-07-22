@@ -53,16 +53,30 @@ for snapshot in config.snapshots.values():
     table_v2 = table + "_V2"
 # pt 1
 # write it all out to temp tables for now
-# for table in tables:
-#     getLogger().info(f"creating temp_{table}")
-#     df = spark.sql(f"select * from {snapshot.target.snapshot_target_schema}.{table}")
-#     getLogger().info(f"converting table {table} types to int types")
-#     df = _convert_decimal_to_int_types(df)
-#     getLogger().info(f"Writing temp_{table} to table")
-#     df.write.mode("overwrite").format("delta").saveAsTable(f"{snapshot.target.snapshot_target_schema}.temp_{table}")
+for table in tables:
+    getLogger().info(f"creating temp_{table}")
+    df = spark.sql(f"select * from {snapshot.target.snapshot_target_schema}.{table}")
+    getLogger().info(f"converting table {table} types to int types")
+    df = _convert_decimal_to_int_types(df)
+    getLogger().info(f"Writing temp_{table} to table")
+    df.write.mode("overwrite").format("delta").saveAsTable(f"{snapshot.target.snapshot_target_schema}.temp_{table}")
 
 # pt 2
 # this is a structual migration so we need to drop and recreate the tables
+for snapshot in config.snapshots.values():
+    snapshot: SnapshotConfig = snapshot
+    table = f"{config.job_name}_{snapshot.target.snapshot_target_table}"  # noqa: E501
+    table_v1 = table + "_V1"
+    table_v2 = table + "_V2"
+    spark.sql(f"""drop table if exists {snapshot.target.snapshot_target_schema}.{table_v1}""")
+    spark.sql(f"""drop table if exists {snapshot.target.snapshot_target_schema}.{table_v2}""")
+    spark.sql(f"""create table {snapshot.target.snapshot_target_schema}.{table_v1} 
+              as select * from {snapshot.target.snapshot_target_schema}.temp_{table_v1}""")
+    spark.sql(f"""create table {snapshot.target.snapshot_target_schema}.{table_v2} 
+              as select * from {snapshot.target.snapshot_target_schema}.temp_{table_v2}""")
+
+#pt 3
+# clean up the temp tables    
 for snapshot in config.snapshots.values():
     snapshot: SnapshotConfig = snapshot
     table = f"{config.job_name}_{snapshot.target.snapshot_target_table}"  # noqa: E501
