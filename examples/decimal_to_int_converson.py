@@ -6,7 +6,7 @@ from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnviro
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
 from pyspark.sql.types import ShortType, IntegerType, LongType, DecimalType
 from pyspark.sql.functions import col
-from logging import getLogger
+from harness.utils.logger import getLogger
 
 
 def _convert_decimal_to_int_types(df):
