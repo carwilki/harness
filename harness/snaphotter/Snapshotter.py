@@ -23,14 +23,23 @@ class Snapshotter(AbstractSnapshotter):
             )
 
     def setupTestData(self):
-        if self.target.snapshot_config.version != 2:
-            raise ValueError("There Must be a version 2 of the snapshot")
+        if self.config.enabled:
+            if self.target.snapshot_config.version != 2:
+                raise ValueError("There Must be a version 2 of the snapshot")
 
-        self._logger.info(f"Setting up test data for snapshotter {self.config.name}")
-        self.target.setup_test_target()
+            self._logger.info(f"Setting up test data for snapshotter {self.config.name}")
+            self.target.setup_test_target()
+        else:
+            self._logger.debug(
+                f"Skipping setupTestData for snapshotter {self.config.name}:Not Enabled"
+            )
 
-    def validateResults(self) -> DataFrameValidatorReport:
-        return self.target.validate_results()
+    def validateResults(self) -> DataFrameValidatorReport | None:
+        if self.config.enabled:
+            return self.target.validate_results()
+
+        self._logger.debug(f"Skipping validation for snapshotter {self.config.name}:Not Enabled")
+        return None
 
     def updateTargetSchema(self, schema: str):
         self._logger.info(f"Changing target schema for target {self.config.name}")
@@ -67,19 +76,24 @@ class Snapshotter(AbstractSnapshotter):
         self.config.enabled = True
 
     def snapshot(self):
-        if self.config.version < 0:
-            self.config.version = 0
-            self._logger.info("invalid version number provided, setting version to 0")
+        if self.config.enabled:
+            if self.config.version < 0:
+                self.config.version = 0
+                self._logger.info("invalid version number provided, setting version to 0")
 
-        if self.config.version < 1:
-            self._logger.info(f"Taking snapshot V1 of {self.config.name}...")
-            self._snapshot()
-        elif self.config.version == 1:
-            self._logger.info(f"Taking snapshot V2 of {self.config.name}...")
-            self._snapshot()
+            if self.config.version < 1:
+                self._logger.info(f"Taking snapshot V1 of {self.config.name}...")
+                self._snapshot()
+            elif self.config.version == 1:
+                self._logger.info(f"Taking snapshot V2 of {self.config.name}...")
+                self._snapshot()
+            else:
+                self._logger.info(
+                    f"V2 snapshot of {self.config.name} detected, skipping..."
+                )
         else:
-            self._logger.info(
-                f"V2 snapshot of {self.config.name} detected, skipping..."
+            self._logger.debug(
+                f"Skipping snapshot for snapshotter {self.config.name}:Not Enabled"
             )
 
     def markAsInput(self):
