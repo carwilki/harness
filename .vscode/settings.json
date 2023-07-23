@@ -15,9 +15,9 @@
         "--ignore=E402"
     ],
     "python.testing.pytestArgs": [
-        "--cov-report=lcov:lcov.info",
-        "--cov=harness",
-        "tests/"
+        // "--cov-report=lcov:lcov.info",
+        // "--cov=harness",
+        // "tests/"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,

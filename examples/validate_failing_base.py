@@ -1,6 +1,7 @@
 from harness.config.EnvConfig import EnvConfig
 from pyspark.sql import SparkSession
-from harness.manager.HarnessApi import HarnessApi
+from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
+from harness.validator.DataFrameValidator import DataFrameValidator
 
 username = dbutils.secrets.get(scope="netezza_petsmart_keys", key="username")
 password = dbutils.secrets.get(scope="netezza_petsmart_keys", key="password")
@@ -18,9 +19,16 @@ env = EnvConfig(
     netezza_jdbc_driver="org.netezza.Driver",
     netezza_jdbc_num_part=9,
 )
+
+HarnessJobManagerEnvironment.bindenv(env)
 spark: SparkSession = spark
-job_id = "01298d4f-934f-439a-b80d-251987f5422"
-api = HarnessApi(env, spark)
-hjm = api.getHarnessJobById(job_id)
-hjm.updateAllTargetSchema("qa_refine")
-hjm.setupTestData()
+compare = spark.sql("SELECT * FROM dev_refine.WM_ORDER_LINE_ITEM")
+base = spark.sql("SELECT * FROM nzmigration.WMS_TO_SCDS_DAILY_WM_ORDER_LINE_ITEM_V2")
+validator = DataFrameValidator()
+validator.validateDF(
+    "WM_ORDER_LINE_ITEM",
+    compare,
+    base,
+    ["LOCATION_ID", "WM_ORDER_ID", "WM_LINE_ITEM_ID"],
+    spark,
+)

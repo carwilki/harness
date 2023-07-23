@@ -82,6 +82,10 @@ class Snapshotter(AbstractSnapshotter):
                 f"V2 snapshot of {self.config.name} detected, skipping..."
             )
 
+    def markAsInput(self):
+        self._logger.info(f"Marking {self.config.name} as input...")
+        self.config.isInput = True
+
     def _snapshot(self):
         df = self.source.read()
         self.target.write(df)

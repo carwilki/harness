@@ -17,6 +17,7 @@ class SnapshotConfig(BaseModel):
     target: TableTargetConfig = None
     source: JDBCSourceConfig = None
     version: int = 0
+    isInput: bool = False
     validator: Optional[ValidatorConfig] = None
     validated: bool = False
     validation_date: Optional[datetime] = None

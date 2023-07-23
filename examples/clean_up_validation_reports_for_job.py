@@ -1,6 +1,10 @@
 from harness.config.EnvConfig import EnvConfig
 from pyspark.sql import SparkSession
 from harness.manager.HarnessApi import HarnessApi
+from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
+from harness.validator.DataFrameValidator import DataFrameValidator
+from harness.utils.logger import getLogger
+
 
 username = dbutils.secrets.get(scope="netezza_petsmart_keys", key="username")
 password = dbutils.secrets.get(scope="netezza_petsmart_keys", key="password")
@@ -18,9 +22,7 @@ env = EnvConfig(
     netezza_jdbc_driver="org.netezza.Driver",
     netezza_jdbc_num_part=9,
 )
-spark: SparkSession = spark
-job_id = "01298d4f-934f-439a-b80d-251987f5422"
+
 api = HarnessApi(env, spark)
-hjm = api.getHarnessJobById(job_id)
-hjm.updateAllTargetSchema("qa_refine")
-hjm.setupTestData()
+hjm = api.getHarnessJobById("01298d4f-934f-439a-b80d-251987f5422")
+getLogger().info(hjm.cleanupValidationReports())

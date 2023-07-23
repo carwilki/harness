@@ -27,23 +27,24 @@ class DataFrameValidator(AbstractValidator):
         Args:000
             df (DataFrame): Data frame to validate
         """
+        # this is a bit of a hack, but we need to rename any '_base' columns to
+        # to something else since base is a reserved word
+        master_new = self.rename_base_colunms(master).localCheckpoint()
+        canidate_new = self.rename_base_colunms(canidate).localCheckpoint()
+        
         cc = canidate.count()
         mc = master.count()
+        
         if cc == 0 and mc == 0:
             self._logger.info(f"No data to validate for {name}")
             self._logger.info("skipping validation .....")
             return DataFrameValidatorReport.empty()
 
-        # this is a bit of a hack, but we need to rename any '_base' columns to
-        # to something else since base is a reserved word
-        master = self.rename_base_colunms(master)
-        canidate = self.rename_base_colunms(canidate)
-
         comparison = SparkCompare(
             cache_intermediates=True,
             spark_session=session,
-            base_df=master,
-            compare_df=canidate,
+            base_df=master_new,
+            compare_df=canidate_new,
             join_columns=primary_keys,
         )
 
@@ -67,6 +68,7 @@ class DataFrameValidator(AbstractValidator):
         self._logger.info(f"base only: {report_table_name}_base_only")
         self._logger.info(f"mismatch only: {report_table_name}_missmatch_only")
         self._logger.info(f"summary for {name}:")
+        self._logger.info(comparison_result.getvalue())
 
         return DataFrameValidatorReport(
             summary=comparison_result.getvalue(),
@@ -76,8 +78,9 @@ class DataFrameValidator(AbstractValidator):
 
     def rename_base_colunms(self, df: DataFrame) -> DataFrame:
         for feild in df.schema.fields:
-            if feild.name.endswith("_base"):
+            if feild.name.lower().endswith("_base"):
+                self._logger.info(f"Renaming {feild.name}")
                 df = df.withColumnRenamed(
-                    feild.name, feild.name.replace("_base", "_base_sfx")
+                    feild.name, feild.name.lower().replace("_base", "_base_sfx")
                 )
         return df

@@ -5,6 +5,7 @@ description = "TBD"
 authors = ["Carson Wilkins <carson.wilkins@databricks.com>"]
 license = "MIT"
 readme = "README.md"
+exclude = ["./test","./examples"]
 
 [tool.poetry.dependencies]
 python = "3.10.6"

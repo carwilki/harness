@@ -174,3 +174,14 @@ class HarnessJobManager:
             self._metadataManager.update(self.config)
         else:
             raise ValueError(f"Snapshot {snapshotName} does not exist")
+
+    def cleanupValidationReports(self) -> str:
+        clean_up = self._metadataManager.cleanupValidationReports(self.config.job_name)
+        self._logger.info(f"Cleaned up validation reports: {clean_up}")
+        return clean_up
+
+    def markInputsSnapshots(self, names: list[str]):
+        for name in names:
+            snapshotter = self._source_snapshoters.get(name)
+            if snapshotter is not None:
+                snapshotter.markAsInput()

@@ -59,9 +59,19 @@ class TableTarget(AbstractTarget):
             self.session.sql(
                 f"truncate table {self.config.test_target_schema}.{self.config.test_target_table}"
             )
-            self.session.sql(f"insert into {ts}.{tt} select * from {ss}.{st}_V1")
+            if self.snapshot_config.isInput:
+                self.session.sql(f"insert into {ts}.{tt} select * from {ss}.{st}_V2")
+            else:
+                self.session.sql(f"insert into {ts}.{tt} select * from {ss}.{st}_V1")
         else:
-            self.session.sql(f"create table {ts}.{tt} as select * from {ss}.{st}_V1")
+            if self.snapshot_config.isInput:
+                self.session.sql(
+                    f"create table {ts}.{tt} as select * from {ss}.{st}_V2"
+                )
+            else:
+                self.session.sql(
+                    f"create table {ts}.{tt} as select * from {ss}.{st}_V1"
+                )
 
     def validate_results(self):
         ts = self.config.test_target_schema
