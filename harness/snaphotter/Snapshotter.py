@@ -27,7 +27,9 @@ class Snapshotter(AbstractSnapshotter):
             if self.target.snapshot_config.version != 2:
                 raise ValueError("There Must be a version 2 of the snapshot")
 
-            self._logger.info(f"Setting up test data for snapshotter {self.config.name}")
+            self._logger.info(
+                f"Setting up test data for snapshotter {self.config.name}"
+            )
             self.target.setup_test_target()
         else:
             self._logger.debug(
@@ -35,10 +37,12 @@ class Snapshotter(AbstractSnapshotter):
             )
 
     def validateResults(self) -> DataFrameValidatorReport | None:
-        if self.config.enabled:
+        if self.config.enabled and not self.config.isInput:
             return self.target.validate_results()
 
-        self._logger.debug(f"Skipping validation for snapshotter {self.config.name}:Not Enabled")
+        self._logger.debug(
+            f"Skipping validation for snapshotter {self.config.name}: Enabled:{self.config.enabled}, isInput:{self.config.isInput}"
+        )
         return None
 
     def updateTargetSchema(self, schema: str):
@@ -79,7 +83,9 @@ class Snapshotter(AbstractSnapshotter):
         if self.config.enabled:
             if self.config.version < 0:
                 self.config.version = 0
-                self._logger.info("invalid version number provided, setting version to 0")
+                self._logger.info(
+                    "invalid version number provided, setting version to 0"
+                )
 
             if self.config.version < 1:
                 self._logger.info(f"Taking snapshot V1 of {self.config.name}...")

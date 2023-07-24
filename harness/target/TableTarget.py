@@ -52,7 +52,6 @@ class TableTarget(AbstractTarget):
         tt = self.config.test_target_table
         ss = self.config.snapshot_target_schema
         st = f"{self.harness_job_config.job_name}_{self.config.snapshot_target_table}"
-
         if catalog.tableExists(
             f"{self.config.test_target_schema}.{self.config.test_target_table}"
         ):
