@@ -1,10 +1,5 @@
 from harness.config.EnvConfig import EnvConfig
-from pyspark.sql import SparkSession
 from harness.manager.HarnessApi import HarnessApi
-from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
-from harness.validator.DataFrameValidator import DataFrameValidator
-from harness.utils.logger import getLogger
-from harness.config.SnapshotConfig import SnapshotConfig
 
 
 username = dbutils.secrets.get(scope="netezza_petsmart_keys", key="username")
