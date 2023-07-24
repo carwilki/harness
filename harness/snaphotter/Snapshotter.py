@@ -45,6 +45,14 @@ class Snapshotter(AbstractSnapshotter):
         )
         return None
 
+    def updateValidaitonFilter(self, filter: str):
+        self._logger.info(
+            f"Changing validation filter for snapshotter {self.config.name}"
+        )
+        self._logger.debug(f"initial value: {self.config.target.validation_filter}")
+        self.config.target.validation_filter = filter
+        self._logger.debug(f"new value: {self.config.target.validation_filter}")
+
     def updateTargetSchema(self, schema: str):
         self._logger.info(f"Changing target schema for target {self.config.name}")
         self._logger.debug(f"initial value: {self.config.target.test_target_schema}")

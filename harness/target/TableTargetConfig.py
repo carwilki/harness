@@ -1,3 +1,4 @@
+from typing import Optional
 from harness.config.TargetConfig import TargetConfig
 from harness.config.TargetTypeEnum import TargetTypeEnum
 
@@ -8,4 +9,5 @@ class TableTargetConfig(TargetConfig):
     target_type: TargetTypeEnum = TargetTypeEnum.dbrtable
     test_target_schema: str
     test_target_table: str
+    validation_filter: Optional[str] = None
     primary_key: list[str]

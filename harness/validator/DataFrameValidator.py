@@ -22,19 +22,15 @@ class DataFrameValidator(AbstractValidator):
         primary_keys: list[str],
         session: SparkSession,
     ) -> DataFrameValidatorReport:
-        """
-        Validate the data frame
-        Args:000
-            df (DataFrame): Data frame to validate
-        """
+    
         # this is a bit of a hack, but we need to rename any '_base' columns to
         # to something else since base is a reserved word
         master_new = self.rename_base_colunms(master).localCheckpoint()
         canidate_new = self.rename_base_colunms(canidate).localCheckpoint()
-        
+
         cc = canidate.count()
         mc = master.count()
-        
+
         if cc == 0 and mc == 0:
             self._logger.info(f"No data to validate for {name}")
             self._logger.info("skipping validation .....")

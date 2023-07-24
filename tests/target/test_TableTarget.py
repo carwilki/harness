@@ -30,14 +30,14 @@ class TestTableTarget:
         )
 
         assert target is not None
-        assert target.config is not None
+        assert target.table_config is not None
         assert target.session is not None
         assert (
-            target.config.snapshot_target_table
+            target.table_config.snapshot_target_table
             == tableTargetConfig.snapshot_target_table
         )
         assert (
-            target.config.snapshot_target_schema
+            target.table_config.snapshot_target_schema
             == tableTargetConfig.snapshot_target_schema
         )
 
