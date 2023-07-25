@@ -23,4 +23,6 @@ api = HarnessApi(env, spark)
 hjm = api.getHarnessJobById("01298d4f-934f-439a-b80d-251987f5422")
 snapshots = hjm.config.snapshots.values()
 
-hjm.updateAllValidationFilters(filter="LOCATION_ID = 1288 or LOCATION_ID=1186")
+#hjm.updateAllValidationFilters(filter="LOCATION_ID = 1288 or LOCATION_ID=1186")
+#hjm.updateValidaitonFilter(snapshotName="WM_E_AUD_LOG",filter="(LOCATION_ID = 1288 or LOCATION_ID=1186) and ( WM_CREATE_TSTMP < '2023-06-23 05:25:35.000' and WM_CREATE_TSTMP >'2023-06-22 04:38:49.000' )")
+hjm.setupTestData()

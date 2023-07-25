@@ -69,6 +69,12 @@ class HarnessJobManager:
                 self._source_snapshoters[str(uuid4())] = snapshotter
 
     def setupTestData(self):
+        """
+        Sets up the test data for the sources
+        loops throught the snapshots and call the 
+        setup test data method for each snapshot. this moves v1 to the refine table
+        if its not an input and v2 if it is an input.
+        """        
         for snapshot in self._source_snapshoters.values():
             snapshot.setupTestData()
 

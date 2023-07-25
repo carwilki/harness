@@ -87,6 +87,7 @@ class TableTarget(AbstractTarget):
         validator = DataFrameValidator()
         results = self.session.sql(f"select * from {ts}.{tt}{filter}")
         base = self.session.sql(f"select * from {ss}.{st}{filter}")
+        
         self.logger.info(f"Validating results in {ts}.{tt} againsts {ss}.{st}")
         
         return validator.validateDF(
