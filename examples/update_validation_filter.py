@@ -26,8 +26,8 @@ snapshots = hjm.config.snapshots.values()
 # hjm.updateAllValidationFilters(filter="LOCATION_ID = 1288 or LOCATION_ID=1186")
 hjm.updateValidaitonFilter(
     snapshotName="WM_E_AUD_LOG",
-    filter="""where (('2023-06-12 04:39:35'<LOAD_TSTMP and LOAD_TSTMP <'2023-06-23 03:03:00') 
-    or ('2023-06-16 03:03:44'<UPDATE_TSTMP and UPDATE_TSTMP<'2023-06-23 03:03:00')) 
+    filter="""where (('2023-06-12 04:39:35'<LOAD_TSTMP and LOAD_TSTMP <'2023-06-23 03:03:00')
+    or ('2023-06-16 03:03:44'<UPDATE_TSTMP and UPDATE_TSTMP<'2023-06-23 03:03:00'))
     and (LOCATION_ID = 1288 or LOCATION_ID=1186)""",
 )
 hjm.updateValidaitonFilter(

@@ -22,7 +22,6 @@ class DataFrameValidator(AbstractValidator):
         primary_keys: list[str],
         session: SparkSession,
     ) -> DataFrameValidatorReport:
-    
         # this is a bit of a hack, but we need to rename any '_base' columns to
         # to something else since base is a reserved word
         master_new = self.rename_base_colunms(master).localCheckpoint()
@@ -43,6 +42,10 @@ class DataFrameValidator(AbstractValidator):
             compare_df=canidate_new,
             join_columns=primary_keys,
         )
+        summary: str = f"summary for {name}:\n\n"
+        summary += (
+            "********************************************************************"
+        )
 
         report_table_name = f"{HarnessJobManagerEnvironment.snapshot_schema()}.{name}_validation_report_on_{datetime.now().strftime('%Y_%m_%d_%H_%M')}"  # noqa: E501
 
@@ -60,14 +63,17 @@ class DataFrameValidator(AbstractValidator):
             f"{report_table_name}_missmatch_only"
         )
 
-        self._logger.info(f"compare only: {report_table_name}_compare_only")
-        self._logger.info(f"base only: {report_table_name}_base_only")
-        self._logger.info(f"mismatch only: {report_table_name}_missmatch_only")
-        self._logger.info(f"summary for {name}:")
-        self._logger.info(comparison_result.getvalue())
-
+        summary += f"compare only: {report_table_name}_compare_only\n"
+        summary += f"base only: {report_table_name}_base_only\n"
+        summary += f"mismatch only: {report_table_name}_missmatch_only\n"
+        summary += comparison_result.getvalue() + "\n\n"
+        summary += f"end summary: {name}"
+        summary += (
+            "********************************************************************"
+        )
+        print(summary)
         return DataFrameValidatorReport(
-            summary=comparison_result.getvalue(),
+            summary=summary,
             table=report_table_name,
             validation_date=datetime.now(),
         )

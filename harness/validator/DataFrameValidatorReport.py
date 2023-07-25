@@ -7,7 +7,7 @@ class DataFrameValidatorReport(BaseModel):
     summary: str
     table: str
     validation_date: datetime
-
+    
     @classmethod
     def empty(cls):
         return DataFrameValidatorReport(
