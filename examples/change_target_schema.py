@@ -23,4 +23,6 @@ job_id = "01298d4f-934f-439a-b80d-251987f5422"
 api = HarnessApi(env, spark)
 hjm = api.getHarnessJobById(job_id)
 hjm.updateAllTargetSchema("qa_refine")
+hjm.updateTargetSchema(snapshot_name,"qa_cust_senstive")
+hjm.markInputsSnapshots(["table1", "table2", "table3",])
 hjm.setupTestData()

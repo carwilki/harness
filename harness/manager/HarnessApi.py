@@ -75,9 +75,10 @@ class HarnessApi:
                     snapshot_target_schema=table["snapshot_target_schema"],
                     test_target_schema=table["test_target_schema"],
                     test_target_table=table["test_target_table"],
+                    validation_filter=table["validation_filter"],
                 )
                 snc = SnapshotConfig(
-                    job_id=id, target=tc, source=sc, name=table["name"]
+                    job_id=id, target=tc, source=sc, name=table["name"], isInput=table["is_input"]
                 )
                 sources[table["name"]] = snc
         hjc = HarnessJobConfig(job_id=id, job_name=name, snapshots=sources)
