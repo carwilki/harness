@@ -85,8 +85,14 @@ class TableTarget(AbstractTarget):
             filter = f" where {self.table_config.validation_filter}"
             
         validator = DataFrameValidator()
-        results = self.session.sql(f"select * from {ts}.{tt}{filter}")
-        base = self.session.sql(f"select * from {ss}.{st}{filter}")
+        refine_q = f"select * from {ts}.{tt}{filter}"
+        v2_q = f"select * from {ss}.{st}{filter}"
+        
+        self.logger.info(f"refine query: {refine_q}")
+        self.logger.info(f"v2 query: {v2_q}")
+        
+        results = self.session.sql(refine_q)
+        base = self.session.sql(v2_q)
         
         self.logger.info(f"Validating results in {ts}.{tt} againsts {ss}.{st}")
         

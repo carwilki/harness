@@ -42,9 +42,9 @@ class DataFrameValidator(AbstractValidator):
             compare_df=canidate_new,
             join_columns=primary_keys,
         )
-        summary: str = f"summary for {name}:\n\n"
+        summary: str = f"summary for {name}:\n"
         summary += (
-            "********************************************************************"
+            "********************************************************************\n\n"
         )
 
         report_table_name = f"{HarnessJobManagerEnvironment.snapshot_schema()}.{name}_validation_report_on_{datetime.now().strftime('%Y_%m_%d_%H_%M')}"  # noqa: E501
@@ -53,29 +53,29 @@ class DataFrameValidator(AbstractValidator):
         self._logger.info(f"Comparing {name} master and canidate")
         comparison.report(comparison_result)
         self._logger.info("Writing report tables")
-
-        comparison.rows_only_compare.write.saveAsTable(
-            f"{report_table_name}_compare_only"
-        )
-        comparison.rows_only_base.write.saveAsTable(f"{report_table_name}_base_only")
-
-        comparison.rows_both_mismatch.write.saveAsTable(
-            f"{report_table_name}_missmatch_only"
-        )
+        compare_only = f"{report_table_name}_compare_only"
+        base_only = f"{report_table_name}_base_only"
+        missmatch_only = f"{report_table_name}_missmatch_only"
+        comparison.rows_only_compare.write.saveAsTable(compare_only)
+        comparison.rows_only_base.write.saveAsTable(base_only)
+        comparison.rows_both_mismatch.write.saveAsTable(missmatch_only)
 
         summary += f"compare only: {report_table_name}_compare_only\n"
         summary += f"base only: {report_table_name}_base_only\n"
         summary += f"mismatch only: {report_table_name}_missmatch_only\n"
         summary += comparison_result.getvalue() + "\n\n"
-        summary += f"end summary: {name}"
+        summary += f"end summary: {name}\n"
         summary += (
-            "********************************************************************"
+            "********************************************************************\n"
         )
         print(summary)
         return DataFrameValidatorReport(
             summary=summary,
             table=report_table_name,
             validation_date=datetime.now(),
+            base_only=base_only,
+            compare_only=compare_only,
+            missmatch_only=missmatch_only,
         )
 
     def rename_base_colunms(self, df: DataFrame) -> DataFrame:

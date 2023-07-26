@@ -71,10 +71,10 @@ class HarnessJobManager:
     def setupTestData(self):
         """
         Sets up the test data for the sources
-        loops throught the snapshots and call the 
+        loops throught the snapshots and call the
         setup test data method for each snapshot. this moves v1 to the refine table
         if its not an input and v2 if it is an input.
-        """        
+        """
         for snapshot in self._source_snapshoters.values():
             snapshot.setupTestData()
 
@@ -191,15 +191,30 @@ class HarnessJobManager:
             snapshotter = self._source_snapshoters.get(name)
             if snapshotter is not None:
                 snapshotter.markAsInput()
-                
+
         self._metadataManager.update(self.config)
 
     def updateValidaitonFilter(self, snapshotName: str, filter: str):
         ss = self._source_snapshoters.get(snapshotName)
         ss.updateValidaitonFilter(filter)
         self._metadataManager.update(self.config)
-        
+
     def updateAllValidationFilters(self, filter: str):
         for ss in self._source_snapshoters.values():
             ss.updateValidaitonFilter(filter)
         self._metadataManager.update(self.config)
+
+    def runSingleValidation(self, snapshotName: str):
+        ss = self._source_snapshoters.get(snapshotName)
+        if ss is not None:
+            report = ss.validateResults()
+            self.config.validation_reports[snapshotName] = report
+        else:
+            raise ValueError(f"Snapshot {snapshotName} does not exist")
+
+    def getReport(self, snapshotName) -> DataFrameValidatorReport:
+        ss = self.config.validation_reports[snapshotName]
+        if ss is not None:
+            return ss
+        else:
+            raise ValueError(f"Snapshot {snapshotName} does not exist")
