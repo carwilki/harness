@@ -191,6 +191,8 @@ class HarnessJobManager:
             snapshotter = self._source_snapshoters.get(name)
             if snapshotter is not None:
                 snapshotter.markAsInput()
+                
+        self._metadataManager.update(self.config)
 
     def updateValidaitonFilter(self, snapshotName: str, filter: str):
         ss = self._source_snapshoters.get(snapshotName)
