@@ -1,0 +1,4 @@
+name,source_schema,source_table,snapshot_target_schema,snapshot_target_table,source_filter,test_target_schema,test_target_table,primary_key
+WM_E_DEPT,SCDS_PRD,WM_E_DEPT,nzmigration,WM_E_DEPT,1=1,dev_refine,WM_E_DEPT,LOCATION_ID|WM_DEPT_ID
+WM_E_CONSOL_PERF_SMRY,SCDS_PRD,WM_E_CONSOL_PERF_SMRY,nzmigration,WM_E_CONSOL_PERF_SMRY,"LOAD_TSTMP >= date_trunc('day', now() - interval '30 days') OR update_tstmp >= date_trunc('day', now() - interval '30 days')",dev_refine,WM_E_CONSOL_PERF_SMRY,LOCATION_ID|WM_PERF_SMRY_TRAN_ID
+WM_UCL_USER,SCDS_PRD,WM_UCL_USER,nzmigration,WM_UCL_USER,1=1,dev_refine,WM_UCL_USER,LOCATION_ID|USER_NAME
