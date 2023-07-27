@@ -31,10 +31,13 @@ class TableTarget(AbstractTarget):
         if self.table_config.snapshot_target_table is None:
             raise Exception("Table name is required")
 
+    def getSnapshotTableName(self, version: int) -> str:
+        return f"{self.table_config.snapshot_target_schema}.{self.harness_job_config.job_name}_{self.table_config.snapshot_target_table}_V{version}"
+
     def write(self, df: DataFrame):
         temptable = f"{str(uuid4()).replace('-','')}_data"
         df.createOrReplaceTempView(temptable)
-        table = f"{self.table_config.snapshot_target_schema}.{self.harness_job_config.job_name}_{self.table_config.snapshot_target_table}_V{self.snapshot_config.version + 1}"  # noqa: E501
+        table = self.getSnapshotTableName(self.snapshot_config.version + 1)
         if not self.session.catalog.tableExists(
             f"{self.table_config.snapshot_target_schema}.{self.table_config.snapshot_target_table}"
         ):
@@ -76,26 +79,27 @@ class TableTarget(AbstractTarget):
         ts = self.table_config.test_target_schema
         tt = self.table_config.test_target_table
         ss = self.table_config.snapshot_target_schema
-        st = (
-            f"{self.harness_job_config.job_name}_{self.table_config.snapshot_target_table}_V2"
-        )
-        
+        st = f"{self.harness_job_config.job_name}_{self.table_config.snapshot_target_table}_V2"
+
         filter = ""
-        if self.table_config.validation_filter is not None and self.table_config.validation_filter != "":
+        if (
+            self.table_config.validation_filter is not None
+            and self.table_config.validation_filter != ""
+        ):
             filter = f" where {self.table_config.validation_filter}"
-            
+
         validator = DataFrameValidator()
-        refine_q = f"select * from {ts}.{tt}{filter}"
-        v2_q = f"select * from {ss}.{st}{filter}"
-        
+        refine_q = f"select * from {ts}.{tt} {filter}"
+        v2_q = f"select * from {ss}.{st} {filter}"
+
         self.logger.info(f"refine query: {refine_q}")
         self.logger.info(f"v2 query: {v2_q}")
-        
+
         results = self.session.sql(refine_q)
         base = self.session.sql(v2_q)
-        
+
         self.logger.info(f"Validating results in {ts}.{tt} againsts {ss}.{st}")
-        
+
         return validator.validateDF(
             f"{self.harness_job_config.job_name}_{tt}",
             results,

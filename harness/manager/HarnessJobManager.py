@@ -6,6 +6,7 @@ from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
 from harness.snaphotter.Snapshotter import Snapshotter
 from harness.snaphotter.SnapshotterFactory import SnapshotterFactory
+from harness.target.TableTargetConfig import TableTargetConfig
 from harness.utils.logger import getLogger
 from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
 
@@ -218,3 +219,15 @@ class HarnessJobManager:
             return ss
         else:
             raise ValueError(f"Snapshot {snapshotName} does not exist")
+
+    def getTargetConfigForSnapshot(self, snapshotName: str) -> TableTargetConfig:
+        ss = self.config.snapshots.get(snapshotName)
+        if ss is not None:
+            return ss.target
+        else:
+            raise ValueError(f"Snapshot {snapshotName} does not exist")
+
+    def getSnapshotTable(self, snapshotName: str, version: int) -> str:
+        ss = self._source_snapshoters.get(snapshotName)
+        if ss is not None:
+            return ss.target.getSnapshotTableName(version)

@@ -2,6 +2,28 @@ from harness.config.EnvConfig import EnvConfig
 from harness.manager.HarnessApi import HarnessApi
 from pyspark.sql import SparkSession
 
+
+def generate_comparison_query(refine, raw, v1, refine_keys, raw_keys) -> str:
+    return f"""with rf_only as (
+  (
+  --create a set of locid and msdid
+  select {refine_keys} from {refine}
+  where LOCATION_ID =1288 or LOCATION_id=1186)
+except
+  ( --remove all the ids that are present in the pre_table
+  select {raw_keys} from qa_legacy.SITE_PROFILE
+  inner join {raw} on store_nbr = DC_NBR
+  where LOCATION_ID =1288 or LOCATION_id=1186)),
+final as (
+  (select {refine_keys} from rf_only)
+  except(
+    --except all from the remainder if they existed in the refine tables pre state.
+    Select {refine_keys} from {v1})
+    )
+select * from final;
+"""
+
+
 spark: SparkSession = spark
 username = dbutils.secrets.get(scope="netezza_petsmart_keys", key="username")
 password = dbutils.secrets.get(scope="netezza_petsmart_keys", key="password")
@@ -21,38 +43,31 @@ env = EnvConfig(
 )
 
 api = HarnessApi(env, spark)
+snapshot_name = "WM_LABOR_MSG"
 hjm = api.getHarnessJobById("01298d4f-934f-439a-b80d-251987f5422")
+
 hjm.updateValidaitonFilter(
-    snapshotName="WM_LABOR_MSG_DTL",
-    filter="""where ('2023-06-15 01:52:33.000'<WM_CREATED_TSTMP and WM_CREATED_TSTMP <'2023-06-23 05:21:56.000')
-    and (LOCATION_ID = 1288 or LOCATION_ID=1186)""",
+    snapshotName=snapshot_name,
+    filter="""where ('2023-05-04 19:24:14.000'<WM_CREATED_TSTMP and WM_CREATED_TSTMP <'2023-06-23 05:36:43.000')
+    and (LOCATION_ID = 1288 or LOCATION_ID=1186)"""
 )
 
 print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
 print("start of validation\n")
 
-hjm.runSingleValidation("WM_LABOR_MSG_DTL")
-report = hjm.getReport("WM_LABOR_MSG_DTL")
-all_records_not_apearing_in_either_v1_pre_v2 = """with rf_only as ((
-  --create a set of locid and msdid
-  select rf.location_id,rf.WM_LABOR_MSG_DTL_ID from qa_refine.WM_LABOR_MSG_DTL rf
-  where rf.LOCATION_ID =1288 or rf.LOCATION_id=1186)
-except
-( --remove all the ids that are present in the pre_table
-  select sp.location_id,r.LABOR_MSG_DTL_ID from qa_legacy.SITE_PROFILE sp
-inner join qa_raw.WM_LABOR_MSG_DTL_PRE r on sp.store_nbr = r.DC_NBR
-where sp.LOCATION_ID =1288 or sp.LOCATION_id=1186)),
-final as ((
-  --build a set of ids from refine
-  select rf.location_id,rf.WM_LABOR_MSG_DTL_ID from qa_refine.WM_LABOR_MSG_DTL rf
-  --join in the ids that are in the refine only table to create a set of ids that are in refine but were
-  --seen in the pre table
-  inner join rf_only o on rf.location_id = o.location_id and rf.WM_LABOR_MSG_DTL_ID = o.WM_LABOR_MSG_DTL_ID)
-except(
-  --except all from the remainder if they existed in the refine tables pre state.
-  Select location_id,WM_LABOR_MSG_DTL_ID from nzmigration.wms_to_scds_daily_WM_LABOR_MSG_DTL_v1))
-select * from final;
-"""
+
+hjm.runSingleValidation(snapshot_name)
+
+report = hjm.getReport(snapshot_name)
+target = hjm.getTargetConfigForSnapshot(snapshot_name)
+
+refine = f"{target.test_target_schema}.{target.test_target_table}"
+pre = f"qa_raw.{target.test_target_table}_PRE"
+keys = ",".join(str(e) for e in target.primary_key).lower()
+raw_keys = ",".join(str(e) for e in target.primary_key).lower().replace("wm_", "")
+v1 = hjm.getSnapshotTable(snapshot_name, 1)
+
+all_records_not_apearing_in_either_v1_pre_v2 = generate_comparison_query(refine, pre, v1, keys, raw_keys)
 
 not_present_in_pre_v1_v2_tests = spark.sql(
     all_records_not_apearing_in_either_v1_pre_v2
