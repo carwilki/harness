@@ -18,7 +18,7 @@ class Snapshotter(AbstractSnapshotter):
             self._validator = DataFrameValidator(self.config.validator)
         else:
             self._validator = None
-            self._logger.info(
+            self._logger.debug(
                 f"No validator configured for snapshotter {self.config.name}"
             )
 
@@ -27,7 +27,7 @@ class Snapshotter(AbstractSnapshotter):
             if self.target.snapshot_config.version != 2:
                 raise ValueError("There Must be a version 2 of the snapshot")
 
-            self._logger.info(
+            self._logger.debug(
                 f"Setting up test data for snapshotter {self.config.name}"
             )
             self.target.setup_test_target()
@@ -46,7 +46,7 @@ class Snapshotter(AbstractSnapshotter):
         return None
 
     def updateValidaitonFilter(self, filter: str):
-        self._logger.info(
+        self._logger.debug(
             f"Changing validation filter for snapshotter {self.config.name}"
         )
         self._logger.debug(f"initial value: {self.config.target.validation_filter}")
@@ -54,19 +54,19 @@ class Snapshotter(AbstractSnapshotter):
         self._logger.debug(f"new value: {self.config.target.validation_filter}")
 
     def updateTargetSchema(self, schema: str):
-        self._logger.info(f"Changing target schema for target {self.config.name}")
+        self._logger.debug(f"Changing target schema for target {self.config.name}")
         self._logger.debug(f"initial value: {self.config.target.test_target_schema}")
         self.config.target.test_target_schema = schema
         self._logger.debug(f"new value: {self.config.target.test_target_schema}")
 
     def updateTargetTable(self, table: str):
-        self._logger.info(f"Changing target table for target {self.config.name}")
+        self._logger.debug(f"Changing target table for target {self.config.name}")
         self._logger.debug(f"initial value: {self.config.target.test_target_schema}")
         self.config.target.test_target_table = table
         self._logger.debug(f"new value: {self.config.target.test_target_table}")
 
     def updateSnapshotSchema(self, schema: str):
-        self._logger.info(f"Changing source schema for snapshot {self.config.name}")
+        self._logger.debug(f"Changing source schema for snapshot {self.config.name}")
         self._logger.debug(
             f"initial value: {self.config.target.snapshot_target_schema}"
         )
@@ -74,35 +74,35 @@ class Snapshotter(AbstractSnapshotter):
         self._logger.debug(f"new value: {self.config.target.snapshot_target_schema}")
 
     def updateSnapshotTable(self, table: str):
-        self._logger.info(f"Changing source table for snapshot {self.config.name}")
+        self._logger.debug(f"Changing source table for snapshot {self.config.name}")
         self._logger.debug(f"initial value: {self.config.target.snapshot_target_table}")
         self.config.target.snapshot_target_table = table
         self._logger.debug(f"new value: {self.config.target.snapshot_target_table}")
 
     def disable(self):
-        self._logger.info(f"Disabling snapshotter {self.config.name}")
+        self._logger.debug(f"Disabling snapshotter {self.config.name}")
         self.config.enabled = False
 
     def enable(self):
-        self._logger.info(f"Enabling snapshotter {self.config.name}")
+        self._logger.debug(f"Enabling snapshotter {self.config.name}")
         self.config.enabled = True
 
     def snapshot(self):
         if self.config.enabled:
             if self.config.version < 0:
                 self.config.version = 0
-                self._logger.info(
+                self._logger.debug(
                     "invalid version number provided, setting version to 0"
                 )
 
             if self.config.version < 1:
-                self._logger.info(f"Taking snapshot V1 of {self.config.name}...")
+                self._logger.debug(f"Taking snapshot V1 of {self.config.name}...")
                 self._snapshot()
             elif self.config.version == 1:
-                self._logger.info(f"Taking snapshot V2 of {self.config.name}...")
+                self._logger.debug(f"Taking snapshot V2 of {self.config.name}...")
                 self._snapshot()
             else:
-                self._logger.info(
+                self._logger.debug(
                     f"V2 snapshot of {self.config.name} detected, skipping..."
                 )
         else:
@@ -111,7 +111,7 @@ class Snapshotter(AbstractSnapshotter):
             )
 
     def markAsInput(self):
-        self._logger.info(f"Marking {self.config.name} as input...")
+        self._logger.debug(f"Marking {self.config.name} as input...")
         self.config.isInput = True
 
     def _snapshot(self):

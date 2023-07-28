@@ -31,8 +31,8 @@ class DataFrameValidator(AbstractValidator):
         mc = master.count()
 
         if cc == 0 and mc == 0:
-            self._logger.info(f"No data to validate for {name}")
-            self._logger.info("skipping validation .....")
+            self._logger.debug(f"No data to validate for {name}")
+            self._logger.debug("skipping validation .....")
             return DataFrameValidatorReport.empty()
 
         comparison = SparkCompare(
@@ -41,6 +41,7 @@ class DataFrameValidator(AbstractValidator):
             base_df=master_new,
             compare_df=canidate_new,
             join_columns=primary_keys,
+            show_all_columns=True,
         )
         summary: str = f"summary for {name}:\n"
         summary += (
@@ -50,9 +51,9 @@ class DataFrameValidator(AbstractValidator):
         report_table_name = f"{HarnessJobManagerEnvironment.snapshot_schema()}.{name}_validation_report_on_{datetime.now().strftime('%Y_%m_%d_%H_%M')}"  # noqa: E501
 
         comparison_result = StringIO()
-        self._logger.info(f"Comparing {name} master and canidate")
+        self._logger.debug(f"Comparing {name} master and canidate")
         comparison.report(comparison_result)
-        self._logger.info("Writing report tables")
+        self._logger.debug("Writing report tables")
         compare_only = f"{report_table_name}_compare_only"
         base_only = f"{report_table_name}_base_only"
         missmatch_only = f"{report_table_name}_missmatch_only"
@@ -68,7 +69,6 @@ class DataFrameValidator(AbstractValidator):
         summary += (
             "********************************************************************\n"
         )
-        print(summary)
         return DataFrameValidatorReport(
             summary=summary,
             table=report_table_name,
@@ -81,7 +81,7 @@ class DataFrameValidator(AbstractValidator):
     def rename_base_colunms(self, df: DataFrame) -> DataFrame:
         for feild in df.schema.fields:
             if feild.name.lower().endswith("_base"):
-                self._logger.info(f"Renaming {feild.name}")
+                self._logger.debug(f"Renaming {feild.name}")
                 df = df.withColumnRenamed(
                     feild.name, feild.name.lower().replace("_base", "_base_sfx")
                 )

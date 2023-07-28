@@ -67,13 +67,13 @@ class HarnessJobManagerMetaData:
         return msg
 
     def cleanupValidationReports(self, job_name: str, dry_run: bool = True) -> str:
-        self._logger.info(f"Cleaning up validation reports for {job_name}")
+        self._logger.debug(f"Cleaning up validation reports for {job_name}")
         msg = "Executing Dry Run, not deleting tables\n"
         tables = self.session.catalog.listTables(f"{self._harness_metadata_schema}")
         for table in tables:
             if match(rf"(?:{job_name.lower()})_*\w*_validation_report_", table.name):
-                self._logger.info(f"Cleaning up {table.name}")
+                self._logger.debug(f"Cleaning up {table.name}")
                 msg += f"""Drop table if exists {self._harness_metadata_schema}.{table.name};\n"""
             else:
-                self._logger.info(f"Skipping cleanup of {table.name}")
+                self._logger.debug(f"Skipping cleanup of {table.name}")
         return msg

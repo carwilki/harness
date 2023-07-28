@@ -79,31 +79,34 @@ class TableTarget(AbstractTarget):
         ts = self.table_config.test_target_schema
         tt = self.table_config.test_target_table
         ss = self.table_config.snapshot_target_schema
-        st = f"{self.harness_job_config.job_name}_{self.table_config.snapshot_target_table}_V2"
-
-        filter = ""
-        if (
-            self.table_config.validation_filter is not None
-            and self.table_config.validation_filter != ""
-        ):
-            filter = f" where {self.table_config.validation_filter}"
+        st = self.table_config.snapshot_target_table
+        v1 = self.session.sql(f"select * from {self.getSnapshotTableName(1)}") 
+        v2 = self.session.sql(f"select * from {self.getSnapshotTableName(2)}") 
 
         validator = DataFrameValidator()
-        refine_q = f"select * from {ts}.{tt} {filter}"
-        v2_q = f"select * from {ss}.{st} {filter}"
-
-        self.logger.info(f"refine query: {refine_q}")
-        self.logger.info(f"v2 query: {v2_q}")
+        refine_q = f"select * from {ts}.{tt}"
+        self.logger.debug(f"refine query: {refine_q}")
 
         results = self.session.sql(refine_q)
-        base = self.session.sql(v2_q)
-
+        base = v1.unionAll(v2).distinct()
+        (compare, base) = self._only_what_is_shared(results, base)
         self.logger.info(f"Validating results in {ts}.{tt} againsts {ss}.{st}")
 
         return validator.validateDF(
             f"{self.harness_job_config.job_name}_{tt}",
-            results,
+            compare,
             base,
             self.table_config.primary_key,
             self.session,
         )
+
+    def _only_what_is_shared(
+        self, compare: DataFrame, base: DataFrame
+    ) -> (DataFrame, DataFrame):
+        keys = self.table_config.primary_key
+        compare_keys = compare.select(keys)
+        base_keys = base.select(keys)
+        intersect = compare_keys.intersect(base_keys)
+        compare_final = compare.join(intersect, keys, "inner")
+        base_final = compare.join(intersect, keys, "inner")
+        return compare_final, base_final

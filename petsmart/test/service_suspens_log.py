@@ -1,5 +1,5 @@
 from harness.config.EnvConfig import EnvConfig
-from pyspark.sql import SparkSession
+from harness.config.SourceTypeEnum import SourceTypeEnum
 from harness.manager.HarnessApi import HarnessApi
 
 username = dbutils.secrets.get(scope="netezza_petsmart_keys", key="username")
@@ -12,14 +12,19 @@ env = EnvConfig(
     metadata_schema="nzmigration",
     metadata_table="harness_metadata_v2",
     snapshot_schema="nzmigration",
+    snapshot_table_post_fix="_gold",
     netezza_jdbc_url="jdbc:netezza://172.16.73.181:5480/",
     netezza_jdbc_user=username,
     netezza_jdbc_password=password,
     netezza_jdbc_driver="org.netezza.Driver",
     netezza_jdbc_num_part=9,
 )
-spark: SparkSession = spark
-job_id = "01298d4f-934f-439a-b80d-251987f5422"
+
+job_id = "wf_SVC_Service_Suspension_Log"
 api = HarnessApi(env, spark)
+
 hjm = api.getHarnessJobById(job_id)
-hjm.updateTargetTable("snapshot","table")
+
+#hjm.setupTestData()
+
+#print(hjm.validateResults())

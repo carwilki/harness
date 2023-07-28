@@ -10,15 +10,15 @@ from harness.utils.logger import getLogger
 
 
 def _convert_decimal_to_int_types(df):
-    for feild in df.schema.fields:
-        if isinstance(feild.dataType, DecimalType):
-            if feild.dataType.scale == 0:
-                if 0 < feild.dataType.precision < 5:
-                    df = df.withColumn(feild.name, col(feild.name).cast(ShortType()))
-                elif 5 < feild.dataType.precision < 12:
-                    df = df.withColumn(feild.name, col(feild.name).cast(IntegerType()))
-                elif 12 < feild.dataType.precision < 22:
-                    df = df.withColumn(feild.name, col(feild.name).cast(LongType()))
+    for field in df.schema.fields:
+        if isinstance(field.dataType, DecimalType):
+            if field.dataType.scale == 0:
+                if 0 < field.dataType.precision < 5:
+                    df = df.withColumn(field.name, col(field.name).cast(ShortType()))
+                elif 5 < field.dataType.precision < 12:
+                    df = df.withColumn(field.name, col(field.name).cast(IntegerType()))
+                elif 12 < field.dataType.precision < 22:
+                    df = df.withColumn(field.name, col(field.name).cast(LongType()))
     return df
 
 
