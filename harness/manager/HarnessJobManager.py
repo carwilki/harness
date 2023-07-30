@@ -30,7 +30,7 @@ class HarnessJobManager:
         self._metadataManager: HarnessJobManagerMetaData = HarnessJobManagerMetaData(
             session
         )
-        self._source_snapshoters: dict[str, Snapshotter] = {}
+        self.snapshoters: dict[str, Snapshotter] = {}
         self._loadExistingMetaDataIfExists()
         # this will overwrite any existing inputs if there is an existing
         # job config
@@ -65,9 +65,9 @@ class HarnessJobManager:
                 harness_config=self.config, snapshot_config=source, session=self.session
             )
             if source.name is not None:
-                self._source_snapshoters[source.name] = snapshotter
+                self.snapshoters[source.name] = snapshotter
             else:
-                self._source_snapshoters[str(uuid4())] = snapshotter
+                self.snapshoters[str(uuid4())] = snapshotter
 
     def setupTestData(self):
         """
@@ -76,7 +76,7 @@ class HarnessJobManager:
         setup test data method for each snapshot. this moves v1 to the refine table
         if its not an input and v2 if it is an input.
         """
-        for snapshot in self._source_snapshoters.values():
+        for snapshot in self.snapshoters.values():
             snapshot.setupTestData()
 
     def snapshot(self):
@@ -85,13 +85,13 @@ class HarnessJobManager:
         """
         if self.config.version <= 0:
             self._logger.debug("Taking snapshot V1...")
-            self._snapshot(self._source_snapshoters)
+            self._snapshot(self.snapshoters)
             self._logger.debug("V1 snapshot completed.")
             self.config.version = 1
             self._metadataManager.update(self.config)
         elif self.config.version == 1:
             self._logger.debug("Taking snapshot V2...")
-            self._snapshot(self._source_snapshoters)
+            self._snapshot(self.snapshoters)
             self._logger.debug("V2 Snapshot completed.")
             self.config.version = 2
             self._metadataManager.update(self.config)
@@ -108,7 +108,7 @@ class HarnessJobManager:
         if self.config.validation_reports is None:
             self.config.validation_reports = {}
 
-        for snapshotter in self._source_snapshoters.values():
+        for snapshotter in self.snapshoters.values():
             validation_report = snapshotter.validateResults()
             self.config.validation_reports[snapshotter.config.name] = validation_report
 
@@ -117,19 +117,19 @@ class HarnessJobManager:
         return self.config.validation_reports
 
     def updateAllTargetSchema(self, schema: str):
-        for snapshotter in self._source_snapshoters.values():
+        for snapshotter in self.snapshoters.values():
             snapshotter.updateTargetSchema(schema)
 
         self._metadataManager.update(self.config)
 
     def updateAllTargetTable(self, table: str):
-        for snapshotter in self._source_snapshoters.values():
+        for snapshotter in self.snapshoters.values():
             snapshotter.updateTargetTable(table)
 
         self._metadataManager.update(self.config)
 
     def updateTargetSchema(self, snapshotName: str, schema: str):
-        snapshotter = self._source_snapshoters[snapshotName]
+        snapshotter = self.snapshoters[snapshotName]
 
         if snapshotter is not None:
             snapshotter.updateTargetSchema(schema)
@@ -138,7 +138,7 @@ class HarnessJobManager:
             raise ValueError(f"Snapshot {snapshotName} does not exist")
 
     def updateTargetTable(self, snapshotName: str, table: str):
-        snapshotter = self._source_snapshoters[snapshotName]
+        snapshotter = self.snapshoters[snapshotName]
 
         if snapshotter is not None:
             snapshotter.updateTargetTable(table)
@@ -147,7 +147,7 @@ class HarnessJobManager:
             raise ValueError(f"Snapshot {snapshotName} does not exist")
 
     def updateSnapshotSchema(self, snapshotName: str, schema: str):
-        snapshotter = self._source_snapshoters[snapshotName]
+        snapshotter = self.snapshoters[snapshotName]
 
         if snapshotter is not None:
             snapshotter.updateSnapshotSchema(schema)
@@ -156,7 +156,7 @@ class HarnessJobManager:
             raise ValueError(f"Snapshot {snapshotName} does not exist")
 
     def updateSnapshotTable(self, snapshotName: str, table: str):
-        snapshotter = self._source_snapshoters[snapshotName]
+        snapshotter = self.snapshoters[snapshotName]
 
         if snapshotter is not None:
             snapshotter.updateSnapshotTable(table)
@@ -165,7 +165,7 @@ class HarnessJobManager:
             raise ValueError(f"Snapshot {snapshotName} does not exist")
 
     def disableSnapshot(self, snapshotName: str):
-        snapshotter = self._source_snapshoters[snapshotName]
+        snapshotter = self.snapshoters[snapshotName]
 
         if snapshotter is not None:
             snapshotter.disable()
@@ -174,7 +174,7 @@ class HarnessJobManager:
             raise ValueError(f"Snapshot {snapshotName} does not exist")
 
     def enableSnapshot(self, snapshotName: str):
-        snapshotter = self._source_snapshoters[snapshotName]
+        snapshotter = self.snapshoters[snapshotName]
 
         if snapshotter is not None:
             snapshotter.enable()
@@ -189,24 +189,24 @@ class HarnessJobManager:
 
     def markInputsSnapshots(self, names: list[str]):
         for name in names:
-            snapshotter = self._source_snapshoters.get(name)
+            snapshotter = self.snapshoters.get(name)
             if snapshotter is not None:
                 snapshotter.markAsInput()
 
         self._metadataManager.update(self.config)
 
     def updateValidaitonFilter(self, snapshotName: str, filter: str):
-        ss = self._source_snapshoters.get(snapshotName)
+        ss = self.snapshoters.get(snapshotName)
         ss.updateValidaitonFilter(filter)
         self._metadataManager.update(self.config)
 
     def updateAllValidationFilters(self, filter: str):
-        for ss in self._source_snapshoters.values():
+        for ss in self.snapshoters.values():
             ss.updateValidaitonFilter(filter)
         self._metadataManager.update(self.config)
 
     def runSingleValidation(self, snapshotName: str) -> DataFrameValidatorReport:
-        ss = self._source_snapshoters.get(snapshotName)
+        ss = self.snapshoters.get(snapshotName)
         if ss is not None:
             report = ss.validateResults()
             self.config.validation_reports[snapshotName] = report
@@ -229,6 +229,7 @@ class HarnessJobManager:
             raise ValueError(f"Snapshot {snapshotName} does not exist")
 
     def getSnapshotTable(self, snapshotName: str, version: int) -> str:
-        ss = self._source_snapshoters.get(snapshotName)
+        ss = self.snapshoters.get(snapshotName)
         if ss is not None:
             return ss.target.getSnapshotTableName(version)
+    

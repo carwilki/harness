@@ -17,18 +17,18 @@ class DataFrameValidator(AbstractValidator):
     def validateDF(
         self,
         name: str,
-        canidate: DataFrame,
-        master: DataFrame,
+        compare: DataFrame,
+        base: DataFrame,
         primary_keys: list[str],
         session: SparkSession,
     ) -> DataFrameValidatorReport:
         # this is a bit of a hack, but we need to rename any '_base' columns to
         # to something else since base is a reserved word
-        master_new = self.rename_base_colunms(master).localCheckpoint()
-        canidate_new = self.rename_base_colunms(canidate).localCheckpoint()
+        base = self.rename_base_colunms(base).cache()
+        compare = self.rename_base_colunms(compare).cache()
 
-        cc = canidate.count()
-        mc = master.count()
+        cc = compare.count()
+        mc = base.count()
 
         if cc == 0 and mc == 0:
             self._logger.debug(f"No data to validate for {name}")
@@ -38,8 +38,8 @@ class DataFrameValidator(AbstractValidator):
         comparison = SparkCompare(
             cache_intermediates=True,
             spark_session=session,
-            base_df=master_new,
-            compare_df=canidate_new,
+            base_df=base,
+            compare_df=compare,
             join_columns=primary_keys,
             show_all_columns=True,
         )

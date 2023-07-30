@@ -23,7 +23,7 @@ class TestDataFrameValidator:
         session = mocker.MagicMock()
         validator = DataFrameValidator()
         report = validator.validateDF(
-            session=session, name="test", canidate=tdf2, master=tdf1, primary_keys=["A"]
+            session=session, name="test", compare=tdf2, base=tdf1, primary_keys=["A"]
         )
         assert report is not None
 
@@ -35,7 +35,7 @@ class TestDataFrameValidator:
         session = mocker.MagicMock()
         validator = DataFrameValidator()
         report: DataFrameValidatorReport = validator.validateDF(
-            session=session, name="test", canidate=tdf2, master=tdf1, primary_keys=["A"]
+            session=session, name="test", compare=tdf2, base=tdf1, primary_keys=["A"]
         )
         expected = DataFrameValidatorReport.empty()
         assert report == expected
@@ -68,8 +68,8 @@ class TestDataFrameValidator:
             validator.validateDF(
                 session=spark,
                 name="test",
-                canidate=df2,
-                master=df1,
+                compare=df2,
+                base=df1,
                 primary_keys=["id"],
             )
         except Exception as e:

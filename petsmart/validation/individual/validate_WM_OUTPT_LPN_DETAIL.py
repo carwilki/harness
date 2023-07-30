@@ -1,6 +1,7 @@
+from pyspark.sql import SparkSession
+
 from harness.config.EnvConfig import EnvConfig
 from harness.manager.HarnessApi import HarnessApi
-from pyspark.sql import SparkSession
 
 
 def generate_comparison_query(refine, raw, v1, refine_keys, raw_keys) -> str:
@@ -43,16 +44,18 @@ env = EnvConfig(
 )
 
 api = HarnessApi(env, spark)
-snapshot_name = "WM_SLOT_ITEM_SCORE"
+snapshot_name = "WM_OUTPT_LPN_DETAIL"
 hjm = api.getHarnessJobById("01298d4f-934f-439a-b80d-251987f5422")
 
 hjm.updateValidaitonFilter(
     snapshotName=snapshot_name,
-    filter="""where ('2023-06-15 22:04:06.000'<WM_CREATE_TSTMP and WM_CREATE_TSTMP <'2023-06-23 00:03:33.000')
-    and (LOCATION_ID = 1288 or LOCATION_ID=1186)"""
+    filter="""where ('2023-06-15 03:08:15.988'<WM_CREATED_TSTMP and WM_CREATED_TSTMP <'2023-06-23 02:50:24.062')
+    and (LOCATION_ID = 1288 or LOCATION_ID=1186)""",
 )
 
-print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
+print(
+    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n"
+)
 print("start of validation\n")
 
 
@@ -67,13 +70,19 @@ keys = ",".join(str(e) for e in target.primary_key).lower()
 raw_keys = ",".join(str(e) for e in target.primary_key).lower().replace("wm_", "")
 v1 = hjm.getSnapshotTable(snapshot_name, 1)
 
-all_records_not_apearing_in_either_v1_pre_v2 = generate_comparison_query(refine, pre, v1, keys, raw_keys)
+all_records_not_apearing_in_either_v1_pre_v2 = generate_comparison_query(
+    refine, pre, v1, keys, raw_keys
+)
 
 not_present_in_pre_v1_v2_tests = spark.sql(
     all_records_not_apearing_in_either_v1_pre_v2
 ).count()
 
-print(f"{not_present_in_pre_v1_v2_tests} records not present in either v1 or v2 or pre\n")
+print(
+    f"{not_present_in_pre_v1_v2_tests} records not present in either v1 or v2 or pre\n"
+)
 
 print("end of validation\n")
-print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
+print(
+    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n"
+)

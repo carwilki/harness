@@ -108,5 +108,5 @@ class TableTarget(AbstractTarget):
         base_keys = base.select(keys)
         intersect = compare_keys.intersect(base_keys)
         compare_final = compare.join(intersect, keys, "inner")
-        base_final = compare.join(intersect, keys, "inner")
+        base_final = base.join(intersect, keys, "inner")
         return compare_final, base_final

@@ -31,5 +31,5 @@ hjm.updateTargetSchema("TP_INVOICE_SERVICE", "qa_refine")
 hjm.updateSnapshotSchema("TP_EVENT", "data_harness_cust_sensitive")
 hjm.updateTargetSchema("TP_EVENT", "data_harness_cust_sensitive")
 hjm.markInputsSnapshots(
-    ["SKU_PROFILE", "SITE_PROFILE", "TP_INVOICE", "TP_INVOICE_SERVICE","TP_EVENT"],
+    ["SKU_PROFILE", "SITE_PROFILE", "TP_INVOICE", "TP_INVOICE_SERVICE", "TP_EVENT"],
 )

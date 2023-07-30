@@ -1,7 +1,8 @@
 from harness.config.EnvConfig import EnvConfig
-from harness.config.SourceTypeEnum import SourceTypeEnum
-from harness.examples.demo.vars import job_id
 from harness.manager.HarnessApi import HarnessApi
+from petsmart.validation.framework.validate_pets_with_pre_tables import (
+    validate_pets_with_pre_table,
+)
 
 username = dbutils.secrets.get(scope="netezza_petsmart_keys", key="username")
 password = dbutils.secrets.get(scope="netezza_petsmart_keys", key="password")
@@ -19,16 +20,14 @@ env = EnvConfig(
     netezza_jdbc_driver="org.netezza.Driver",
     netezza_jdbc_num_part=9,
 )
+job_id = "01298d4f-934f-439a-b80d-251987f5422"
 api = HarnessApi(env, spark)
-
 hjm = api.getHarnessJobById(job_id)
-if hjm is None:
-    # raise Exception(f"No harness job found with id: {job_id}")
-    hjm = api.createHarnessJobFromCSV(
-        id=job_id,
-        name="a_wms_to_scds_4hr_test_demo_1",
-        path="tableList_WMS_To_SCDS_4hr.csv",
-        sourceType=SourceTypeEnum.netezza_jdbc,
-    )
-
-hjm.snapshot()
+for snapshot in hjm.snapshoters.values():
+    try:
+        validate_pets_with_pre_table(snapshot=snapshot, spark=spark)
+    except Exception as e:
+        print(
+            f"Snapshot {snapshot.config.job_id}:{snapshot.config.name} failed validation. exception below"
+        )
+        print(e)

@@ -1,5 +1,6 @@
-from harness.config.EnvConfig import EnvConfig
 from pyspark.sql import SparkSession
+
+from harness.config.EnvConfig import EnvConfig
 from harness.manager.HarnessApi import HarnessApi
 
 username = dbutils.secrets.get(scope="netezza_petsmart_keys", key="username")
@@ -22,4 +23,4 @@ spark: SparkSession = spark
 job_id = "01298d4f-934f-439a-b80d-251987f5422"
 api = HarnessApi(env, spark)
 hjm = api.getHarnessJobById(job_id)
-hjm.updateTargetTable("snapshot","table")
+hjm.updateTargetTable("snapshot", "table")

@@ -1,6 +1,7 @@
+from pyspark.sql import SparkSession
+
 from harness.config.EnvConfig import EnvConfig
 from harness.manager.HarnessApi import HarnessApi
-from pyspark.sql import SparkSession
 
 spark: SparkSession = spark
 username = dbutils.secrets.get(scope="netezza_petsmart_keys", key="username")
@@ -28,7 +29,9 @@ hjm.updateValidaitonFilter(
     and (LOCATION_ID = 1288 or LOCATION_ID=1186)""",
 )
 
-print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
+print(
+    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n"
+)
 print("start of validation\n")
 
 hjm.runSingleValidation("WM_LABOR_MSG_DTL_CRIT")
@@ -58,7 +61,11 @@ not_present_in_pre_v1_v2_tests = spark.sql(
     all_records_not_apearing_in_either_v1_pre_v2
 ).count()
 
-print(f"{not_present_in_pre_v1_v2_tests} records not present in either v1 or v2 or pre\n")
+print(
+    f"{not_present_in_pre_v1_v2_tests} records not present in either v1 or v2 or pre\n"
+)
 
 print("end of validation\n")
-print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
+print(
+    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n"
+)

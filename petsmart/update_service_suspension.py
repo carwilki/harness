@@ -21,5 +21,12 @@ env = EnvConfig(
 job_id = "wf_Automated_Reminder_Calls_non_PII"
 api = HarnessApi(env, spark)
 hjm = api.getHarnessJobById(job_id)
-hjm.markInputsSnapshots(['SKU_PROFILE_RPT', 'AUTOMATED_CALL_HOLIDAYS', 'SITE_PROFILE_RPT', 'AUTOMATED_CALL_RULES', 'TP_HISTORY'])
-
+hjm.markInputsSnapshots(
+    [
+        "SKU_PROFILE_RPT",
+        "AUTOMATED_CALL_HOLIDAYS",
+        "SITE_PROFILE_RPT",
+        "AUTOMATED_CALL_RULES",
+        "TP_HISTORY",
+    ]
+)

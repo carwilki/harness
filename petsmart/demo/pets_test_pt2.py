@@ -1,6 +1,6 @@
 from harness.config.EnvConfig import EnvConfig
-from harness.manager.HarnessApi import HarnessApi
 from harness.examples.demo.vars import job_id
+from harness.manager.HarnessApi import HarnessApi
 
 username = dbutils.secrets.get(scope="netezza_petsmart_keys", key="username")
 password = dbutils.secrets.get(scope="netezza_petsmart_keys", key="password")

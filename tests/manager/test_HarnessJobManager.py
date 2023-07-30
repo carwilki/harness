@@ -31,7 +31,7 @@ class TestHarnessJobManager:
         constructor = HarnessJobManager(config, session)
         assert constructor is not None
         assert type(constructor.config) is HarnessJobConfig
-        assert isinstance(constructor._source_snapshoters, dict)
+        assert isinstance(constructor.snapshoters, dict)
         assert type(constructor._metadataManager) == HarnessJobManagerMetaData
 
     def test_can_create(self, mocker: MockFixture, faker: Faker):
@@ -131,7 +131,7 @@ class TestHarnessJobManager:
         constructor = HarnessJobManager(config, session)
         assert constructor is not None
         assert type(constructor.config) is HarnessJobConfig
-        assert isinstance(constructor._source_snapshoters, dict)
+        assert isinstance(constructor.snapshoters, dict)
 
     def test_should_be_able_to_snapshot_with_jdbc_sourc_and_table_target(
         self, mocker: MockFixture, faker: Faker

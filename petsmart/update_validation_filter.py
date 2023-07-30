@@ -1,7 +1,6 @@
 from harness.config.EnvConfig import EnvConfig
 from harness.manager.HarnessApi import HarnessApi
 
-
 username = dbutils.secrets.get(scope="netezza_petsmart_keys", key="username")
 password = dbutils.secrets.get(scope="netezza_petsmart_keys", key="password")
 token = dbutils.secrets.get(scope="netezza_petsmart_keys", key="workspace_token")
@@ -40,7 +39,7 @@ hjm.updateValidaitonFilter(
     snapshotName="WM_LABOR_MSG_DTL_CRIT",
     filter=""""(('2023-06-12 04:45:06'<LOAD_TSTMP and LOAD_TSTMP <'2023-06-23 03:03:33')
     or ('2023-06-16 03:04:22'<UPDATE_TSTMP and UPDATE_TSTMP<'2023-06-23 03:03:33'))
-    and (LOCATION_ID = 1288 or LOCATION_ID=1186)"""
+    and (LOCATION_ID = 1288 or LOCATION_ID=1186)""",
 )
 hjm.updateValidaitonFilter(
     snapshotName="WM_PIX_TRAN",
@@ -118,5 +117,5 @@ hjm.updateValidaitonFilter(
     snapshotName="WM_OUTPT_LPN",
     filter="""where (('2023-06-16 03:03:26'<LOAD_TSTMP and LOAD_TSTMP <'2023-06-23 03:02:20')
     or ('2023-06-16 03:03:26'<UPDATE_TSTMP and UPDATE_TSTMP<'2023-06-23 03:02:20'))
-    and (LOCATION_ID = 1288 or LOCATION_ID=1186)"""
+    and (LOCATION_ID = 1288 or LOCATION_ID=1186)""",
 )

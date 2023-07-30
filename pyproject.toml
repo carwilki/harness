@@ -17,6 +17,7 @@ datacompy = { version = "^0.10.1", extras = ["spark"] }
 pyspark = "^3.4.0"
 delta-spark = "^2.4.0"
 pytest-freezegun = "^0.4.2"
+databricks-connect = "^13.2.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.3.1"
@@ -65,3 +66,8 @@ ignore_errors = true
 
 [tool.coverage.html]
 directory = "coverage_html_report"
+
+[tool.isort]
+profile = "black"
+skip_gitignore = true
+line_length = 120

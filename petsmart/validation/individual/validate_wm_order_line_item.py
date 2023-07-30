@@ -1,6 +1,7 @@
+from pyspark.sql import SparkSession
+
 from harness.config.EnvConfig import EnvConfig
 from harness.manager.HarnessApi import HarnessApi
-from pyspark.sql import SparkSession
 
 
 def generate_comparison_query(refine, raw, v1, refine_keys, raw_keys) -> str:
@@ -43,37 +44,42 @@ env = EnvConfig(
 )
 
 api = HarnessApi(env, spark)
-snapshot_name = "WM_TASK_DTL"
 hjm = api.getHarnessJobById("01298d4f-934f-439a-b80d-251987f5422")
-
 hjm.updateValidaitonFilter(
-    snapshotName=snapshot_name,
-    filter="""where ('2023-06-08 09:55:03.000'<WM_CREATE_TSTMP and WM_CREATE_TSTMP <'2023-06-23 05:21:48.526')
+    snapshotName="WM_ORDER_LINE_ITEM",
+    filter="""where ('2021-09-08 03:39:32.540'<WM_CREATED_TSTMP and WM_CREATED_TSTMP <'2023-06-23 05:20:45.000')
     and (LOCATION_ID = 1288 or LOCATION_ID=1186)""",
 )
 
-print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
+print(
+    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n"
+)
 print("start of validation\n")
-
-
+snapshot_name = "WM_ORDER_LINE_ITEM"
 hjm.runSingleValidation(snapshot_name)
-
 report = hjm.getReport(snapshot_name)
 target = hjm.getTargetConfigForSnapshot(snapshot_name)
-
+report = hjm.getReport(snapshot_name)
 refine = f"{target.test_target_schema}.{target.test_target_table}"
 pre = f"qa_raw.{target.test_target_table}_PRE"
 keys = ",".join(str(e) for e in target.primary_key).lower()
 raw_keys = ",".join(str(e) for e in target.primary_key).lower().replace("wm_", "")
 v1 = hjm.getSnapshotTable(snapshot_name, 1)
+print(generate_comparison_query(refine, pre, v1, keys, raw_keys))
 
-all_records_not_apearing_in_either_v1_pre_v2 = generate_comparison_query(refine, pre, v1, keys, raw_keys)
+all_records_not_apearing_in_either_v1_pre_v2 = generate_comparison_query(
+    refine, pre, v1, keys, raw_keys
+)
 
 not_present_in_pre_v1_v2_tests = spark.sql(
     all_records_not_apearing_in_either_v1_pre_v2
 ).count()
 
-print(f"{not_present_in_pre_v1_v2_tests} records not present in either v1 or v2 or pre\n")
+print(
+    f"{not_present_in_pre_v1_v2_tests} records not present in either v1 or v2 or pre\n"
+)
 
 print("end of validation\n")
-print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
+print(
+    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n"
+)
