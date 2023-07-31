@@ -87,10 +87,9 @@ class TableTarget(AbstractTarget):
         refine_q = f"select * from {ts}.{tt}"
         self.logger.debug(f"refine query: {refine_q}")
 
-        results = self.session.sql(refine_q)
-        base = v1.join(v2, self.table_config.primary_key, "left_anti")
-        base = base.unionByName(v2)
-        (compare, base) = self._only_what_is_shared(results, base)
+        compare = self.session.sql(refine_q)
+        base = v2
+    
         self.logger.info(f"Validating results in {ts}.{tt} againsts {ss}.{st}")
 
         return validator.validateDF(

@@ -1,3 +1,4 @@
+dbutils.library.restartPython()
 from harness.config.EnvConfig import EnvConfig
 from harness.manager.HarnessApi import HarnessApi
 from pyspark.sql import SparkSession, DataFrame
