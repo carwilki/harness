@@ -53,7 +53,6 @@ def validate_pets_with_pre_table(
         pre_full.join(site_profile, pre_full.DC_NBR == site_profile.STORE_NBR)
         .repartition(25)
         .select(raw_keys)
-        .withColumnRenamed("ID", "WM_ILM_APPOINTMENT_OBJECTS_ID")
         .distinct()
     )
 
