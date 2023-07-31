@@ -88,7 +88,8 @@ class TableTarget(AbstractTarget):
         self.logger.debug(f"refine query: {refine_q}")
 
         results = self.session.sql(refine_q)
-        base = v1.unionAll(v2).distinct()
+        base = v1.join(v2, self.table_config.primary_key, "left_anti")
+        base = base.unionByName(v2)
         (compare, base) = self._only_what_is_shared(results, base)
         self.logger.info(f"Validating results in {ts}.{tt} againsts {ss}.{st}")
 
@@ -107,6 +108,7 @@ class TableTarget(AbstractTarget):
         compare_keys = compare.select(keys)
         base_keys = base.select(keys)
         intersect = compare_keys.intersect(base_keys)
-        compare_final = compare.join(intersect, keys, "inner")
-        base_final = base.join(intersect, keys, "inner")
+        compare_final = compare.join(intersect, keys, "inner").select[compare['*']]
+        base_final = base.join(intersect, keys, "inner").select[base['*']]
         return compare_final, base_final
+    
