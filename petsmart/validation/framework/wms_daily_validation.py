@@ -35,7 +35,7 @@ for snapshot in hjm.snapshoters.values():
     try:
         validate_pets_with_pre_table(snapshot=snapshot, spark=spark)
         snapshot.config.validation_report = validate_pets_with_pre_table(snapshot=snapshot, spark=spark)
-        hjm.updateSnapshot(snapshot=snapshot)
+        hjm.update()
     except Exception as e:
         print(
             f"Snapshot {snapshot.config.job_id}:{snapshot.config.name} failed validation. exception below"
