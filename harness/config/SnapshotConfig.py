@@ -17,12 +17,13 @@ class SnapshotConfig(BaseModel):
     target: TableTargetConfig = None
     source: JDBCSourceConfig = None
     version: int = 0
-    isInput: bool = False
+    isInput: bool | None = False
     validator: Optional[ValidatorConfig] = None
     validated: bool = False
     validation_date: Optional[datetime] = None
     validation_report: Optional[str] = None
     enabled: bool = True
+    snapshot_report: Optional[str] = None
 
     @classmethod
     @pydantic_validator("target")

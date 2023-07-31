@@ -233,3 +233,5 @@ class HarnessJobManager:
         if ss is not None:
             return ss.target.getSnapshotTableName(version)
     
+    def update(self):
+        self._metadataManager.update(self.config)

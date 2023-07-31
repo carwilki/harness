@@ -1,0 +1,2 @@
+name,source_schema,source_table,snapshot_target_schema,snapshot_target_table,source_filter,test_target_schema,test_target_table,primary_key,validation_filter,is_input
+SITE_PROFILE,EDW_PRD,SITE_PROFILE,nzmigration,SITE_PROFILE,1=1,qa_legacy,SITE_PROFILE,LOCATION_ID
