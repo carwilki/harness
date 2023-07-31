@@ -35,7 +35,6 @@ for snapshot in hjm.snapshoters.values():
     
     try:
         validate_pets_with_pre_table(snapshot=snapshot, spark=spark)
-        validate_pets_with_pre_table(snapshot=snapshot, spark=spark)
         snapshot.config.snapshot_report = mystdout.getvalue()
         hjm.update()
     except Exception as e:
