@@ -32,10 +32,6 @@ hjm.updateValidaitonFilter(snapshotName=snapshot_name, filter="""""")
 target: TableTargetConfig = hjm.getTargetConfigForSnapshot(snapshot_name)
 
 keys = target.primary_key
-raw_keys = []
-for key in keys:
-    raw_keys.append(key.lower().replace("wm_", ""))
-
 
 refine = (
     spark.sql(f"select * from {target.test_target_schema}.{target.test_target_table}")
@@ -43,14 +39,6 @@ refine = (
     .distinct()
     .cache()
 )
-
-
-# pre = (
-#     spark.sql(f"select * from qa_raw.{target.test_target_table}_PRE")
-#     .distinct()
-#     .repartition(50)
-#     .cache()
-# )
 
 v1 = (
     spark.sql(f"select * from {hjm.getSnapshotTable(snapshot_name, 1)}")
@@ -67,19 +55,9 @@ v2 = (
     .distinct()
     .cache()
 )
-site_profile = spark.sql(
-    "select store_nbr,location_id from qa_legacy.SITE_PROFILE"
-).cache()
- 
-report: DataFrameValidatorReport = None
+
 report: DataFrameValidatorReport = hjm.runSingleValidation(snapshot_name)
  
-# pre_location_id = (
-#     pre.join(site_profile, pre.DC_NBR == site_profile.store_nbr)
-#     .select(raw_keys)
-#     .distinct()
-# ).cache()
-
 v1_count = v1.count()
 v2_count = v2.count()
 vA = v1.unionByName(v2).distinct().cache()
