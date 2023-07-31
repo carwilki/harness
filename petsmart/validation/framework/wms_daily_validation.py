@@ -32,9 +32,11 @@ hjm = api.getHarnessJobById(job_id)
 for snapshot in hjm.snapshoters.values():
     old_stdout = sys.stdout
     sys.stdout = mystdout = StringIO()
+    
     try:
         validate_pets_with_pre_table(snapshot=snapshot, spark=spark)
-        snapshot.config.validation_report = validate_pets_with_pre_table(snapshot=snapshot, spark=spark)
+        validate_pets_with_pre_table(snapshot=snapshot, spark=spark)
+        snapshot.config.snapshot_report = mystdout.getvalue()
         hjm.update()
     except Exception as e:
         print(

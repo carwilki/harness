@@ -21,7 +21,6 @@ class SnapshotConfig(BaseModel):
     validator: Optional[ValidatorConfig] = None
     validated: bool = False
     validation_date: Optional[datetime] = None
-    validation_report: Optional[str] = None
     enabled: bool = True
     snapshot_report: Optional[str] = None
 
