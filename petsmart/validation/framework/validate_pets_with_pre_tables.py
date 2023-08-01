@@ -37,8 +37,6 @@ def validate_pets_with_pre_table(
         spark.sql(
             f"select * from {target.test_target_schema}.{target.test_target_table} where {filter}"
         )
-        .repartition(25)
-        .distinct()
         .cache()
     )
 
@@ -48,29 +46,21 @@ def validate_pets_with_pre_table(
         spark.sql(
             f"select * from qa_raw.{target.test_target_table}_PRE where {pre_filter}"
         )
-        .distinct()
-        .repartition(25)
         .cache()
     )
 
     pre_keys = (
         pre_full.join(site_profile, pre_full.DC_NBR == site_profile.STORE_NBR)
-        .repartition(25)
         .select(raw_keys)
-        .distinct()
     )
 
     v1 = (
         spark.sql(f"select * from {v1snapshot} where {filter}")
-        .repartition(25)
-        .distinct()
         .cache()
     )
 
     v2 = (
         spark.sql(f"select * from {v2snapshot} where {filter}")
-        .repartition(25)
-        .distinct()
         .cache()
     )
 
