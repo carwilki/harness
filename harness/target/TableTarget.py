@@ -80,16 +80,19 @@ class TableTarget(AbstractTarget):
         tt = self.table_config.test_target_table
         ss = self.table_config.snapshot_target_schema
         st = self.table_config.snapshot_target_table
-        v1 = self.session.sql(f"select * from {self.getSnapshotTableName(1)}") 
-        v2 = self.session.sql(f"select * from {self.getSnapshotTableName(2)}") 
+        v2 = self.session.sql(
+            f"select * from {self.getSnapshotTableName(2)} where {self.table_config.validation_filter}"
+        )
 
         validator = DataFrameValidator()
-        refine_q = f"select * from {ts}.{tt}"
+        refine_q = (
+            f"select * from {ts}.{tt} where {self.table_config.validation_filter}"
+        )
         self.logger.debug(f"refine query: {refine_q}")
 
         compare = self.session.sql(refine_q)
         base = v2
-    
+
         self.logger.info(f"Validating results in {ts}.{tt} againsts {ss}.{st}")
 
         return validator.validateDF(
@@ -107,6 +110,6 @@ class TableTarget(AbstractTarget):
         compare_keys = compare.select(keys)
         base_keys = base.select(keys)
         intersect = compare_keys.intersect(base_keys)
-        compare_final = compare.join(intersect, keys, "inner").select(compare['*'])
-        base_final = base.join(intersect, keys, "inner").select(base['*'])
+        compare_final = compare.join(intersect, keys, "inner").select(compare["*"])
+        base_final = base.join(intersect, keys, "inner").select(base["*"])
         return compare_final, base_final
