@@ -24,15 +24,13 @@ env = EnvConfig(
     netezza_jdbc_num_part=9,
 )
 
-
-
 job_id = "01298d4f-934f-439a-b80d-251987f5422"
 api = HarnessApi(env, spark)
 hjm = api.getHarnessJobById(job_id)
 for snapshot in hjm.snapshoters.values():
     old_stdout = sys.stdout
     sys.stdout = mystdout = StringIO()
-    
+
     try:
         validate_pets_with_pre_table(snapshot=snapshot, spark=spark)
         snapshot.config.snapshot_report = mystdout.getvalue()

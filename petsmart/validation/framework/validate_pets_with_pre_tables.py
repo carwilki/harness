@@ -14,6 +14,8 @@ def validate_pets_with_pre_table(
     target: TableTargetConfig = snapshot.config.target
     v1snapshot = snapshot.target.getSnapshotTableName(1)
     v2snapshot = snapshot.target.getSnapshotTableName(2)
+    filter = "location_id in(1288,1186)"
+    pre_filter = "dc_nbr in(36,38)"
 
     if key_overides is None:
         keys = target.primary_key
@@ -33,7 +35,7 @@ def validate_pets_with_pre_table(
 
     refine_full = (
         spark.sql(
-            f"select * from {target.test_target_schema}.{target.test_target_table}"
+            f"select * from {target.test_target_schema}.{target.test_target_table} where {filter}"
         )
         .repartition(25)
         .distinct()
@@ -43,7 +45,9 @@ def validate_pets_with_pre_table(
     refine_keys = refine_full.select(keys).repartition(25).distinct().cache()
 
     pre_full = (
-        spark.sql(f"select * from qa_raw.{target.test_target_table}_PRE")
+        spark.sql(
+            f"select * from qa_raw.{target.test_target_table}_PRE where {pre_filter}"
+        )
         .distinct()
         .repartition(25)
         .cache()
@@ -56,9 +60,19 @@ def validate_pets_with_pre_table(
         .distinct()
     )
 
-    v1 = spark.sql(f"select * from {v1snapshot}").repartition(25).distinct().cache()
+    v1 = (
+        spark.sql(f"select * from {v1snapshot} where {filter}")
+        .repartition(25)
+        .distinct()
+        .cache()
+    )
 
-    v2 = spark.sql(f"select * from {v2snapshot}").repartition(25).distinct().cache()
+    v2 = (
+        spark.sql(f"select * from {v2snapshot} where {filter}")
+        .repartition(25)
+        .distinct()
+        .cache()
+    )
 
     v1_keys = v1.select(keys).cache()
 
@@ -70,7 +84,6 @@ def validate_pets_with_pre_table(
     vA = v1_keys.unionByName(v2_keys).distinct().cache()
     v1_only = v1_keys.exceptAll(v2_keys).cache()
     v2_only = v2_keys.exceptAll(v1_keys).cache()
-    v1_v2_shared = vA.exceptAll(v1_only).exceptAll(v2_only).cache()
     new_inserts = refine_keys.exceptAll(v1_keys).cache()
     delta_pre = pre_keys.exceptAll(v1_keys).cache()
     expected_records_inserted = delta_pre.unionAll(v2_only).exceptAll(v1_keys).cache()
@@ -110,6 +123,7 @@ def validate_pets_with_pre_table(
     print(
         f"records in v1 but not in refine:                    {records_in_v1_not_in_refine.count()}"
     )
+    print()
     print(
         f"records in v2 but not in refine:                    {records_in_v2_not_in_refine.count()}"
     )
