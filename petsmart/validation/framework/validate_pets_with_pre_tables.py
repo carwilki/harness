@@ -71,10 +71,9 @@ def validate_pets_with_pre_table(
     v1_only = v1_keys.exceptAll(v2_keys).cache()
     v2_only = v2_keys.exceptAll(v1_keys).cache()
     v1_v2_shared = vA.exceptAll(v1_only).exceptAll(v2_only).cache()
-    inserts_not_in_snapshots = pre_keys.exceptAll(v2_only)
     new_inserts = refine_keys.exceptAll(v1_keys).cache()
     delta_pre = pre_keys.exceptAll(v1_keys).cache()
-    expected_records_inserted = delta_pre.unionAll(v2_only).exceptAll(v1_only).cache()
+    expected_records_inserted = delta_pre.unionAll(v2_only).exceptAll(v1_keys).cache()
     records_not_inserted = expected_records_inserted.exceptAll(refine_keys).cache()
     unexpected_records_in_refine = (
         refine_keys.exceptAll(pre_keys).exceptAll(v1_keys).exceptAll(v2_keys).cache()
@@ -89,16 +88,8 @@ def validate_pets_with_pre_table(
     print("start of validation report")
     print(report.summary)
     print(f"pre-table records:                                  {pre_full.count()}")
-    print(f"pre-table post join                                 {delta_pre.count()}")
-    print(f"unique_v1:                                          {v1_only.count()}")
-    print(f"unique_v2:                                          {v2_only.count()}")
-    print(f"v1_v2_shared_records:                               {v1_v2_shared.count()}")
+    print(f"v2 records:                                         {v2.count()}")
     print(f"all version:                                        {vA.count()}")
-    print(f"pre existing records:                               {v1_keys.count()}")
-    print(f"new records in pre-table:                           {delta_pre.count()}")
-    print(
-        f"records not in snapshot:                            {inserts_not_in_snapshots.count()}"
-    )
     print(
         f"expected inserted records:                          {expected_records_inserted.count()}"
     )
