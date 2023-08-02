@@ -1,9 +1,15 @@
-from datetime import datetime
-from io import StringIO
-import sys
+from uuid import uuid4
+
+from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql.functions import col, max, min
+
 from harness.config.EnvConfig import EnvConfig
 from harness.manager.HarnessApi import HarnessApi
+from petsmart.validation.framework.validate_pets_with_pre_tables import (
+    validate_pets_with_pre_table,
+)
 
+spark: SparkSession = spark
 username = dbutils.secrets.get(scope="netezza_petsmart_keys", key="username")
 password = dbutils.secrets.get(scope="netezza_petsmart_keys", key="password")
 token = dbutils.secrets.get(scope="netezza_petsmart_keys", key="workspace_token")
@@ -21,11 +27,8 @@ env = EnvConfig(
     netezza_jdbc_num_part=9,
 )
 
-job_id = "01298d4f-934f-439a-b80d-251987f5422"
-api = HarnessApi(env, spark)
-hjm = api.getHarnessJobById(job_id)
 
-with open(f"/dbfs/nz_validtion_report/{hjm.config.job_name}_{datetime.now().strftime('%d-%b-%Y-%H-%M')}.txt", "w") as f:
-    for snapshot in hjm.snapshoters.values():
-        if snapshot.config.snapshot_report is not None:
-            f.write(snapshot.config.snapshot_report)
+api = HarnessApi(env, spark)
+snapshot_name = "WM_E_AUD_LOG"
+hjm = api.getHarnessJobById("01298d4f-934f-439a-b80d-251987f5422")
+validate_pets_with_pre_table(hjm.snapshoters.get(snapshot_name),spark)

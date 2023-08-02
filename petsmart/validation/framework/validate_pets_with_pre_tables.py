@@ -33,36 +33,23 @@ def validate_pets_with_pre_table(
         "select STORE_NBR,LOCATION_ID from qa_legacy.SITE_PROFILE"
     ).cache()
 
-    refine_full = (
-        spark.sql(
-            f"select * from {target.test_target_schema}.{target.test_target_table} where {filter}"
-        )
-        .cache()
-    )
+    refine_full = spark.sql(
+        f"select * from {target.test_target_schema}.{target.test_target_table} where {filter}"
+    ).cache()
 
-    refine_keys = refine_full.select(keys).repartition(25).distinct().cache()
+    refine_keys = refine_full.select(keys).repartition(25).cache()
 
-    pre_full = (
-        spark.sql(
-            f"select * from qa_raw.{target.test_target_table}_PRE where {pre_filter}"
-        )
-        .cache()
+    pre_full = spark.sql(
+        f"select * from qa_raw.{target.test_target_table}_PRE where {pre_filter}"
     )
+    
+    pre_post_join = pre_full.join(site_profile, pre_full.DC_NBR == site_profile.STORE_NBR)
 
-    pre_keys = (
-        pre_full.join(site_profile, pre_full.DC_NBR == site_profile.STORE_NBR)
-        .select(raw_keys)
-    )
+    pre_keys = pre_post_join.select(raw_keys)
 
-    v1 = (
-        spark.sql(f"select * from {v1snapshot} where {filter}")
-        .cache()
-    )
+    v1 = spark.sql(f"select * from {v1snapshot} where {filter}").cache()
 
-    v2 = (
-        spark.sql(f"select * from {v2snapshot} where {filter}")
-        .cache()
-    )
+    v2 = spark.sql(f"select * from {v2snapshot} where {filter}").cache()
 
     v1_keys = v1.select(keys).cache()
 
@@ -74,9 +61,11 @@ def validate_pets_with_pre_table(
     vA = v1_keys.unionByName(v2_keys).distinct().cache()
     v1_only = v1_keys.exceptAll(v2_keys).cache()
     v2_only = v2_keys.exceptAll(v1_keys).cache()
+    v1_v2_shared = vA.exceptAll(v1_only).exceptAll(v2_only).cache()
+    inserts_not_in_snapshots = pre_keys.exceptAll(v2_only)
     new_inserts = refine_keys.exceptAll(v1_keys).cache()
     delta_pre = pre_keys.exceptAll(v1_keys).cache()
-    expected_records_inserted = delta_pre.unionAll(v2_only).exceptAll(v1_keys).cache()
+    expected_records_inserted = delta_pre.unionByName(v2_only).exceptAll(v1).cache()
     records_not_inserted = expected_records_inserted.exceptAll(refine_keys).cache()
     unexpected_records_in_refine = (
         refine_keys.exceptAll(pre_keys).exceptAll(v1_keys).exceptAll(v2_keys).cache()
@@ -91,8 +80,16 @@ def validate_pets_with_pre_table(
     print("start of validation report")
     print(report.summary)
     print(f"pre-table records:                                  {pre_full.count()}")
-    print(f"v2 records:                                         {v2.count()}")
+    print(f"pre-keys post join records:                         {pre_post_join.count()}")
+    print(f"unique_v1:                                          {v1_only.count()}")
+    print(f"unique_v2:                                          {v2_only.count()}")
+    print(f"v1_v2_shared_records:                               {v1_v2_shared.count()}")
     print(f"all version:                                        {vA.count()}")
+    print(f"pre existing records:                               {v1_keys.count()}")
+    print(f"new records in pre-table:                           {delta_pre.count()}")
+    print(
+        f"records not in snapshot:                            {inserts_not_in_snapshots.count()}"
+    )
     print(
         f"expected inserted records:                          {expected_records_inserted.count()}"
     )
@@ -113,7 +110,6 @@ def validate_pets_with_pre_table(
     print(
         f"records in v1 but not in refine:                    {records_in_v1_not_in_refine.count()}"
     )
-    print()
     print(
         f"records in v2 but not in refine:                    {records_in_v2_not_in_refine.count()}"
     )
