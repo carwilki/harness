@@ -10,25 +10,25 @@ def validate_pets_with_pre_table(
     spark: SparkSession,
     key_overides: list[str] | None = None,
     pre_keys_overide: list[str] | None = None,
-) -> None:
+) -> str:
     target: TableTargetConfig = snapshot.config.target
     v1snapshot = snapshot.target.getSnapshotTableName(1)
     v2snapshot = snapshot.target.getSnapshotTableName(2)
     filter = "location_id in(1288,1186)"
     pre_filter = "dc_nbr in(36,38)"
-
+  
     if key_overides is None:
         keys = target.primary_key
     else:
         keys = key_overides
-
+   
     raw_keys = []
     if pre_keys_overide is None:
         for key in keys:
             raw_keys.append(key.lower().replace("wm_", ""))
     else:
         raw_keys = pre_keys_overide
-
+   
     site_profile = spark.sql(
         "select STORE_NBR,LOCATION_ID from qa_legacy.SITE_PROFILE"
     ).cache()
@@ -39,14 +39,6 @@ def validate_pets_with_pre_table(
 
     refine_keys = refine_full.select(keys).repartition(25).cache()
 
-    pre_full = spark.sql(
-        f"select * from qa_raw.{target.test_target_table}_PRE where {pre_filter}"
-    )
-    
-    pre_post_join = pre_full.join(site_profile, pre_full.DC_NBR == site_profile.STORE_NBR)
-
-    pre_keys = pre_post_join.select(raw_keys)
-
     v1 = spark.sql(f"select * from {v1snapshot} where {filter}").cache()
 
     v2 = spark.sql(f"select * from {v2snapshot} where {filter}").cache()
@@ -55,6 +47,16 @@ def validate_pets_with_pre_table(
 
     v2_keys = v2.select(keys).cache()
 
+    pre_full = spark.sql(
+        f"select * from qa_raw.{target.test_target_table}_PRE where {pre_filter}"
+    )
+    
+    pre_post_join = pre_full.join(site_profile, pre_full.DC_NBR == site_profile.STORE_NBR).select(pre_full["*"],
+                                                                                                  site_profile["location_id"])
+
+    pre_keys = pre_post_join.select(raw_keys)
+
+
     report: DataFrameValidatorReport = None
     report: DataFrameValidatorReport = snapshot.validateResults()
 
@@ -62,58 +64,38 @@ def validate_pets_with_pre_table(
     v1_only = v1_keys.exceptAll(v2_keys).cache()
     v2_only = v2_keys.exceptAll(v1_keys).cache()
     v1_v2_shared = vA.exceptAll(v1_only).exceptAll(v2_only).cache()
-    inserts_not_in_snapshots = pre_keys.exceptAll(v2_only)
+    v2_missing_from_pre = v2_only.exceptAll(pre_keys)
     new_inserts = refine_keys.exceptAll(v1_keys).cache()
-    delta_pre = pre_keys.exceptAll(v1_keys).cache()
-    expected_records_inserted = delta_pre.unionByName(v2_only).exceptAll(v1).cache()
-    records_not_inserted = expected_records_inserted.exceptAll(refine_keys).cache()
-    unexpected_records_in_refine = (
-        refine_keys.exceptAll(pre_keys).exceptAll(v1_keys).exceptAll(v2_keys).cache()
-    )
     records_in_pre_not_in_refine = pre_keys.exceptAll(refine_keys).cache()
-    records_in_v2_not_in_refine = v2_only.exceptAll(refine_keys).cache()
     records_in_v1_not_in_refine = v1_only.exceptAll(refine_keys).cache()
+    records_in_v2_not_in_refine = v2_only.exceptAll(v2_missing_from_pre).exceptAll(refine_keys).cache()
+    new_records = pre_keys.exceptAll(v1_keys).cache()
+    new_records_in_refine_but_not_pre = refine_keys.exceptAll(new_inserts).exceptAll(v2_keys).exceptAll(v1_keys)
+    v2_in_refine = v2_keys.exceptAll(v2_missing_from_pre)
+    ret = "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n"
+    ret+=("start of validation report\n")
+    ret+=(f"\n{report.summary}\n")
+    ret+=(f"pre-table records:                                  {pre_full.count()}\n")
+    ret+=(f"pre-keys post join records:                         {pre_post_join.count()}\n")
+    ret+=(f"unique_v1:                                          {v1_only.count()}\n")
+    ret+=(f"unique_v2:                                          {v2_only.count()}\n")
+    ret+=(f"v1_v2_shared_records:                               {v1_v2_shared.count()}\n")
+    ret+=(f"all versions(v1 & v2):                              {vA.count()}\n")
+    ret+=("\n")
+    ret+=(f"records already in refine:                          {v1.count()}\n")
+    ret+=(f"new records in pre-table:                           {new_records.count()}\n")
+    ret+=(f"expected inserted records:                          {new_records.count()}\n")
+    ret+=(f"records inserted into refine:                       {new_inserts.count()}\n")
+    ret+=(f"records in refine:                                  {refine_keys.count()}\n")
+    ret+=(f"master records not in pre:                          {v2_missing_from_pre.count()}\n")    
+    ret+=(f"master records in refine:                           {v2_in_refine.count()}\n")
+    ret+=(f"v1 records missing in refine:                       {records_in_v1_not_in_refine.count()}\n")
+    ret+=(f"master not in pre and missing from refine:          {records_in_v2_not_in_refine.count()}\n")
+    ret+=(f"new records from pre not in refine:                 {records_in_pre_not_in_refine.count()}\n")
+    ret+=(f"new records in refine but not pre:                  {new_records_in_refine_but_not_pre.count()}\n")
+    ret+=("end of validation report")
+    ret+=(
+        "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n"
+    )
 
-    print(
-        "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n"
-    )
-    print("start of validation report")
-    print(report.summary)
-    print(f"pre-table records:                                  {pre_full.count()}")
-    print(f"pre-keys post join records:                         {pre_post_join.count()}")
-    print(f"unique_v1:                                          {v1_only.count()}")
-    print(f"unique_v2:                                          {v2_only.count()}")
-    print(f"v1_v2_shared_records:                               {v1_v2_shared.count()}")
-    print(f"all version:                                        {vA.count()}")
-    print(f"pre existing records:                               {v1_keys.count()}")
-    print(f"new records in pre-table:                           {delta_pre.count()}")
-    print(
-        f"records not in snapshot:                            {inserts_not_in_snapshots.count()}"
-    )
-    print(
-        f"expected inserted records:                          {expected_records_inserted.count()}"
-    )
-    print(f"records inserted into refine:                       {new_inserts.count()}")
-    print(f"records in refine:                                  {refine_keys.count()}")
-    print(
-        f"records not inserted:                               {records_not_inserted.count()}"
-    )
-    print(
-        f"unexpected records in refine:                       {unexpected_records_in_refine.count()}"
-    )
-    print(
-        f"records in pre but not in refine:                   {records_in_pre_not_in_refine.count()}"
-    )
-    print(
-        f"records in refine but not pre:                      {records_not_inserted.count()}"
-    )
-    print(
-        f"records in v1 but not in refine:                    {records_in_v1_not_in_refine.count()}"
-    )
-    print(
-        f"records in v2 but not in refine:                    {records_in_v2_not_in_refine.count()}"
-    )
-    print("end of validation report")
-    print(
-        "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n"
-    )
+    return ret

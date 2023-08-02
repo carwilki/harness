@@ -1,3 +1,4 @@
+dbutils.library.restartPython()
 from uuid import uuid4
 
 from pyspark.sql import DataFrame, SparkSession
@@ -26,7 +27,6 @@ env = EnvConfig(
     netezza_jdbc_driver="org.netezza.Driver",
     netezza_jdbc_num_part=9,
 )
-
 
 api = HarnessApi(env, spark)
 snapshot_name = "WM_E_AUD_LOG"
