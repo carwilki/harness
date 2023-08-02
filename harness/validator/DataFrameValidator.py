@@ -41,7 +41,7 @@ class DataFrameValidator(AbstractValidator):
             base_df=base,
             compare_df=compare,
             join_columns=primary_keys,
-            show_all_columns=True,
+            show_all_columns=False,
         )
         summary: str = f"summary for {name}:\n"
         summary += (

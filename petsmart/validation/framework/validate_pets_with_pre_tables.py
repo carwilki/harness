@@ -56,8 +56,6 @@ def validate_pets_with_pre_table(
 
     pre_keys = pre_post_join.select(raw_keys)
 
-
-    report: DataFrameValidatorReport = None
     report: DataFrameValidatorReport = snapshot.validateResults()
 
     vA = v1_keys.unionByName(v2_keys).distinct().cache()
@@ -93,7 +91,7 @@ def validate_pets_with_pre_table(
     ret+=(f"master not in pre and missing from refine:          {records_in_v2_not_in_refine.count()}\n")
     ret+=(f"new records from pre not in refine:                 {records_in_pre_not_in_refine.count()}\n")
     ret+=(f"new records in refine but not pre:                  {new_records_in_refine_but_not_pre.count()}\n")
-    ret+=("end of validation report")
+    ret+=("end of validation report\n")
     ret+=(
         "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n"
     )
