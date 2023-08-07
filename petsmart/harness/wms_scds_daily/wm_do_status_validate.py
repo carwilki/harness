@@ -7,7 +7,7 @@ from pyspark.sql.functions import col, max, min
 
 from harness.config.EnvConfig import EnvConfig
 from harness.manager.HarnessApi import HarnessApi
-from petsmart.validation.wms_scds_daily.validate_pets_with_pre_tables import (
+from petsmart.harness.wms_scds_daily.validate_pets_with_pre_tables import (
     validate_pets_with_pre_table,
 )
 

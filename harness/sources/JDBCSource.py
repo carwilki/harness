@@ -1,5 +1,5 @@
 from pyspark.sql import DataFrame, SparkSession
-from pyspark.sql.types import DecimalType, ShortType, IntegerType, LongType
+from pyspark.sql.types import DecimalType, ShortType, IntegerType, LongType,ByteType
 from pyspark.sql.functions import col
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
@@ -92,14 +92,18 @@ class NetezzaJDBCSource(AbstractSource):
         for feild in df.schema.fields:
             if isinstance(feild.dataType, DecimalType):
                 if feild.dataType.scale == 0:
-                    if 0 < feild.dataType.precision < 5:
+                    if 0 < feild.dataType.precision <= 2:
+                        df = df.withColumn(
+                            feild.name, col(feild.name).cast(ByteType())
+                        )
+                    elif 2 < feild.dataType.precision <= 5:
                         df = df.withColumn(
                             feild.name, col(feild.name).cast(ShortType())
                         )
-                    elif 5 < feild.dataType.precision < 12:
+                    elif 5 < feild.dataType.precision <= 9:
                         df = df.withColumn(
                             feild.name, col(feild.name).cast(IntegerType())
                         )
-                    elif 12 < feild.dataType.precision < 22:
+                    elif 10 < feild.dataType.precision <= 18:
                         df = df.withColumn(feild.name, col(feild.name).cast(LongType()))
         return df
