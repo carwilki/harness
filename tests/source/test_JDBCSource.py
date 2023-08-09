@@ -7,6 +7,7 @@ from pyspark.sql.types import (
     ShortType,
     IntegerType,
     LongType,
+    ByteType
 )
 from pytest_mock import MockFixture
 from harness.config.HarnessJobConfig import HarnessJobConfig
@@ -91,7 +92,7 @@ class TestJDBCSource:
 
         expected = StructType(
             [
-                StructField("f1", ShortType(), True),
+                StructField("f1", ByteType(), True),
                 StructField("f2", ShortType(), True),
                 StructField("f3", IntegerType(), True),
                 StructField("f4", LongType(), True),

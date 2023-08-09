@@ -12,7 +12,7 @@ from harness.sources.JDBCSource import NetezzaJDBCSource
 from harness.sources.JDBCSourceConfig import JDBCSourceConfig
 from harness.target.TableTarget import TableTarget
 from harness.target.TableTargetConfig import TableTargetConfig
-from tests.utils.generator import (
+from utils.generator import (
     generate_env_config,
     generate_standard_harness_job_config,
 )

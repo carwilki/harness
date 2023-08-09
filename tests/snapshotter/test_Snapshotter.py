@@ -3,7 +3,7 @@ from pyspark.sql import SparkSession
 from pytest_mock import MockFixture
 from harness.snaphotter.Snapshotter import Snapshotter
 from harness.config.SnapshotConfig import SnapshotConfig
-from tests.utils.generator import (
+from utils.generator import (
     generate_standard_snapshot_config,
 )
 
