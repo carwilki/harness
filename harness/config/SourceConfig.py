@@ -1,4 +1,5 @@
 import abc
+from typing import Optional
 
 from pydantic import BaseModel, validator
 
@@ -6,6 +7,7 @@ from harness.config.SourceTypeEnum import SourceTypeEnum
 
 
 class SourceConfig(BaseModel, abc.ABC):
+    source_filter: Optional[str]
     source_type: SourceTypeEnum
 
     @classmethod

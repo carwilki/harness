@@ -10,7 +10,7 @@ from harness.config.SourceTypeEnum import SourceTypeEnum
 from harness.manager.HarnessJobManager import HarnessJobManager
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
-from harness.sources.JDBCSourceConfig import JDBCSourceConfig
+from harness.sources.SourceConfig import JDBCSourceConfig
 from harness.target.TableTargetConfig import TableTargetConfig
 
 
@@ -78,7 +78,11 @@ class HarnessApi:
                     validation_filter=table["validation_filter"],
                 )
                 snc = SnapshotConfig(
-                    job_id=id, target=tc, source=sc, name=table["name"], isInput=table["is_input"]
+                    job_id=id,
+                    target=tc,
+                    source=sc,
+                    name=table["name"],
+                    isInput=table["is_input"],
                 )
                 sources[table["name"]] = snc
         hjc = HarnessJobConfig(job_id=id, job_name=name, snapshots=sources)

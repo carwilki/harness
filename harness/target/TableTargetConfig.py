@@ -1,4 +1,5 @@
 from typing import Optional
+
 from harness.config.TargetConfig import TargetConfig
 from harness.config.TargetTypeEnum import TargetTypeEnum
 

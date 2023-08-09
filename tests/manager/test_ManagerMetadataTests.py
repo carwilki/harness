@@ -6,7 +6,7 @@ from pytest_mock import MockFixture
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
-from harness.sources.JDBCSourceConfig import JDBCSourceConfig
+from harness.sources.SourceConfig import JDBCSourceConfig
 from utils.generator import (
     generate_env_config,
     generate_standard_harness_job_config,

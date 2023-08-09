@@ -9,7 +9,7 @@ from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.manager.HarnessJobManager import HarnessJobManager
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
-from harness.sources.JDBCSourceConfig import JDBCSourceConfig
+from harness.sources.SourceConfig import JDBCSourceConfig
 from harness.target.TableTargetConfig import TableTargetConfig
 from utils.generator import generate_env_config
 

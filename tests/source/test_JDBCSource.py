@@ -14,7 +14,7 @@ from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
 from pyspark.sql.dataframe import DataFrame
 from harness.sources.JDBCSource import NetezzaJDBCSource
-from harness.sources.JDBCSourceConfig import JDBCSourceConfig
+from harness.sources.SourceConfig import JDBCSourceConfig
 
 
 class TestJDBCSource:

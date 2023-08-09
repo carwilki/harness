@@ -29,7 +29,7 @@ class AbstractTarget(ABC):
     @abstractmethod
     def validate_results(self) -> DataFrameValidatorReport:
         pass
-    
+
     @abstractmethod
     def getSnapshotTableName(self, version: int) -> str:
         pass

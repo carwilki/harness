@@ -5,7 +5,7 @@ from harness.config.SnapshotConfig import SnapshotConfig
 from harness.config.SourceTypeEnum import SourceTypeEnum
 from harness.sources.JDBCSource import DatabricksJDBCSource, NetezzaJDBCSource
 
-from harness.sources.JDBCSourceConfig import JDBCSourceConfig
+from harness.sources.SourceConfig import JDBCSourceConfig
 from harness.sources.SourceFactory import SourceFactory
 
 

@@ -6,8 +6,8 @@ from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.target.AbstractTarget import AbstractTarget
 from harness.target.TableTargetConfig import TableTargetConfig
-from harness.validator.DataFrameValidator import DataFrameValidator
 from harness.utils.logger import getLogger
+from harness.validator.DataFrameValidator import DataFrameValidator
 
 
 class TableTarget(AbstractTarget):

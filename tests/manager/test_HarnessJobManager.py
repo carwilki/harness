@@ -9,7 +9,7 @@ from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnviro
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
 from harness.snaphotter.Snapshotter import Snapshotter
 from harness.sources.JDBCSource import NetezzaJDBCSource
-from harness.sources.JDBCSourceConfig import JDBCSourceConfig
+from harness.sources.SourceConfig import JDBCSourceConfig
 from harness.target.TableTarget import TableTarget
 from harness.target.TableTargetConfig import TableTargetConfig
 from utils.generator import (

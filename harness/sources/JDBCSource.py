@@ -1,11 +1,12 @@
 from pyspark.sql import DataFrame, SparkSession
-from pyspark.sql.types import DecimalType, ShortType, IntegerType, LongType,ByteType
 from pyspark.sql.functions import col
+from pyspark.sql.types import ByteType, DecimalType, IntegerType, LongType, ShortType
+
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.sources.AbstractSource import AbstractSource
-from harness.sources.JDBCSourceConfig import JDBCSourceConfig
+from harness.sources.SourceConfig import JDBCSourceConfig
 
 
 class DatabricksJDBCSource(AbstractSource):
@@ -93,9 +94,7 @@ class NetezzaJDBCSource(AbstractSource):
             if isinstance(feild.dataType, DecimalType):
                 if feild.dataType.scale == 0:
                     if 0 < feild.dataType.precision <= 2:
-                        df = df.withColumn(
-                            feild.name, col(feild.name).cast(ByteType())
-                        )
+                        df = df.withColumn(feild.name, col(feild.name).cast(ByteType()))
                     elif 2 < feild.dataType.precision <= 5:
                         df = df.withColumn(
                             feild.name, col(feild.name).cast(ShortType())

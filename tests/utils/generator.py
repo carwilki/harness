@@ -8,7 +8,7 @@ from harness.config.SourceTypeEnum import SourceTypeEnum
 from harness.config.TargetConfig import TargetConfig
 from harness.config.TargetTypeEnum import TargetTypeEnum
 from harness.config.ValidatorConfig import ValidatorConfig
-from harness.sources.JDBCSourceConfig import JDBCSourceConfig
+from harness.sources.SourceConfig import JDBCSourceConfig
 from harness.target.TableTargetConfig import TableTargetConfig
 
 

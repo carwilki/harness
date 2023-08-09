@@ -7,7 +7,7 @@ from pydantic import validator as pydantic_validator
 from harness.config.SourceConfig import SourceConfig
 from harness.config.TargetConfig import TargetConfig
 from harness.config.ValidatorConfig import ValidatorConfig
-from harness.sources.JDBCSourceConfig import JDBCSourceConfig
+from harness.sources.SourceConfig import JDBCSourceConfig
 from harness.target.TableTargetConfig import TableTargetConfig
 
 

@@ -12,7 +12,7 @@ from harness.config.SourceTypeEnum import SourceTypeEnum
 from harness.manager.HarnessApi import HarnessApi
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
-from harness.sources.JDBCSourceConfig import JDBCSourceConfig
+from harness.sources.SourceConfig import JDBCSourceConfig
 from harness.target.TableTargetConfig import TableTargetConfig
 
 username = dbutils.secrets.get(scope="netezza_petsmart_keys", key="username")
