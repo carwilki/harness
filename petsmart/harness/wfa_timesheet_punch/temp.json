@@ -1,0 +1,149 @@
+{
+    "job_id": "wf_WFA_TIME_SHEET_PUNCH",
+    "job_name": "wf_WFA_TIME_SHEET_PUNCH",
+    "version": 2,
+    "testrunner": null,
+    "snapshots": {
+      "WFA_TIME_SHEET_PUNCH": {
+        "name": "WFA_TIME_SHEET_PUNCH",
+        "job_id": "wf_WFA_TIME_SHEET_PUNCH",
+        "target": {
+          "target_type": "dbrtable",
+          "snapshot_target_schema": "nzmigration",
+          "snapshot_target_table": "WFA_TIME_SHEET_PUNCH",
+          "test_target_schema": "qa_legacy",
+          "test_target_table": "WFA_TIME_SHEET_PUNCH",
+          "validation_filter": "",
+          "primary_key": [
+            "DAY_DT",
+            "TIME_SHEET_ITEM_ID"
+          ]
+        },
+        "source": {
+          "source_filter": "1=1",
+          "source_type": "netezza_jdbc",
+          "source_table": "WFA_TIME_SHEET_PUNCH",
+          "source_schema": "EDW_PRD"
+        },
+        "version": 2,
+        "isInput": false,
+        "validator": null,
+        "validated": false,
+        "validation_date": null,
+        "enabled": true,
+        "snapshot_report": ""
+      },
+      "SITE_PROFILE_RPT": {
+        "name": "SITE_PROFILE_RPT",
+        "job_id": "wf_WFA_TIME_SHEET_PUNCH",
+        "target": {
+          "target_type": "dbrtable",
+          "snapshot_target_schema": "nzmigration",
+          "snapshot_target_table": "SITE_PROFILE_RPT",
+          "test_target_schema": "qa_legacy",
+          "test_target_table": "SITE_PROFILE_RPT",
+          "validation_filter": "",
+          "primary_key": [
+            "LOCATION_ID"
+          ]
+        },
+        "source": {
+          "source_filter": "1=1",
+          "source_type": "netezza_jdbc",
+          "source_table": "SITE_PROFILE_RPT",
+          "source_schema": "EDW_PRD"
+        },
+        "version": 2,
+        "isInput": true,
+        "validator": null,
+        "validated": false,
+        "validation_date": null,
+        "enabled": true,
+        "snapshot_report": null
+      },
+      "WFA_BUSINESS_AREA": {
+        "name": "WFA_BUSINESS_AREA",
+        "job_id": "wf_WFA_TIME_SHEET_PUNCH",
+        "target": {
+          "target_type": "dbrtable",
+          "snapshot_target_schema": "nzmigration",
+          "snapshot_target_table": "WFA_BUSINESS_AREA",
+          "test_target_schema": "qa_legacy",
+          "test_target_table": "WFA_BUSINESS_AREA",
+          "validation_filter": "",
+          "primary_key": [
+            "WFA_BUSN_AREA_ID"
+          ]
+        },
+        "source": {
+          "source_filter": "1=1",
+          "source_type": "netezza_jdbc",
+          "source_table": "WFA_BUSINESS_AREA",
+          "source_schema": "EDW_PRD"
+        },
+        "version": 2,
+        "isInput": true,
+        "validator": null,
+        "validated": false,
+        "validation_date": null,
+        "enabled": true,
+        "snapshot_report": null
+      },
+      "WFA_DEPARTMENT": {
+        "name": "WFA_DEPARTMENT",
+        "job_id": "wf_WFA_TIME_SHEET_PUNCH",
+        "target": {
+          "target_type": "dbrtable",
+          "snapshot_target_schema": "nzmigration",
+          "snapshot_target_table": "WFA_DEPARTMENT",
+          "test_target_schema": "qa_legacy",
+          "test_target_table": "WFA_DEPARTMENT",
+          "validation_filter": "",
+          "primary_key": [
+            "WFA_DEPT_ID"
+          ]
+        },
+        "source": {
+          "source_filter": "1=1",
+          "source_type": "netezza_jdbc",
+          "source_table": "WFA_DEPARTMENT",
+          "source_schema": "EDW_PRD"
+        },
+        "version": 2,
+        "isInput": true,
+        "validator": null,
+        "validated": false,
+        "validation_date": null,
+        "enabled": true,
+        "snapshot_report": null
+      },
+      "WFA_TASK": {
+        "name": "WFA_TASK",
+        "job_id": "wf_WFA_TIME_SHEET_PUNCH",
+        "target": {
+          "target_type": "dbrtable",
+          "snapshot_target_schema": "nzmigration",
+          "snapshot_target_table": "WFA_TASK",
+          "test_target_schema": "qa_legacy",
+          "test_target_table": "WFA_TASK",
+          "validation_filter": "",
+          "primary_key": [
+            "WFA_TASK_ID"
+          ]
+        },
+        "source": {
+          "source_filter": "1=1",
+          "source_type": "netezza_jdbc",
+          "source_table": "WFA_TASK",
+          "source_schema": "EDW_PRD"
+        },
+        "version": 2,
+        "isInput": true,
+        "validator": null,
+        "validated": false,
+        "validation_date": null,
+        "enabled": true,
+        "snapshot_report": null
+      }
+    }
+  }

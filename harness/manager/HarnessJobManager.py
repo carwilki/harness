@@ -84,6 +84,7 @@ class HarnessJobManager:
         Takes a snapshot of the data sources and inputs.
         """
         if self.config.version <= 0:
+            self.config.version = 0
             self._logger.debug("Taking snapshot V1...")
             self._snapshot(self.snapshoters)
             self._logger.debug("V1 snapshot completed.")
@@ -100,9 +101,12 @@ class HarnessJobManager:
 
     def _snapshot(self, snapshotters: dict[str, Snapshotter]):
         for snapshotter in snapshotters.values():
-            snapshotter.snapshot()
-            self._metadataManager.update(self.config)
-            self._logger.debug(f"Snapshotted {snapshotter.config.name}")
+            if snapshotter.config.version == self.config.version:
+                snapshotter.snapshot()
+                self._metadataManager.update(self.config)
+                self._logger.debug(f"Snapshotted {snapshotter.config.name}")
+            else:
+                self._logger.info(f"skipping snapshot:{snapshotter.config.name} already taken")
 
     def validateResults(self) -> dict[str, DataFrameValidatorReport]:
         if self.config.validation_reports is None:
