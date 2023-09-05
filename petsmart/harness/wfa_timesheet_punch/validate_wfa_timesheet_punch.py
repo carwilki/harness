@@ -17,7 +17,7 @@ env = EnvConfig(
     netezza_jdbc_user=username,
     netezza_jdbc_password=password,
     netezza_jdbc_driver="org.netezza.Driver",
-    netezza_jdbc_num_part=9,
+    netezza_jdbc_num_part=18,
 )
 
 job_id = "wf_WFA_TIME_SHEET_PUNCH"
@@ -37,5 +37,6 @@ for snapshot in hjm.snapshoters.values():
         print(ret)
         snapshot.config.snapshot_report = ret
 
+hjm.updateTargetSchema()
 
 hjm.update()

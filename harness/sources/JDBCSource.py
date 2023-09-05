@@ -90,19 +90,71 @@ class NetezzaJDBCSource(AbstractSource):
         return df.repartition(50)
 
     def _convert_decimal_to_int_types(self, df):
-        for feild in df.schema.fields:
-            if isinstance(feild.dataType, DecimalType):
-                if feild.dataType.scale == 0:
-                    if 0 < feild.dataType.precision <= 2:
-                        df = df.withColumn(feild.name, col(feild.name).cast(ByteType()))
-                    elif 2 < feild.dataType.precision <= 5:
+        for field in df.schema.fields:
+            if isinstance(field.dataType, DecimalType):
+                if field.dataType.scale == 0:
+                    if 0 < field.dataType.precision <= 2:
+                        df = df.withColumn(field.name, col(field.name).cast(ByteType()))
+                    elif 2 < field.dataType.precision <= 5:
                         df = df.withColumn(
-                            feild.name, col(feild.name).cast(ShortType())
+                            field.name, col(field.name).cast(ShortType())
                         )
-                    elif 5 < feild.dataType.precision <= 9:
+                    elif 5 < field.dataType.precision <= 9:
                         df = df.withColumn(
-                            feild.name, col(feild.name).cast(IntegerType())
+                            field.name, col(field.name).cast(IntegerType())
                         )
-                    elif 10 < feild.dataType.precision <= 18:
-                        df = df.withColumn(feild.name, col(feild.name).cast(LongType()))
+                    elif 10 <= field.dataType.precision <= 18:
+                        df = df.withColumn(field.name, col(field.name).cast(LongType()))
+        return df
+
+
+class SimplifiedNetezzaJDBCSource:
+    def __init__(
+        self,
+        source_schema: str,
+        source_table: str,
+        harness_config: HarnessJobConfig,
+        session: SparkSession,
+    ):
+        self.harness_config: HarnessJobConfig = harness_config
+        self.session: SparkSession = session
+        self.source_schema: str = source_schema
+        self.source_table: str = source_table
+        
+    def read(self) -> DataFrame:
+        config = HarnessJobManagerEnvironment.getConfig()
+        SQL = f"""(select * from {self.source_schema}..{self.source_table}) as data"""
+
+        reader_options = {
+            "driver": config.get("netezza_jdbc_driver"),
+            "url": f"""{config.get("netezza_jdbc_url")}{self.source_schema};""",
+            "dbtable": f"{SQL}",
+            "fetchsize": 10000,
+            "user": config.get("netezza_jdbc_user"),
+            "password": config.get("netezza_jdbc_password"),
+            "numPartitions": config.get("netezza_jdbc_num_part"),
+        }
+
+        df = self.session.read.format("jdbc").options(**reader_options).load()
+
+        df = self._convert_decimal_to_int_types(df)
+
+        return df.repartition(50)
+
+    def _convert_decimal_to_int_types(self, df):
+        for field in df.schema.fields:
+            if isinstance(field.dataType, DecimalType):
+                if field.dataType.scale == 0:
+                    if 0 < field.dataType.precision <= 2:
+                        df = df.withColumn(field.name, col(field.name).cast(ByteType()))
+                    elif 2 < field.dataType.precision <= 5:
+                        df = df.withColumn(
+                            field.name, col(field.name).cast(ShortType())
+                        )
+                    elif 5 < field.dataType.precision <= 9:
+                        df = df.withColumn(
+                            field.name, col(field.name).cast(IntegerType())
+                        )
+                    elif 10 <= field.dataType.precision <= 18:
+                        df = df.withColumn(field.name, col(field.name).cast(LongType()))
         return df
