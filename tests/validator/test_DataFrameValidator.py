@@ -28,7 +28,7 @@ class TestDataFrameValidator:
         assert report is not None
 
     def test_can_not_validate_two_empty_dataframes(
-        self, mocker: MockFixture, spark: SparkSession, bindenv, freezer
+        self, mocker: MockFixture, spark: SparkSession
     ):
         tdf1 = spark.createDataFrame([], StructType([]))
         tdf2 = spark.createDataFrame([], StructType([]))
@@ -41,7 +41,7 @@ class TestDataFrameValidator:
         assert report == expected
 
     def test_columns_with_base_postfix_should_not_cause_errors(
-        self, faker, mocker: MockFixture, spark: SparkSession, bindenv, freezer
+        self, mocker: MockFixture, spark: SparkSession
     ):
         write = mocker.patch("pyspark.sql.DataFrame.write")
         write.return_value = mocker.MagicMock()

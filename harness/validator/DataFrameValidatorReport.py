@@ -17,5 +17,5 @@ class DataFrameValidatorReport(BaseModel):
         return DataFrameValidatorReport(
             summary="No data in master and canidate",
             table="no_data",
-            validation_date=datetime.now(),
+            validation_date=datetime.min,
         )
