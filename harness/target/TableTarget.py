@@ -113,3 +113,7 @@ class TableTarget(AbstractTarget):
         compare_final = compare.join(intersect, keys, "inner").select(compare["*"])
         base_final = base.join(intersect, keys, "inner").select(base["*"])
         return compare_final, base_final
+
+    def destroy(self):
+        for i in range(1, self.snapshot_config.version + 1):
+            self.session.sql(f"drop table if exists {self.getSnapshotTableName(i)};")

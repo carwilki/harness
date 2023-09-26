@@ -14,9 +14,8 @@ pydantic-config = "^0.1.1"
 pydantic = "^1.10.8"
 databricks-sdk = "^0.1.8"
 datacompy = { version = "^0.10.1", extras = ["spark"] }
-pyspark = "^3.4.0"
-delta-spark = "^2.4.0"
-pytest-freezegun = "^0.4.2"
+pyspark = "3.4.0"
+delta-spark = "2.4.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.3.1"
@@ -30,6 +29,7 @@ pytest-cov = "^4.1.0"
 pylint = "^2.17.4"
 graphviz = "^0.20.1"
 flake8 = "^6.0.0"
+pytest-freezegun = "^0.4.2"
 
 [tool.pytest.ini_options]
 pythonpath = [".","harness","tests"]

@@ -118,3 +118,7 @@ class Snapshotter(AbstractSnapshotter):
         df = self.source.read()
         self.target.write(df)
         self.config.version += 1
+
+    def destroy(self):
+        self._logger.debug(f"Destroying snapshotter {self.config.name}")
+        self.target.destroy()

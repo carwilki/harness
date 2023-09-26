@@ -1,7 +1,7 @@
 from datetime import datetime
 from faker import Faker
 import pytest
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession 
 from pytest_mock import MockFixture
 
 from harness.config.ValidatorConfig import ValidatorConfig
@@ -18,11 +18,8 @@ from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
 @pytest.fixture(scope="session")
 def spark():
     spark = (
-        SparkSession.builder.master("local[1]")
+        SparkSession.builder.master("local")
         .appName("local-tests")
-        .config("spark.executor.cores", "1")
-        .config("spark.executor.instances", "1")
-        .config("spark.sql.shuffle.partitions", "1")
         .config("spark.driver.bindAddress", "127.0.0.1")
         .getOrCreate()
     )

@@ -239,3 +239,9 @@ class HarnessJobManager:
 
     def update(self):
         self._metadataManager.update(self.config)
+        
+    def destroy(self):
+        for snapshotter in self.snapshoters.values():
+            snapshotter.destroy()
+            
+        self._metadataManager.delete(self.config.job_id)

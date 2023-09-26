@@ -33,3 +33,7 @@ class AbstractTarget(ABC):
     @abstractmethod
     def getSnapshotTableName(self, version: int) -> str:
         pass
+    
+    @abstractmethod
+    def destroy(self):
+        pass

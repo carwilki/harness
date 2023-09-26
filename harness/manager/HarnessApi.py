@@ -88,3 +88,7 @@ class HarnessApi:
         hjc = HarnessJobConfig(job_id=id, job_name=name, snapshots=sources)
 
         return self.createHarnessJob(hjc)
+    
+    def deleteHarnessJob(self, id: str) -> str:
+        hjm = self.getHarnessJobById(id)
+        hjm.destroy()

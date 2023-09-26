@@ -18,3 +18,7 @@ class AbstractSnapshotter(abc.ABC):
     @abc.abstractmethod
     def snapshot(self, version: int, session: SparkSession):
         pass
+    
+    @abc.abstractmethod
+    def destroy(self):
+        pass
