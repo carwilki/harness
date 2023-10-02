@@ -8,4 +8,5 @@ class TargetTypeEnum(EnumBase):
     Attributes:
         dbrtable (str): A target type that represents a database table.
     """
+
     dbrtable = "dbrtable"

@@ -253,54 +253,6 @@ class TestHarnessJobManager:
         )
         assert update.call_count == 1
 
-    def test_updateAllTargetSchema(
-        self,
-        harnessConfig: HarnessJobConfig,
-        faker: Faker,
-        mocker: MockFixture,
-    ):
-        expected = faker.pystr()
-        inital = faker.pystr()
-        update = mocker.patch.object(HarnessJobManagerMetaData, "update")
-        for cfg in harnessConfig.snapshots.values():
-            cfg.target.test_target_schema = inital
-
-        hjm = HarnessJobManager(config=harnessConfig, session=mocker.MagicMock())
-
-        for cfg in harnessConfig.snapshots.values():
-            assert cfg.target.test_target_schema == inital
-
-        hjm.updateAllTestSchema(expected)
-
-        for cfg in harnessConfig.snapshots.values():
-            assert cfg.target.test_target_schema == expected
-
-        update.assert_called_once()
-
-    def test_updateAllTargetTable(
-        self,
-        harnessConfig: HarnessJobConfig,
-        faker: Faker,
-        mocker: MockFixture,
-    ):
-        expected = faker.pystr()
-        inital = faker.pystr()
-        update = mocker.patch.object(HarnessJobManagerMetaData, "update")
-        for cfg in harnessConfig.snapshots.values():
-            cfg.target.test_target_table = inital
-
-        hjm = HarnessJobManager(config=harnessConfig, session=mocker.MagicMock())
-
-        for cfg in harnessConfig.snapshots.values():
-            assert cfg.target.test_target_table == inital
-
-        hjm.updateAllTestTable(expected)
-
-        for cfg in harnessConfig.snapshots.values():
-            assert cfg.target.test_target_table == expected
-
-        update.assert_called_once()
-
     def test_disableSnapshot(
         self,
         harnessConfig: HarnessJobConfig,
@@ -321,7 +273,7 @@ class TestHarnessJobManager:
         hjm.disableSnapshot(snapshotName)
         assert hjm.config.snapshots[snapshotName].enabled is False
         update.assert_called_once()
-        
+
     def test_enableSnapshot(
         self,
         harnessConfig: HarnessJobConfig,

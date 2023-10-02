@@ -14,6 +14,7 @@ class SourceFactory:
     A factory class for creating instances of AbstractSource subclasses based on the provided source configuration.
     """
 
+    @classmethod
     def create(
         cls,
         harness_config: HarnessJobConfig,

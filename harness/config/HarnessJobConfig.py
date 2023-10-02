@@ -19,6 +19,7 @@ class HarnessJobConfig(BaseModel):
         snapshots (dict[str, SnapshotConfig | None], optional): A dictionary of snapshot configurations for the job. Defaults to {}.
         validation_reports (dict[str, DataFrameValidatorReport | None], optional): A dictionary of validation reports for the job. Defaults to {}.
     """
+
     job_id: str
     job_name: str
     version: int = 0

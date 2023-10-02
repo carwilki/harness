@@ -16,15 +16,7 @@ class Snapshotter(AbstractSnapshotter):
         self, config: SnapshotConfig, source: AbstractSource, target: AbstractTarget
     ) -> None:
         super().__init__(config=config, source=source, target=target)
-
         self._logger = getLogger()
-        if self.config.validator is not None:
-            self._validator = DataFrameValidator(self.config.validator)
-        else:
-            self._validator = None
-            self._logger.debug(
-                f"No validator configured for snapshotter {self.config.name}"
-            )
 
     def setupTestData(self):
         """
@@ -45,20 +37,6 @@ class Snapshotter(AbstractSnapshotter):
             self._logger.debug(
                 f"Skipping setupTestData for snapshotter {self.config.name}:Not Enabled"
             )
-
-    def validateResults(self) -> DataFrameValidatorReport | None:
-        """
-            validates the results of the snapshotter
-        Raises:
-            ValueError: will be raised if the snapshotter version is not 2
-        """
-        if self.config.enabled and not self.config.isInput:
-            return self.target.validate_results()
-
-        self._logger.debug(
-            f"Skipping validation for snapshotter {self.config.name}: Enabled:{self.config.enabled}, isInput:{self.config.isInput}"
-        )
-        return None
 
     def updateDevTargetSchema(self, schema: str):
         """

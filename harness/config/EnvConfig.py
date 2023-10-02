@@ -23,6 +23,7 @@ class EnvConfig(BaseModel):
         databricks_jdbc_user (Optional[str]): The username for Databricks.
         databricks_jdbc_pat (Optional[str]): The personal access token for Databricks.
     """
+
     workspace_url: str
     workspace_token: str
     metadata_schema: str

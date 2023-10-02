@@ -21,7 +21,6 @@ class TestSnapshotter:
         assert sut.config == config
         assert sut.source == source
         assert sut.target == target
-        assert sut._validator is None
         source.assert_not_called()
         target.assert_not_called()
 

@@ -18,9 +18,9 @@ class AbstractSnapshotter(abc.ABC):
     def __init__(
         self, config: SnapshotConfig, source: AbstractSource, target: AbstractTarget
     ) -> None:
-        self.config = config
-        self.source = source
-        self.target = target
+        self.config: SnapshotConfig = config
+        self.source: AbstractSource = source
+        self.target: AbstractTarget = target
 
     @abc.abstractmethod
     def snapshot(self, version: int, session: SparkSession):

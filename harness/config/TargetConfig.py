@@ -9,6 +9,7 @@ class TargetConfig(BaseModel, abc.ABC):
     """
     Base class for all target configurations.
     """
+
     target_type: TargetTypeEnum
 
     @classmethod

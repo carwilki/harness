@@ -184,13 +184,6 @@ class HarnessJobManager:
         snapshotter = self.snapshoters[snapshotName]
 
         if snapshotter is not None:
-            snapshotter.updateSnapshotTargetSchema(schema)
-            self._metadataManager.update(self.config)
-        else:
-            raise ValueError(f"Snapshot {snapshotName} does not exist")
-        snapshotter = self.snapshoters[snapshotName]
-
-        if snapshotter is not None:
             snapshotter.updateSnapshotSchema(schema)
             self._metadataManager.update(self.config)
         else:

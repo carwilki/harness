@@ -137,6 +137,5 @@ class HarnessApi:
         Returns:
             str: a message describing the result of the delete.
         """
-        return self._metadataManager.deleteJob(id)
         hjm = self.getHarnessJobById(id)
         hjm.destroy()

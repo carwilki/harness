@@ -1,22 +1,10 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
-from pydantic import validator as pydantic_validator
+from pydantic import BaseModel, validator
 
-from harness.config.SourceConfig import SourceConfig
-from harness.config.TargetConfig import TargetConfig
-from harness.config.ValidatorConfig import ValidatorConfig
 from harness.sources.SourceConfig import JDBCSourceConfig
 from harness.target.TableTargetConfig import TableTargetConfig
-
-
-from datetime import datetime
-from typing import Optional
-from pydantic import BaseModel, validator
-from harness.config.TargetConfig import TableTargetConfig
-from harness.config.SourceConfig import JDBCSourceConfig
-from harness.config.ValidatorConfig import ValidatorConfig
 
 
 class SnapshotConfig(BaseModel):
@@ -35,8 +23,6 @@ class SnapshotConfig(BaseModel):
     :type version: int, optional
     :param isInput: Whether the snapshot is an input.
     :type isInput: bool, optional
-    :param validator: Validator configuration.
-    :type validator: ValidatorConfig, optional
     :param validated: Whether the snapshot is validated.
     :type validated: bool, optional
     :param validation_date: Date of validation.
@@ -53,7 +39,6 @@ class SnapshotConfig(BaseModel):
     source: JDBCSourceConfig = None
     version: int = 0
     isInput: bool | None = False
-    validator: Optional[ValidatorConfig] = None
     validated: bool = False
     validation_date: Optional[datetime] = None
     enabled: bool = True

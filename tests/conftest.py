@@ -6,7 +6,7 @@ from pytest_mock import MockFixture
 
 from harness.config.ValidatorConfig import ValidatorConfig
 from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
-from harness.target.TableTargetConfig import TableTargetConfig
+from harness.target.TableTarget import TableTargetConfig
 from utils.generator import (
     generate_env_config,
     generate_jdbc_source_config,
