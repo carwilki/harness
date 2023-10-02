@@ -8,6 +8,17 @@ from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
 
 
 class HarnessJobConfig(BaseModel):
+    """
+    A configuration object representing a job in Harness.
+
+    Attributes:
+        job_id (str): The ID of the job.
+        job_name (str): The name of the job.
+        version (int, optional): The version of the job. Defaults to 0.
+        testrunner (Optional[TestRunnerConfig], optional): The test runner configuration for the job. Defaults to None.
+        snapshots (dict[str, SnapshotConfig | None], optional): A dictionary of snapshot configurations for the job. Defaults to {}.
+        validation_reports (dict[str, DataFrameValidatorReport | None], optional): A dictionary of validation reports for the job. Defaults to {}.
+    """
     job_id: str
     job_name: str
     version: int = 0
