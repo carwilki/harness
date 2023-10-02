@@ -10,7 +10,10 @@ from harness.sources.SourceConfig import JDBCSourceConfig
 
 
 class SourceFactory:
-    @classmethod
+    """
+    A factory class for creating instances of AbstractSource subclasses based on the provided source configuration.
+    """
+
     def create(
         cls,
         harness_config: HarnessJobConfig,
@@ -18,6 +21,18 @@ class SourceFactory:
         source_config: SourceConfig,
         session: SparkSession,
     ) -> AbstractSource:
+        """
+        Creates an instance of AbstractSource based on the provided source configuration.
+
+        Args:
+            harness_config (HarnessJobConfig): The Harness job configuration.
+            snapshot_config (SnapshotConfig): The snapshot configuration.
+            source_config (SourceConfig): The source configuration.
+            session (SparkSession): The Spark session.
+
+        Returns:
+            AbstractSource: An instance of AbstractSource.
+        """
         match source_config.source_type:
             case SourceTypeEnum.netezza_jdbc:
                 assert isinstance(source_config, JDBCSourceConfig)

@@ -8,7 +8,6 @@ from harness.snaphotter.Snapshotter import Snapshotter
 from harness.snaphotter.SnapshotterFactory import SnapshotterFactory
 from harness.target.TableTargetConfig import TableTargetConfig
 from harness.utils.logger import getLogger
-from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
 
 
 class HarnessJobManager:
@@ -100,57 +99,95 @@ class HarnessJobManager:
             self._logger.debug("Snapshot already completed, skipping...")
 
     def _snapshot(self, snapshotters: dict[str, Snapshotter]):
+        """
+            internal method to take a snapshot of the data sources and inputs.
+        Args:
+            snapshotters (dict[str, Snapshotter]): Dictionary of Snapshotter objects
+        """
         for snapshotter in snapshotters.values():
             if snapshotter.config.version == self.config.version:
                 snapshotter.snapshot()
                 self._metadataManager.update(self.config)
                 self._logger.debug(f"Snapshotted {snapshotter.config.name}")
             else:
-                self._logger.info(f"skipping snapshot:{snapshotter.config.name} already taken")
+                self._logger.info(
+                    f"skipping snapshot:{snapshotter.config.name} already taken"
+                )
 
-    def validateResults(self) -> dict[str, DataFrameValidatorReport]:
-        if self.config.validation_reports is None:
-            self.config.validation_reports = {}
-
-        for snapshotter in self.snapshoters.values():
-            validation_report = snapshotter.validateResults()
-            self.config.validation_reports[snapshotter.config.name] = validation_report
-
-        self._metadataManager.update(self.config)
-
-        return self.config.validation_reports
-
-    def updateAllTargetSchema(self, schema: str):
-        for snapshotter in self.snapshoters.values():
-            snapshotter.updateTargetSchema(schema)
-
-        self._metadataManager.update(self.config)
-
-    def updateAllTargetTable(self, table: str):
-        for snapshotter in self.snapshoters.values():
-            snapshotter.updateTargetTable(table)
-
-        self._metadataManager.update(self.config)
-
-    def updateTargetSchema(self, snapshotName: str, schema: str):
+    def updateTestSchema(self, snapshotName: str, schema: str):
+        """
+        Updates the test schema for a given snapshot.
+        Args:
+            snapshotName (str): The name of the snapshot
+            schema (str): The schema of the snapshot
+        """
         snapshotter = self.snapshoters[snapshotName]
 
         if snapshotter is not None:
-            snapshotter.updateTargetSchema(schema)
+            snapshotter.updateTestTargetSchema(schema)
             self._metadataManager.update(self.config)
         else:
             raise ValueError(f"Snapshot {snapshotName} does not exist")
 
-    def updateTargetTable(self, snapshotName: str, table: str):
+    def updateTestTable(self, snapshotName: str, table: str):
+        """
+        Updates the test table for a given snapshot.
+        Args:
+            snapshotName (str): The name of the snapshot
+            table (str): The table of the snapshot
+        """
         snapshotter = self.snapshoters[snapshotName]
 
         if snapshotter is not None:
-            snapshotter.updateTargetTable(table)
+            snapshotter.updateTestTargetTable(table)
+            self._metadataManager.update(self.config)
+        else:
+            raise ValueError(f"Snapshot {snapshotName} does not exist")
+
+    def updateDevSchema(self, snapshotName: str, schema: str):
+        """
+        Updates the dev schema for a given snapshot.
+        Args:
+            snapshotName (str): The name of the snapshot
+            schema (str): The schema of the snapshot
+        """
+        snapshotter = self.snapshoters[snapshotName]
+
+        if snapshotter is not None:
+            snapshotter.updateDevTargetSchema(schema)
+            self._metadataManager.update(self.config)
+        else:
+            raise ValueError(f"Snapshot {snapshotName} does not exist")
+
+    def updateDevTable(self, snapshotName: str, table: str):
+        """
+        Updates the dev table for a given snapshot.
+        Args:
+            snapshotName (str): The name of the snapshot
+            table (str): The table of the snapshot
+        """
+        snapshotter = self.snapshoters[snapshotName]
+
+        if snapshotter is not None:
+            snapshotter.updateDevTargetTable(table)
             self._metadataManager.update(self.config)
         else:
             raise ValueError(f"Snapshot {snapshotName} does not exist")
 
     def updateSnapshotSchema(self, snapshotName: str, schema: str):
+        """
+        Updates the snapshot schema for a given snapshot.
+        Args:
+            snapshotName (str): The name of the snapshot
+            schema (str): The schema of the snapshot
+        """
+        snapshotter = self.snapshoters[snapshotName]
+
+        if snapshotter is not None:
+            snapshotter.updateSnapshotTargetSchema(schema)
+            self._metadataManager.update(self.config)
+        else:
+            raise ValueError(f"Snapshot {snapshotName} does not exist")
         snapshotter = self.snapshoters[snapshotName]
 
         if snapshotter is not None:
@@ -160,6 +197,12 @@ class HarnessJobManager:
             raise ValueError(f"Snapshot {snapshotName} does not exist")
 
     def updateSnapshotTable(self, snapshotName: str, table: str):
+        """
+        Updates the snapshot table for a given snapshot.
+        Args:
+            snapshotName (str): The name of the snapshot
+            table (str): The table of the snapshot
+        """
         snapshotter = self.snapshoters[snapshotName]
 
         if snapshotter is not None:
@@ -169,6 +212,11 @@ class HarnessJobManager:
             raise ValueError(f"Snapshot {snapshotName} does not exist")
 
     def disableSnapshot(self, snapshotName: str):
+        """
+        Disables a snapshot
+        Args:
+            snapshotName (str): The name of the snapshot
+        """
         snapshotter = self.snapshoters[snapshotName]
 
         if snapshotter is not None:
@@ -178,6 +226,11 @@ class HarnessJobManager:
             raise ValueError(f"Snapshot {snapshotName} does not exist")
 
     def enableSnapshot(self, snapshotName: str):
+        """
+        Enables a snapshot
+        Args:
+            snapshotName (str): The name of the snapshot
+        """
         snapshotter = self.snapshoters[snapshotName]
 
         if snapshotter is not None:
@@ -186,46 +239,14 @@ class HarnessJobManager:
         else:
             raise ValueError(f"Snapshot {snapshotName} does not exist")
 
-    def cleanupValidationReports(self) -> str:
-        clean_up = self._metadataManager.cleanupValidationReports(self.config.job_name)
-        self._logger.debug(f"Cleaned up validation reports: {clean_up}")
-        return clean_up
-
-    def markInputsSnapshots(self, names: list[str]):
-        for name in names:
-            snapshotter = self.snapshoters.get(name)
-            if snapshotter is not None:
-                snapshotter.markAsInput()
-
-        self._metadataManager.update(self.config)
-
-    def updateValidaitonFilter(self, snapshotName: str, filter: str):
-        ss = self.snapshoters.get(snapshotName)
-        ss.updateValidaitonFilter(filter)
-        self._metadataManager.update(self.config)
-
-    def updateAllValidationFilters(self, filter: str):
-        for ss in self.snapshoters.values():
-            ss.updateValidaitonFilter(filter)
-        self._metadataManager.update(self.config)
-
-    def runSingleValidation(self, snapshotName: str) -> DataFrameValidatorReport:
-        ss = self.snapshoters.get(snapshotName)
-        if ss is not None:
-            report = ss.validateResults()
-            self.config.validation_reports[snapshotName] = report
-            return report
-        else:
-            raise ValueError(f"Snapshot {snapshotName} does not exist")
-
-    def getReport(self, snapshotName) -> DataFrameValidatorReport:
-        ss = self.config.validation_reports[snapshotName]
-        if ss is not None:
-            return ss
-        else:
-            raise ValueError(f"Snapshot {snapshotName} does not exist")
-
     def getTargetConfigForSnapshot(self, snapshotName: str) -> TableTargetConfig:
+        """
+        Returns the target config for a given snapshot
+        Args:
+            snapshotName (str): The name of the snapshot
+        Returns:
+            TableTargetConfig: The target config for the snapshot
+        """
         ss = self.config.snapshots.get(snapshotName)
         if ss is not None:
             return ss.target
@@ -233,15 +254,32 @@ class HarnessJobManager:
             raise ValueError(f"Snapshot {snapshotName} does not exist")
 
     def getSnapshotTable(self, snapshotName: str, version: int) -> str:
+        """
+        Returns the table name for a given snapshot
+        Args:
+            snapshotName (str): The name of the snapshot
+            version (int): The version of the snapshot
+        Returns:
+            str: The table name for the snapshot
+        """
         ss = self.snapshoters.get(snapshotName)
         if ss is not None:
             return ss.target.getSnapshotTableName(version)
 
     def update(self):
+        """
+        Updates the metadata for the job
+        """
+        self._logger.debug("Updating metadata...")
         self._metadataManager.update(self.config)
-        
+        self._logger.debug("Metadata updated.")
+
     def destroy(self):
+        """
+        Destroys the job manager
+        """
+        self._logger.debug("Destroying metadata...")
         for snapshotter in self.snapshoters.values():
             snapshotter.destroy()
-            
+
         self._metadataManager.delete(self.config.job_id)

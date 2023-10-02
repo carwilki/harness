@@ -10,7 +10,7 @@ from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
 from harness.snaphotter.Snapshotter import Snapshotter
 from harness.sources.JDBCSource import NetezzaJDBCSource
 from harness.sources.SourceConfig import JDBCSourceConfig
-from harness.target.TableTarget import TableTarget
+from harness.target.TableTarget import DeltaTableTarget
 from harness.target.TableTargetConfig import TableTargetConfig
 from utils.generator import (
     generate_env_config,
@@ -72,7 +72,7 @@ class TestHarnessJobManager:
         config.version = 0
         session = mocker.MagicMock()
         read = mocker.patch.object(NetezzaJDBCSource, "read")
-        write = mocker.patch.object(TableTarget, "write")
+        write = mocker.patch.object(DeltaTableTarget, "write")
         update = mocker.patch.object(HarnessJobManagerMetaData, "update")
         read.return_value(spark.createDataFrame([{"a": 1}]))
         write.return_value(True)
@@ -92,7 +92,7 @@ class TestHarnessJobManager:
         session = mocker.MagicMock()
         update = mocker.patch.object(HarnessJobManagerMetaData, "update")
         read = mocker.patch.object(NetezzaJDBCSource, "read")
-        write = mocker.patch.object(TableTarget, "write")
+        write = mocker.patch.object(DeltaTableTarget, "write")
         read.return_value(spark.createDataFrame([{"a": 1}]))
         write.return_value(True)
         manager = HarnessJobManager(config=config, session=session)
@@ -113,7 +113,7 @@ class TestHarnessJobManager:
         update = mocker.patch.object(HarnessJobManagerMetaData, "update")
         session = mocker.MagicMock()
         read = mocker.patch.object(NetezzaJDBCSource, "read")
-        write = mocker.patch.object(TableTarget, "write")
+        write = mocker.patch.object(DeltaTableTarget, "write")
         read.return_value(spark.createDataFrame([{"a": 1}]))
         write.return_value(True)
         manager = HarnessJobManager(config=config, session=session)
@@ -174,7 +174,7 @@ class TestHarnessJobManager:
         )
         hjm = HarnessJobManager(config=harnessConfig, session=mocker.MagicMock())
         assert hjm.config.snapshots[snapshotName].target.test_target_schema == inital
-        hjm.updateTargetSchema(snapshotName, expected)
+        hjm.updateTestSchema(snapshotName, expected)
         assert hjm.config.snapshots[snapshotName].target.test_target_schema == expected
         assert update.call_count == 1
 
@@ -198,7 +198,7 @@ class TestHarnessJobManager:
         hjm = HarnessJobManager(config=harnessConfig, session=mocker.MagicMock())
 
         assert hjm.config.snapshots[snapshotName].target.test_target_table == inital
-        hjm.updateTargetTable(snapshotName, expected)
+        hjm.updateTestTable(snapshotName, expected)
         assert hjm.config.snapshots[snapshotName].target.test_target_table == expected
         assert update.call_count == 1
 
@@ -270,7 +270,7 @@ class TestHarnessJobManager:
         for cfg in harnessConfig.snapshots.values():
             assert cfg.target.test_target_schema == inital
 
-        hjm.updateAllTargetSchema(expected)
+        hjm.updateAllTestSchema(expected)
 
         for cfg in harnessConfig.snapshots.values():
             assert cfg.target.test_target_schema == expected
@@ -294,7 +294,7 @@ class TestHarnessJobManager:
         for cfg in harnessConfig.snapshots.values():
             assert cfg.target.test_target_table == inital
 
-        hjm.updateAllTargetTable(expected)
+        hjm.updateAllTestTable(expected)
 
         for cfg in harnessConfig.snapshots.values():
             assert cfg.target.test_target_table == expected

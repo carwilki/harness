@@ -7,6 +7,11 @@ from harness.config.SnapshotConfig import SnapshotConfig
 
 
 class AbstractSource(abc.ABC):
+    """
+    Abstract base class for data sources in Harness. All data sources should inherit from this class and implement the
+    `read` method.
+    """
+
     def __init__(
         self,
         harness_config: HarnessJobConfig,
@@ -20,4 +25,7 @@ class AbstractSource(abc.ABC):
 
     @abc.abstractmethod
     def read(self) -> DataFrame:
+        """
+        Reads data from the source and returns it as a pandas DataFrame.
+        """
         pass

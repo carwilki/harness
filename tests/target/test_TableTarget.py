@@ -4,7 +4,7 @@ from pytest_mock import MockFixture
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
 
-from harness.target.TableTarget import TableTarget
+from harness.target.TableTarget import DeltaTableTarget
 from harness.target.TableTargetConfig import TableTargetConfig
 from harness.validator.DataFrameValidator import DataFrameValidator
 from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
@@ -22,7 +22,7 @@ class TestTableTarget:
     ):
         session: SparkSession = mocker.MagicMock()
 
-        target = TableTarget(
+        target = DeltaTableTarget(
             harness_job_config=harnessConfig,
             snapshot_config=snapshotConfig,
             table_config=tableTargetConfig,
@@ -54,7 +54,7 @@ class TestTableTarget:
         session = mocker.MagicMock()
         session.catalog.tableExists.return_value = False
 
-        target = TableTarget(
+        target = DeltaTableTarget(
             harness_job_config=harnessConfig,
             snapshot_config=snapshotConfig,
             table_config=tableTargetConfig,
@@ -79,7 +79,7 @@ class TestTableTarget:
         session = mocker.MagicMock()
         session.catalog.tableExists.return_value = True
 
-        target = TableTarget(
+        target = DeltaTableTarget(
             harness_job_config=harnessConfig,
             snapshot_config=snapshotConfig,
             table_config=tableTargetConfig,
@@ -103,7 +103,7 @@ class TestTableTarget:
         session = mocker.MagicMock()
         session.catalog.tableExists.return_value = True
 
-        target = TableTarget(
+        target = DeltaTableTarget(
             harness_job_config=harnessConfig,
             snapshot_config=snapshotConfig,
             table_config=tableTargetConfig,
@@ -127,7 +127,7 @@ class TestTableTarget:
         session = mocker.MagicMock()
         session.catalog.tableExists.return_value = False
 
-        target = TableTarget(
+        target = DeltaTableTarget(
             harness_job_config=harnessConfig,
             snapshot_config=snapshotConfig,
             table_config=tableTargetConfig,
@@ -138,30 +138,3 @@ class TestTableTarget:
 
         assert target.session.catalog.tableExists.call_count == 1
         assert target.session.sql.call_count == 1
-
-    def test_can_validate(
-        self,
-        mocker: MockFixture,
-        faker: Faker,
-        harnessConfig: HarnessJobConfig,
-        snapshotConfig: SnapshotConfig,
-        tableTargetConfig: TableTargetConfig,
-        validatorReport: DataFrameValidatorReport,
-        bindenv,
-    ):
-        session = mocker.MagicMock()
-
-        validateDf = mocker.patch.object(DataFrameValidator, "validateDF")
-        validateDf.return_value = validatorReport
-
-        target = TableTarget(
-            harness_job_config=harnessConfig,
-            snapshot_config=snapshotConfig,
-            table_config=tableTargetConfig,
-            session=session,
-        )
-
-        target.validate_results()
-
-        assert target.session.sql.call_count == 2
-        assert validateDf.call_count == 1

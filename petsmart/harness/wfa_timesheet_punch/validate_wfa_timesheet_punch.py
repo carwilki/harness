@@ -37,6 +37,6 @@ for snapshot in hjm.snapshoters.values():
         print(ret)
         snapshot.config.snapshot_report = ret
 
-hjm.updateTargetSchema()
+hjm.updateTestSchema()
 
 hjm.update()

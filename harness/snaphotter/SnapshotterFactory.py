@@ -59,6 +59,18 @@ class SnapshotterFactory:
         source_config: SourceConfig,
         session: SparkSession,
     ) -> AbstractSource:
+        """
+        Creates a source object based on the given configuration parameters.
+
+        Args:
+            harness_config (HarnessJobConfig): The configuration for the Harness job.
+            snapshot_config (SnapshotConfig): The configuration for the snapshot.
+            source_config (SourceConfig): The configuration for the source.
+            session (SparkSession): The Spark session to use.
+
+        Returns:
+            AbstractSource: The created source object.
+        """
         return SourceFactory.create(
             harness_config=harness_config,
             snapshot_config=snapshot_config,
@@ -74,6 +86,18 @@ class SnapshotterFactory:
         config: TargetConfig,
         session: SparkSession,
     ) -> AbstractTarget:
+        """
+        Creates a target object using the given configurations and SparkSession.
+
+        Args:
+            harness_config (HarnessJobConfig): The configuration for the Harness job.
+            snapshot_config (SnapshotConfig): The configuration for the snapshot.
+            config (TargetConfig): The configuration for the target.
+            session (SparkSession): The SparkSession to use for creating the target.
+
+        Returns:
+            AbstractTarget: The created target object.
+        """
         return TargetFactory.create(
             session=session,
             harness_config=harness_config,

@@ -10,6 +10,19 @@ from harness.sources.SourceConfig import JDBCSourceConfig
 
 
 class DatabricksJDBCSource(AbstractSource):
+    """
+    A class used to read data from a Databricks JDBC source.
+
+    Attributes:
+        harness_config (HarnessJobConfig): The Harness job configuration.
+        snapshot_config (SnapshotConfig): The snapshot configuration.
+        config (JDBCSourceConfig): The JDBC source configuration.
+        session (SparkSession): The Spark session.
+
+    Methods:
+        read(): Reads data from the Databricks JDBC source and returns a DataFrame.
+    """
+
     def __init__(
         self,
         harness_config: HarnessJobConfig,
@@ -25,6 +38,12 @@ class DatabricksJDBCSource(AbstractSource):
         self.config: JDBCSourceConfig = config
 
     def read(self) -> DataFrame:
+        """
+        Reads data from a JDBC source table and returns it as a DataFrame.
+
+        Returns:
+            DataFrame: A DataFrame containing the data from the JDBC source table.
+        """
         config = HarnessJobManagerEnvironment.getConfig()
         SQL = (
             f"""Select * from {self.config.source_schema}.{self.config.source_table}"""
@@ -48,6 +67,23 @@ class DatabricksJDBCSource(AbstractSource):
 
 
 class NetezzaJDBCSource(AbstractSource):
+    """
+    A class representing a Netezza JDBC source for reading data into a Spark DataFrame.
+
+    Args:
+        harness_config (HarnessJobConfig): The Harness job configuration.
+        snapshot_config (SnapshotConfig): The snapshot configuration.
+        config (JDBCSourceConfig): The JDBC source configuration.
+        session (SparkSession): The Spark session.
+
+    Attributes:
+        config (JDBCSourceConfig): The JDBC source configuration.
+
+    Methods:
+        read(): Reads data from the Netezza JDBC source into a Spark DataFrame.
+        _convert_decimal_to_int_types(df): Converts decimal types to integer types in the given DataFrame.
+    """
+
     def __init__(
         self,
         harness_config: HarnessJobConfig,
@@ -63,6 +99,12 @@ class NetezzaJDBCSource(AbstractSource):
         self.config: JDBCSourceConfig = config
 
     def read(self) -> DataFrame:
+        """
+        Reads data from a JDBC source table and returns it as a DataFrame.
+
+        Returns:
+            DataFrame: A DataFrame containing the data from the JDBC source table.
+        """
         config = HarnessJobManagerEnvironment.getConfig()
         SQL = (
             f"""Select * from {self.config.source_schema}.{self.config.source_table}"""
@@ -76,58 +118,6 @@ class NetezzaJDBCSource(AbstractSource):
         reader_options = {
             "driver": config.get("netezza_jdbc_driver"),
             "url": f"""{config.get("netezza_jdbc_url")}{self.config.source_schema};""",
-            "dbtable": f"{SQL}",
-            "fetchsize": 10000,
-            "user": config.get("netezza_jdbc_user"),
-            "password": config.get("netezza_jdbc_password"),
-            "numPartitions": config.get("netezza_jdbc_num_part"),
-        }
-
-        df = self.session.read.format("jdbc").options(**reader_options).load()
-
-        df = self._convert_decimal_to_int_types(df)
-
-        return df.repartition(50)
-
-    def _convert_decimal_to_int_types(self, df):
-        for field in df.schema.fields:
-            if isinstance(field.dataType, DecimalType):
-                if field.dataType.scale == 0:
-                    if 0 < field.dataType.precision <= 2:
-                        df = df.withColumn(field.name, col(field.name).cast(ByteType()))
-                    elif 2 < field.dataType.precision <= 5:
-                        df = df.withColumn(
-                            field.name, col(field.name).cast(ShortType())
-                        )
-                    elif 5 < field.dataType.precision <= 9:
-                        df = df.withColumn(
-                            field.name, col(field.name).cast(IntegerType())
-                        )
-                    elif 10 <= field.dataType.precision <= 18:
-                        df = df.withColumn(field.name, col(field.name).cast(LongType()))
-        return df
-
-
-class SimplifiedNetezzaJDBCSource:
-    def __init__(
-        self,
-        source_schema: str,
-        source_table: str,
-        harness_config: HarnessJobConfig,
-        session: SparkSession,
-    ):
-        self.harness_config: HarnessJobConfig = harness_config
-        self.session: SparkSession = session
-        self.source_schema: str = source_schema
-        self.source_table: str = source_table
-        
-    def read(self) -> DataFrame:
-        config = HarnessJobManagerEnvironment.getConfig()
-        SQL = f"""(select * from {self.source_schema}..{self.source_table}) as data"""
-
-        reader_options = {
-            "driver": config.get("netezza_jdbc_driver"),
-            "url": f"""{config.get("netezza_jdbc_url")}{self.source_schema};""",
             "dbtable": f"{SQL}",
             "fetchsize": 10000,
             "user": config.get("netezza_jdbc_user"),

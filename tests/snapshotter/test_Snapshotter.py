@@ -71,7 +71,7 @@ class TestSnapshotter:
         target = mocker.MagicMock()
         sut = Snapshotter(config=snapshotConfig, source=source, target=target)
         assert sut.config.target.test_target_schema == "test_target_schema"
-        sut.updateTargetSchema("new_target_schema")
+        sut.updateTestTargetSchema("new_target_schema")
         assert sut.config.target.test_target_schema == "new_target_schema"
 
     def test_updateTargetTable(
@@ -84,7 +84,7 @@ class TestSnapshotter:
         target = mocker.MagicMock()
         sut = Snapshotter(config=snapshotConfig, source=source, target=target)
         assert sut.config.target.test_target_table == initial_value
-        sut.updateTargetTable(expected_value)
+        sut.updateTestTargetTable(expected_value)
         assert sut.config.target.test_target_table == expected_value
 
     def test_updateSnapshotSchema(
@@ -110,5 +110,5 @@ class TestSnapshotter:
         target = mocker.MagicMock()
         sut = Snapshotter(config=snapshotConfig, source=source, target=target)
         assert sut.config.target.test_target_table == initial_value
-        sut.updateTargetTable(expected_value)
+        sut.updateTestTargetTable(expected_value)
         assert sut.config.target.test_target_table == expected_value

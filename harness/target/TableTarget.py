@@ -7,10 +7,13 @@ from harness.config.SnapshotConfig import SnapshotConfig
 from harness.target.AbstractTarget import AbstractTarget
 from harness.target.TableTargetConfig import TableTargetConfig
 from harness.utils.logger import getLogger
-from harness.validator.DataFrameValidator import DataFrameValidator
 
 
-class TableTarget(AbstractTarget):
+class DeltaTableTarget(AbstractTarget):
+    """
+    Represents a Delta table target. Takes data from a datafram and write it to its target table.
+    """
+
     def __init__(
         self,
         harness_job_config: HarnessJobConfig,
@@ -18,6 +21,17 @@ class TableTarget(AbstractTarget):
         table_config: TableTargetConfig,
         session: SparkSession,
     ):
+        """
+            Builds Delta table target.
+        Args:
+            harness_job_config (HarnessJobConfig): the job configuration
+            snapshot_config (SnapshotConfig): snapshot configuration
+            table_config (TableTargetConfig): Target table configuration
+            session (SparkSession): spark session to use to perfrom spark operations
+
+        Raises:
+            Exception: If no schema or table name is provided.
+        """
         super().__init__(
             harness_job_config=harness_job_config,
             snapshot_config=snapshot_config,
@@ -32,9 +46,14 @@ class TableTarget(AbstractTarget):
             raise Exception("Table name is required")
 
     def getSnapshotTableName(self, version: int) -> str:
-        return f"{self.table_config.snapshot_target_schema}.{self.harness_job_config.job_name}_{self.table_config.snapshot_target_table}_V{version}"
+        """Gets the name of the snapshot table."""
+
+        return f"""{self.table_config.snapshot_target_schema}.{self.harness_job_config.job_name}_{self.table_config.snapshot_target_table}_V{version}"""
 
     def write(self, df: DataFrame):
+        """ "
+        writes the data from the dataframe into the target table
+        """
         temptable = f"{str(uuid4()).replace('-','')}_data"
         df.createOrReplaceTempView(temptable)
         table = self.getSnapshotTableName(self.snapshot_config.version + 1)
@@ -49,12 +68,38 @@ class TableTarget(AbstractTarget):
             self.session.sql(f"truncate table {table}")
             self.session.sql(f"insert into {table} select * from {temptable}")
 
+    def setup_dev_target(self):
+        """
+        Sets up the target table for development.
+        """
+        catalog = self.session.catalog
+        ts = self.table_config.dev_target_schema
+        tt = self.table_config.dev_target_table
+        ss = self.table_config.snapshot_target_schema
+        st = f"{self.harness_job_config.job_name}_{self.table_config.snapshot_target_table}"
+        self.setup_data(catalog, ts, tt, ss, st)
+
     def setup_test_target(self):
+        """
+        Sets up the target table for testing.
+        """
         catalog = self.session.catalog
         ts = self.table_config.test_target_schema
         tt = self.table_config.test_target_table
         ss = self.table_config.snapshot_target_schema
         st = f"{self.harness_job_config.job_name}_{self.table_config.snapshot_target_table}"
+        self.setup_data(catalog, ts, tt, ss, st)
+
+    def setup_data(self, catalog, ts: str, tt: str, ss: str, st: str):
+        """
+            performs the setup opertations to configure a table with new data for test or development.
+        Args:
+            catalog (_type_): _description_
+            ts : the schema to put the data into
+            tt : the table to put the data into
+            ss : the source schema from the testing data database where the source data is stored
+            st : the source table from the testing data database where the source data is stored
+        """
         if catalog.tableExists(
             f"{self.table_config.test_target_schema}.{self.table_config.test_target_table}"
         ):
@@ -75,45 +120,7 @@ class TableTarget(AbstractTarget):
                     f"create table {ts}.{tt} as select * from {ss}.{st}_V1"
                 )
 
-    def validate_results(self):
-        ts = self.table_config.test_target_schema
-        tt = self.table_config.test_target_table
-        ss = self.table_config.snapshot_target_schema
-        st = self.table_config.snapshot_target_table
-        v2 = self.session.sql(
-            f"select * from {self.getSnapshotTableName(2)} where {self.table_config.validation_filter}"
-        )
-
-        validator = DataFrameValidator()
-        refine_q = (
-            f"select * from {ts}.{tt} where {self.table_config.validation_filter}"
-        )
-        self.logger.debug(f"refine query: {refine_q}")
-
-        compare = self.session.sql(refine_q)
-        base = v2
-
-        self.logger.info(f"Validating results in {ts}.{tt} againsts {ss}.{st}")
-
-        return validator.validateDF(
-            f"{self.harness_job_config.job_name}_{tt}",
-            compare,
-            base,
-            self.table_config.primary_key,
-            self.session,
-        )
-
-    def _only_what_is_shared(
-        self, compare: DataFrame, base: DataFrame
-    ) -> (DataFrame, DataFrame):
-        keys = self.table_config.primary_key
-        compare_keys = compare.select(keys)
-        base_keys = base.select(keys)
-        intersect = compare_keys.intersect(base_keys)
-        compare_final = compare.join(intersect, keys, "inner").select(compare["*"])
-        base_final = base.join(intersect, keys, "inner").select(base["*"])
-        return compare_final, base_final
-
     def destroy(self):
+        """destroys all of the source data. does not delete the target table(s)"""
         for i in range(1, self.snapshot_config.version + 1):
             self.session.sql(f"drop table if exists {self.getSnapshotTableName(i)};")
