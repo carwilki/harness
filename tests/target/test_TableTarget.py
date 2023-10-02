@@ -1,13 +1,12 @@
 from faker import Faker
 from pyspark.sql import SparkSession
 from pytest_mock import MockFixture
+from harness.config.EnvironmentEnum import EnvironmentEnum
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
 
 from harness.target.TableTarget import DeltaTableTarget
 from harness.target.TableTargetConfig import TableTargetConfig
-from harness.validator.DataFrameValidator import DataFrameValidator
-from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
 
 
 class TestTableTarget:
@@ -102,7 +101,9 @@ class TestTableTarget:
     ):
         session = mocker.MagicMock()
         session.catalog.tableExists.return_value = True
-
+        tableTargetConfig.test_target_schema = (
+            "QA_" + tableTargetConfig.test_target_schema
+        )
         target = DeltaTableTarget(
             harness_job_config=harnessConfig,
             snapshot_config=snapshotConfig,
@@ -110,7 +111,7 @@ class TestTableTarget:
             session=session,
         )
 
-        target.setup_test_target()
+        target.setupDataForEnv(EnvironmentEnum.QA)
 
         assert target.session.catalog.tableExists.call_count == 1
         assert target.session.sql.call_count == 2
@@ -126,7 +127,9 @@ class TestTableTarget:
     ):
         session = mocker.MagicMock()
         session.catalog.tableExists.return_value = False
-
+        tableTargetConfig.test_target_schema = (
+            "QA_" + tableTargetConfig.test_target_schema
+        )
         target = DeltaTableTarget(
             harness_job_config=harnessConfig,
             snapshot_config=snapshotConfig,
@@ -134,7 +137,7 @@ class TestTableTarget:
             session=session,
         )
 
-        target.setup_test_target()
+        target.setupDataForEnv(EnvironmentEnum.QA)
 
         assert target.session.catalog.tableExists.call_count == 1
         assert target.session.sql.call_count == 1

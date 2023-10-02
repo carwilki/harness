@@ -1,12 +1,16 @@
 from uuid import uuid4
 
 from pyspark.sql import DataFrame, SparkSession
+from harness.config.EnvConfig import EnvConfig
+from harness.config.EnvironmentEnum import EnvironmentEnum
 
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
+from harness.manager.HarnessJobManagerEnvironment import HarnessJobManagerEnvironment
 from harness.target.AbstractTarget import AbstractTarget
 from harness.target.TableTargetConfig import TableTargetConfig
 from harness.utils.logger import getLogger
+from harness.utils.schema import stripPrefix
 
 
 class DeltaTableTarget(AbstractTarget):
@@ -39,6 +43,7 @@ class DeltaTableTarget(AbstractTarget):
         )
         self.logger = getLogger()
         self.table_config = table_config
+        self.env_config: EnvConfig = HarnessJobManagerEnvironment.get_config()
         if self.table_config.snapshot_target_schema is None:
             raise Exception("Schema name is required")
 
@@ -68,29 +73,32 @@ class DeltaTableTarget(AbstractTarget):
             self.session.sql(f"truncate table {table}")
             self.session.sql(f"insert into {table} select * from {temptable}")
 
-    def setup_dev_target(self):
+    def getTargetSchemaForEnv(self, env: EnvironmentEnum) -> str:
         """
-        Sets up the target table for development.
+        Gets the target schema for the given environment.
         """
-        catalog = self.session.catalog
-        ts = self.table_config.dev_target_schema
-        tt = self.table_config.dev_target_table
-        ss = self.table_config.snapshot_target_schema
-        st = f"{self.harness_job_config.job_name}_{self.table_config.snapshot_target_table}"
-        self.setup_data(catalog, ts, tt, ss, st)
+        schema = stripPrefix(self.table_config.test_target_schema)
+        if env == EnvironmentEnum.DEV:
+            return f"dev_{schema}"
+        elif env == EnvironmentEnum.QA:
+            return f"qa_{schema}"
+        elif env == EnvironmentEnum.PROD:
+            return schema
+        else:
+            raise Exception("Invalid environment")
 
-    def setup_test_target(self):
+    def setupDataForEnv(self, env: EnvironmentEnum):
         """
         Sets up the target table for testing.
         """
         catalog = self.session.catalog
-        ts = self.table_config.test_target_schema
+        ts = self.getTargetSchemaForEnv(env)
         tt = self.table_config.test_target_table
         ss = self.table_config.snapshot_target_schema
         st = f"{self.harness_job_config.job_name}_{self.table_config.snapshot_target_table}"
-        self.setup_data(catalog, ts, tt, ss, st)
+        self._setupData(catalog, ts, tt, ss, st)
 
-    def setup_data(self, catalog, ts: str, tt: str, ss: str, st: str):
+    def _setupData(self, catalog, ts: str, tt: str, ss: str, st: str):
         """
             performs the setup opertations to configure a table with new data for test or development.
         Args:

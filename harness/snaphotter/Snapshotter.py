@@ -1,10 +1,9 @@
 from harness.config.SnapshotConfig import SnapshotConfig
+from harness.config.EnvironmentEnum import EnvironmentEnum
 from harness.snaphotter.AbstractSnapshotter import AbstractSnapshotter
 from harness.sources.AbstractSource import AbstractSource
 from harness.target.AbstractTarget import AbstractTarget
 from harness.utils.logger import getLogger
-from harness.validator.DataFrameValidator import DataFrameValidator
-from harness.validator.DataFrameValidatorReport import DataFrameValidatorReport
 
 
 class Snapshotter(AbstractSnapshotter):
@@ -18,7 +17,7 @@ class Snapshotter(AbstractSnapshotter):
         super().__init__(config=config, source=source, target=target)
         self._logger = getLogger()
 
-    def setupTestData(self):
+    def setupTestDataForEnv(self, env: EnvironmentEnum) -> None:
         """
             sets up data for environment
         Raises:
@@ -26,13 +25,13 @@ class Snapshotter(AbstractSnapshotter):
         """
 
         if self.config.enabled:
-            if self.target.snapshot_config.version != 2:
+            if self.target.snapshot_config.version != 2: 
                 raise ValueError("There Must be a version 2 of the snapshot")
 
             self._logger.debug(
                 f"Setting up test data for snapshotter {self.config.name}"
             )
-            self.target.setup_test_target()
+            self.target.setupDataForEnv(env)
         else:
             self._logger.debug(
                 f"Skipping setupTestData for snapshotter {self.config.name}:Not Enabled"

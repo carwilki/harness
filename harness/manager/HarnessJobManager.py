@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from pyspark.sql import SparkSession
+from harness.config.EnvironmentEnum import EnvironmentEnum
 
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.manager.HarnessJobManagerMetaData import HarnessJobManagerMetaData
@@ -68,7 +69,7 @@ class HarnessJobManager:
             else:
                 self.snapshoters[str(uuid4())] = snapshotter
 
-    def setupTestData(self):
+    def setupTestData(self, env: EnvironmentEnum | None = None):
         """
         Sets up the test data for the sources
         loops throught the snapshots and call the
@@ -76,7 +77,7 @@ class HarnessJobManager:
         if its not an input and v2 if it is an input.
         """
         for snapshot in self.snapshoters.values():
-            snapshot.setupTestData()
+            snapshot.setupTestDataForEnv(env)
 
     def snapshot(self):
         """

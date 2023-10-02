@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from pyspark.sql import DataFrame, SparkSession
+from harness.config.EnvironmentEnum import EnvironmentEnum
 
 from harness.config.HarnessJobConfig import HarnessJobConfig
 from harness.config.SnapshotConfig import SnapshotConfig
@@ -40,16 +41,9 @@ class AbstractTarget(ABC):
         pass
 
     @abstractmethod
-    def setup_test_target(self):
+    def setupDataForEnv(self, env: EnvironmentEnum):
         """
         Abstract method to set up the target for testing.
-        """
-        pass
-
-    @abstractmethod
-    def setup_dev_target(self):
-        """
-        Abstract method to set up the target for development.
         """
         pass
 
