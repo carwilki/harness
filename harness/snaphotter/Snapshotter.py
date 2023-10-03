@@ -19,11 +19,13 @@ class Snapshotter(AbstractSnapshotter):
 
     def setupTestDataForEnv(self, env: EnvironmentEnum) -> None:
         """
-            sets up data for environment
-        Raises:
-            ValueError: will be raised if the snapshotter version is not 2
-        """
+            sets up the test data for the given environment.
+        Args:
+            env (EnvironmentEnum): environment that the data should be moved into.
 
+        Raises:
+            ValueError: Raises an exception if the version of the snapshot is not 2.
+        """
         if self.config.enabled:
             if self.target.snapshot_config.version != 2: 
                 raise ValueError("There Must be a version 2 of the snapshot")

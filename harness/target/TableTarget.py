@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql import DataFrame, SparkSession, Catalog
 from harness.config.EnvConfig import EnvConfig
 from harness.config.EnvironmentEnum import EnvironmentEnum
 
@@ -77,7 +77,7 @@ class DeltaTableTarget(AbstractTarget):
         """
         Gets the target schema for the given environment.
         """
-        #TODO: this is PetsMart specific implementation. Should be refactored to be generalized.
+        # TODO: this is PetsMart specific implementation. Should be refactored to be generalized.
         schema = stripPrefix(self.table_config.test_target_schema)
         if env == EnvironmentEnum.DEV:
             return f"dev_{schema}"
@@ -99,35 +99,38 @@ class DeltaTableTarget(AbstractTarget):
         st = f"{self.harness_job_config.job_name}_{self.table_config.snapshot_target_table}"
         self._setupData(catalog, ts, tt, ss, st)
 
-    def _setupData(self, catalog, ts: str, tt: str, ss: str, st: str):
+    def _setupData(self, catalog: Catalog, ts: str, tt: str, ss: str, st: str):
         """
             performs the setup opertations to configure a table with new data for test or development.
         Args:
-            catalog (_type_): _description_
+            catalog (Catalog): catalog to use to look up if the schema or table exists
             ts : the schema to put the data into
             tt : the table to put the data into
             ss : the source schema from the testing data database where the source data is stored
             st : the source table from the testing data database where the source data is stored
         """
-        if catalog.tableExists(
-            f"{ts}.{tt}"
-        ):
-            self.session.sql(
-                f"truncate table {ts}.{tt}"
-            )
+        if catalog.tableExists(f"{ts}.{tt}"):
+            query = f"truncate table {ts}.{tt}"
+            self.logger.debug("executing truncate table")
+            self.logger.debug(query)
+            self.session.sql(query)
+
             if self.snapshot_config.isInput:
-                self.session.sql(f"insert into {ts}.{tt} select * from {ss}.{st}_V2")
+                query = f"insert into {ts}.{tt} select * from {ss}.{st}_V2"
             else:
-                self.session.sql(f"insert into {ts}.{tt} select * from {ss}.{st}_V1")
+                query = f"insert into {ts}.{tt} select * from {ss}.{st}_V1"
+
+            self.logger.debug("executing insert into table")
+            self.logger.debug(query)
+            self.session.sql(query)
         else:
             if self.snapshot_config.isInput:
-                self.session.sql(
-                    f"create table {ts}.{tt} as select * from {ss}.{st}_V2"
-                )
+                query = f"create table {ts}.{tt} as select * from {ss}.{st}_V2"
             else:
-                self.session.sql(
-                    f"create table {ts}.{tt} as select * from {ss}.{st}_V1"
-                )
+                query = f"create table {ts}.{tt} as select * from {ss}.{st}_V1"
+            self.logger.debug("executing create table")
+            self.logger.debug(query)
+            self.session.sql(query)
 
     def destroy(self):
         """destroys all of the source data. does not delete the target table(s)"""
