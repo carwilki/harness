@@ -45,4 +45,3 @@ class EnvConfig(BaseModel):
     databricks_jdbc_pat: Optional[str] = None
     dev_env_prefix: Optional[str] = "dev_"
     dev_env_suffix: Optional[str] = None
-    

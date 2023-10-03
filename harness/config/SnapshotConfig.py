@@ -38,10 +38,14 @@ class SnapshotConfig(BaseModel):
     target: TableTargetConfig = None
     source: JDBCSourceConfig = None
     version: int = 0
+    # TODO: this is PetsMart specific implementation. Should be refactored to be generalized
+    # and replaces with an enum for multiple types of tables.
     isInput: bool | None = False
+    # TODO: this should be removed and put into a validation manager
     validated: bool = False
     validation_date: Optional[datetime] = None
     enabled: bool = True
+    # TODO: this should be removed and put into a validation manager
     snapshot_report: Optional[str] = None
 
     @classmethod

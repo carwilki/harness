@@ -77,6 +77,7 @@ class DeltaTableTarget(AbstractTarget):
         """
         Gets the target schema for the given environment.
         """
+        #TODO: this is PetsMart specific implementation. Should be refactored to be generalized.
         schema = stripPrefix(self.table_config.test_target_schema)
         if env == EnvironmentEnum.DEV:
             return f"dev_{schema}"
@@ -109,10 +110,10 @@ class DeltaTableTarget(AbstractTarget):
             st : the source table from the testing data database where the source data is stored
         """
         if catalog.tableExists(
-            f"{self.table_config.test_target_schema}.{self.table_config.test_target_table}"
+            f"{ts}.{tt}"
         ):
             self.session.sql(
-                f"truncate table {self.table_config.test_target_schema}.{self.table_config.test_target_table}"
+                f"truncate table {ts}.{tt}"
             )
             if self.snapshot_config.isInput:
                 self.session.sql(f"insert into {ts}.{tt} select * from {ss}.{st}_V2")
