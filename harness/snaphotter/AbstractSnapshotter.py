@@ -13,7 +13,7 @@ class AbstractSnapshotter(abc.ABC):
 
     Attributes:
         config (SnapshotConfig): The snapshot configuration object.
-    """
+    """    
 
     def __init__(
         self, config: SnapshotConfig, source: AbstractSource, target: AbstractTarget

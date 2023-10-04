@@ -17,6 +17,8 @@ datacompy = { version = "^0.10.1", extras = ["spark"] }
 pyspark = "3.4.0"
 delta-spark = "2.4.0"
 
+
+
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.3.1"
 nutter = "^0.1.35"
@@ -30,6 +32,8 @@ pylint = "^2.17.4"
 graphviz = "^0.20.1"
 flake8 = "^6.0.0"
 pytest-freezegun = "^0.4.2"
+sphinx = "^7.2.6"
+sphinx-rtd-theme = "^1.3.0"
 
 [tool.pytest.ini_options]
 pythonpath = [".","harness","tests"]

@@ -90,12 +90,25 @@ class HarnessApi:
         Returns:
             Optional[HarnessJobManager]: may return None if the given JSON string is invalid.
         """
+
         config = HarnessJobConfig.from_json(json)
         return self.createNewHarnessJob(config, self._spark)
 
     def createHarnessJobFromCSV(
         self, id: str, name: str, path: str, sourceType: SourceTypeEnum
     ) -> Optional[HarnessJobManager]:
+        """
+            creates a new HarnessJobManager object from the given CSV file.
+        Args:
+            id (str): the id of the HarnessJobManager object to create.
+            name (str): the name of the HarnessJobManager object to create.
+            path (str): the path to the CSV file that describes the HarnessJobManager object to create.
+            sourceType (SourceTypeEnum): the type of source to use for the HarnessJobManager object to create.
+
+        Returns:
+            Optional[HarnessJobManager]: may return None if the given CSV file is invalid.
+        """
+        
         # TODO: need to refactor this to a helper class.
         with open(path, "r") as file:
             tableList = csv.DictReader(file)

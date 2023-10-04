@@ -26,8 +26,9 @@ class Snapshotter(AbstractSnapshotter):
         Raises:
             ValueError: Raises an exception if the version of the snapshot is not 2.
         """
+        
         if self.config.enabled:
-            if self.target.snapshot_config.version != 2: 
+            if self.target.snapshot_config.version != 2:
                 raise ValueError("There Must be a version 2 of the snapshot")
 
             self._logger.debug(
