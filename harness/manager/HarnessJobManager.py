@@ -76,6 +76,8 @@ class HarnessJobManager:
         setup test data method for each snapshot. this moves v1 to the refine table
         if its not an input and v2 if it is an input.
         """
+        if env is None:
+            env = EnvironmentEnum.QA
         for snapshot in self.snapshoters.values():
             snapshot.setupTestDataForEnv(env)
 
