@@ -1,3 +1,5 @@
+import asyncio
+import concurrent.futures
 from uuid import uuid4
 
 from pyspark.sql import SparkSession
@@ -30,7 +32,7 @@ class HarnessJobManager:
         self._metadataManager: HarnessJobManagerMetaData = HarnessJobManagerMetaData(
             session
         )
-        self.snapshoters: dict[str, Snapshotter] = {}
+        self.snapshotters: dict[str, Snapshotter] = {}
         self._loadExistingMetaDataIfExists()
         # this will overwrite any existing inputs if there is an existing
         # job config
@@ -65,9 +67,9 @@ class HarnessJobManager:
                 harness_config=self.config, snapshot_config=source, session=self.session
             )
             if source.name is not None:
-                self.snapshoters[source.name] = snapshotter
+                self.snapshotters[source.name] = snapshotter
             else:
-                self.snapshoters[str(uuid4())] = snapshotter
+                self.snapshotters[str(uuid4())] = snapshotter
 
     def setupTestData(self, env: EnvironmentEnum | None = None):
         """
@@ -78,30 +80,61 @@ class HarnessJobManager:
         """
         if env is None:
             env = EnvironmentEnum.QA
-        for snapshot in self.snapshoters.values():
+        for snapshot in self.snapshotters.values():
             snapshot.setupTestDataForEnv(env)
 
-    def snapshot(self):
+    def snapshot(self, is_async: bool = False):
         """
         Takes a snapshot of the data sources and inputs.
         """
         if self.config.version <= 0:
             self.config.version = 0
             self._logger.debug("Taking snapshot V1...")
-            self._snapshot(self.snapshoters)
+            self._snapshot_async(self.snapshotters, is_async)
             self._logger.debug("V1 snapshot completed.")
             self.config.version = 1
             self._metadataManager.update(self.config)
         elif self.config.version == 1:
             self._logger.debug("Taking snapshot V2...")
-            self._snapshot(self.snapshoters)
+            self._snapshot_async(self.snapshotters, is_async)
             self._logger.debug("V2 Snapshot completed.")
             self.config.version = 2
             self._metadataManager.update(self.config)
         else:
             self._logger.debug("Snapshot already completed, skipping...")
 
-    def _snapshot(self, snapshotters: dict[str, Snapshotter]):
+    def _snapshot_async(self, is_async: bool = False):
+        num_workers = None
+        if is_async:
+            num_workers = 24
+        else:
+            num_workers = 1
+
+        with concurrent.futures.ProcessPoolExecutor(
+            max_workers=num_workers
+        ) as executor:
+            futures = [
+                executor.submit(self._snapshot, snapshotter)
+                for snapshotter in self.snapshotters.values()
+            ]
+
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                future.result()
+            except Exception as exc:
+                self._logger.error(f"Error while snapshotting: {exc}")
+
+    def _snapshot(self, snapshotter: Snapshotter):
+        if snapshotter.config.version == self.config.version:
+            snapshotter.snapshot()
+            self._metadataManager.update(self.config)
+            self._logger.debug(f"Snapshotted {snapshotter.config.name}")
+        else:
+            self._logger.info(
+                f"skipping snapshot:{snapshotter.config.name} already taken"
+            )
+
+    def _snapshot_all(self, snapshotters: dict[str, Snapshotter]):
         """
             internal method to take a snapshot of the data sources and inputs.
         Args:
@@ -124,7 +157,7 @@ class HarnessJobManager:
             snapshotName (str): The name of the snapshot
             schema (str): The schema of the snapshot
         """
-        snapshotter = self.snapshoters[snapshotName]
+        snapshotter = self.snapshotters[snapshotName]
 
         if snapshotter is not None:
             snapshotter.updateTestTargetSchema(schema)
@@ -139,7 +172,7 @@ class HarnessJobManager:
             snapshotName (str): The name of the snapshot
             table (str): The table of the snapshot
         """
-        snapshotter = self.snapshoters[snapshotName]
+        snapshotter = self.snapshotters[snapshotName]
 
         if snapshotter is not None:
             snapshotter.updateTestTargetTable(table)
@@ -154,7 +187,7 @@ class HarnessJobManager:
             snapshotName (str): The name of the snapshot
             schema (str): The schema of the snapshot
         """
-        snapshotter = self.snapshoters[snapshotName]
+        snapshotter = self.snapshotters[snapshotName]
 
         if snapshotter is not None:
             snapshotter.updateDevTargetSchema(schema)
@@ -169,7 +202,7 @@ class HarnessJobManager:
             snapshotName (str): The name of the snapshot
             table (str): The table of the snapshot
         """
-        snapshotter = self.snapshoters[snapshotName]
+        snapshotter = self.snapshotters[snapshotName]
 
         if snapshotter is not None:
             snapshotter.updateDevTargetTable(table)
@@ -184,7 +217,7 @@ class HarnessJobManager:
             snapshotName (str): The name of the snapshot
             schema (str): The schema of the snapshot
         """
-        snapshotter = self.snapshoters[snapshotName]
+        snapshotter = self.snapshotters[snapshotName]
 
         if snapshotter is not None:
             snapshotter.updateSnapshotSchema(schema)
@@ -199,7 +232,7 @@ class HarnessJobManager:
             snapshotName (str): The name of the snapshot
             table (str): The table of the snapshot
         """
-        snapshotter = self.snapshoters[snapshotName]
+        snapshotter = self.snapshotters[snapshotName]
 
         if snapshotter is not None:
             snapshotter.updateSnapshotTable(table)
@@ -213,7 +246,7 @@ class HarnessJobManager:
         Args:
             snapshotName (str): The name of the snapshot
         """
-        snapshotter = self.snapshoters[snapshotName]
+        snapshotter = self.snapshotters[snapshotName]
 
         if snapshotter is not None:
             snapshotter.disable()
@@ -227,7 +260,7 @@ class HarnessJobManager:
         Args:
             snapshotName (str): The name of the snapshot
         """
-        snapshotter = self.snapshoters[snapshotName]
+        snapshotter = self.snapshotters[snapshotName]
 
         if snapshotter is not None:
             snapshotter.enable()
@@ -258,7 +291,7 @@ class HarnessJobManager:
         Returns:
             str: The table name for the snapshot
         """
-        ss = self.snapshoters.get(snapshotName)
+        ss = self.snapshotters.get(snapshotName)
         if ss is not None:
             return ss.target.getSnapshotTableName(version)
 
@@ -275,7 +308,7 @@ class HarnessJobManager:
         Destroys the job manager
         """
         self._logger.debug("Destroying metadata...")
-        for snapshotter in self.snapshoters.values():
+        for snapshotter in self.snapshotters.values():
             snapshotter.destroy()
 
         self._metadataManager.delete(self.config.job_id)

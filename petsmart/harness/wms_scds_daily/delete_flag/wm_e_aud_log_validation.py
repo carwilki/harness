@@ -32,7 +32,7 @@ env = EnvConfig(
 api = HarnessApi(env, spark)
 snapshot_name = "WM_E_AUD_LOG"
 hjm = api.getHarnessJobById("01298d4f-934f-439a-b80d-251987f5422")
-snapshotter = hjm.snapshoters.get(snapshot_name)
+snapshotter = hjm.snapshotters.get(snapshot_name)
 ret = validate_pets_with_pre_table(snapshot=snapshotter, spark=spark)
 snapshotter.config.snapshot_report = ret
 print(ret)

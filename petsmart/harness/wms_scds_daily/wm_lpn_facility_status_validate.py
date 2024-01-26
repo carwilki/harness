@@ -32,7 +32,7 @@ env = EnvConfig(
 api = HarnessApi(env, spark)
 snapshot_name = "WM_LPN_FACILITY_STATUS"
 hjm = api.getHarnessJobById("01298d4f-934f-439a-b80d-251987f5422")
-snapshotter = hjm.snapshoters.get(snapshot_name)
+snapshotter = hjm.snapshotters.get(snapshot_name)
 pre_overide = ["LOCATION_ID", "LPN_FACILITY_STATUS", "INBOUND_OUTBOUND_INDICATOR"]
 ret = validate_pets_with_pre_table(
     snapshot=snapshotter, spark=spark, pre_keys_overide=pre_overide

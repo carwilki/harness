@@ -28,7 +28,7 @@ env = EnvConfig(
 job_id = "01298d4f-934f-439a-b80d-251987f5422"
 api = HarnessApi(env, spark)
 hjm = api.getHarnessJobById(job_id)
-for snapshot in hjm.snapshoters.values():
+for snapshot in hjm.snapshotters.values():
     ret = ""
     try:
         ret = validate_pets_with_pre_table(snapshot=snapshot, spark=spark)

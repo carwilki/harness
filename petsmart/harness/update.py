@@ -28,5 +28,5 @@ job_id = 'wf_workforce_annalyitcs'
 # hjm.snapshot()
 
 hjm = api.getHarnessJobById(job_id)
-snapshotter = hjm.snapshoters.get('WFA_TSCHD')
+snapshotter = hjm.snapshotters.get('WFA_TSCHD')
 hjm

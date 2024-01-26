@@ -26,6 +26,6 @@ api = HarnessApi(env, spark)
 hjm = api.getHarnessJobById(job_id)
 
 with open(f"/dbfs/nz_validtion_report/{hjm.config.job_name}_{datetime.now().strftime('%d-%b-%Y-%H-%M')}.txt", "w") as f:
-    for snapshot in hjm.snapshoters.values():
+    for snapshot in hjm.snapshotters.values():
         if snapshot.config.snapshot_report is not None:
             f.write(snapshot.config.snapshot_report)

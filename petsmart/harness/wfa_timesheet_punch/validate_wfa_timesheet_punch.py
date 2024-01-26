@@ -24,7 +24,7 @@ job_id = "wf_WFA_TIME_SHEET_PUNCH"
 api = HarnessApi(env, spark)
 hjm = api.getHarnessJobById(job_id)
 
-for snapshot in hjm.snapshoters.values():
+for snapshot in hjm.snapshotters.values():
     try:
         ret = snapshot.validateResults()
         if ret is not None:

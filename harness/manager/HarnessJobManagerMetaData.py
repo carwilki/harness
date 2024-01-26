@@ -32,7 +32,6 @@ class HarnessJobManagerMetaData:
             Optional[HarnessJobConfig]: may return None if the job is not found
         """
         manager = HarnessJobManagerMetaData(spark)
-        manager = HarnessJobManagerMetaData(spark)
         return manager.get(id)
 
     def create_metadata_table(self):
