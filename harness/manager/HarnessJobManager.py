@@ -104,12 +104,7 @@ class HarnessJobManager:
             self._logger.debug("Snapshot already completed, skipping...")
 
     def _snapshot_async(self, is_async: bool = False):
-        num_workers = None
-        if is_async:
-            num_workers = 24
-        else:
-            num_workers = 1
-
+        num_workers = 4
         with concurrent.futures.ProcessPoolExecutor(
             max_workers=num_workers
         ) as executor:
